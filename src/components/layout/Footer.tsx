@@ -131,10 +131,6 @@ export function Footer() {
             <Link href="/tentang-kami#dasar-iman" className="hover:underline">
               {t.footer.statementOfFaith}
             </Link>
-            <span>&bull;</span>
-            <Link href="/admin/login" className="hover:underline opacity-60 hover:opacity-100">
-              Admin Portal
-            </Link>
           </div>
         </div>
       </div>

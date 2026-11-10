@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -24,7 +25,29 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
+  const [featuredArticles, setFeaturedArticles] = React.useState<any[]>([]);
+  const [upcomingEvents, setUpcomingEvents] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    fetch("/api/articles?limit=2&status=PUBLISHED")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setFeaturedArticles(data.data);
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/events?limit=2&status=PUBLISHED")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.success && Array.isArray(data.data) && data.data.length > 0) {
+          setUpcomingEvents(data.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <>
@@ -392,47 +415,80 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Left Column: 2 Featured Articles */}
+              {/* Left Column: Featured Articles */}
               <div className="lg:col-span-7 space-y-4">
-                <Card className="p-6 hover:border-primary/40 transition-colors shadow-warm-sm group cursor-pointer">
-                  <div className="flex flex-col sm:flex-row gap-5 items-start">
-                    <div className="size-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
-                      <Flame className="size-7" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="primarySoft">Refleksi Pemuridan</Badge>
-                        <span className="text-xs text-muted-foreground">5 min read</span>
-                      </div>
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                        Mengapa pemuridan harus hidup di tengah misi?
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Refleksi mendalam tentang perjalanan murid Kristus yang tidak boleh berhenti pada zona nyaman komunitas internal.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
+                {featuredArticles.length > 0 ? (
+                  featuredArticles.map((art) => {
+                    const displayTitle = locale === "en" && art.titleEn ? art.titleEn : art.title;
+                    const displayExcerpt = locale === "en" && art.excerptEn ? art.excerptEn : art.excerpt;
 
-                <Card className="p-6 hover:border-accent/40 transition-colors shadow-warm-sm group cursor-pointer">
-                  <div className="flex flex-col sm:flex-row gap-5 items-start">
-                    <div className="size-14 rounded-2xl bg-accent-50 text-accent flex items-center justify-center shrink-0">
-                      <MapPin className="size-7" />
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <Badge variant="amber">Kabar Ladang</Badge>
-                        <span className="text-xs text-muted-foreground">Banten & Ternate</span>
+                    return (
+                      <Link href="/artikel" key={art.id} className="block">
+                        <Card className="p-6 hover:border-primary/40 transition-colors shadow-warm-sm group cursor-pointer">
+                          <div className="flex flex-col sm:flex-row gap-5 items-start">
+                            <div className="size-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                              <Flame className="size-7" />
+                            </div>
+                            <div className="space-y-2">
+                              <div className="flex items-center gap-2">
+                                <Badge variant="primarySoft">{art.category}</Badge>
+                                <span className="text-xs text-muted-foreground">5 min read</span>
+                              </div>
+                              <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                                {displayTitle}
+                              </h3>
+                              <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
+                                {displayExcerpt}
+                              </p>
+                            </div>
+                          </div>
+                        </Card>
+                      </Link>
+                    );
+                  })
+                ) : (
+                  <>
+                    <Card className="p-6 hover:border-primary/40 transition-colors shadow-warm-sm group cursor-pointer">
+                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                        <div className="size-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                          <Flame className="size-7" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="primarySoft">Refleksi Pemuridan</Badge>
+                            <span className="text-xs text-muted-foreground">5 min read</span>
+                          </div>
+                          <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                            Mengapa pemuridan harus hidup di tengah misi?
+                          </h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Refleksi mendalam tentang perjalanan murid Kristus yang tidak boleh berhenti pada zona nyaman komunitas internal.
+                          </p>
+                        </div>
                       </div>
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                        Melihat api perintisan kembali menyala di Kota Rempah
-                      </h3>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        Catatan perjalanan tim pelayan ESM saat menyusuri persekutuan mahasiswa di Maluku Utara.
-                      </p>
-                    </div>
-                  </div>
-                </Card>
+                    </Card>
+
+                    <Card className="p-6 hover:border-accent/40 transition-colors shadow-warm-sm group cursor-pointer">
+                      <div className="flex flex-col sm:flex-row gap-5 items-start">
+                        <div className="size-14 rounded-2xl bg-accent-50 text-accent flex items-center justify-center shrink-0">
+                          <MapPin className="size-7" />
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <Badge variant="amber">Kabar Ladang</Badge>
+                            <span className="text-xs text-muted-foreground">Banten & Ternate</span>
+                          </div>
+                          <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                            Melihat api perintisan kembali menyala di Kota Rempah
+                          </h3>
+                          <p className="text-xs text-muted-foreground leading-relaxed">
+                            Catatan perjalanan tim pelayan ESM saat menyusuri persekutuan mahasiswa di Maluku Utara.
+                          </p>
+                        </div>
+                      </div>
+                    </Card>
+                  </>
+                )}
               </div>
 
               {/* Right Column: Mini Agenda Schedule Card */}
@@ -447,27 +503,56 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-3.5">
-                    <div className="flex items-start gap-3.5 p-3 rounded-xl bg-card border border-border">
-                      <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-primary text-white shrink-0 font-bold">
-                        <span className="text-[10px] uppercase tracking-wider">Agt</span>
-                        <span className="text-base leading-none">23</span>
-                      </div>
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground block">Annual Movement Prayer</span>
-                        <span className="text-[11px] text-muted-foreground block">Doa serentak lintas komunitas (Online Zoom)</span>
-                      </div>
-                    </div>
+                    {upcomingEvents.length > 0 ? (
+                      upcomingEvents.map((ev, idx) => {
+                        const dateObj = new Date(ev.startDate);
+                        const month = dateObj.toLocaleDateString("id-ID", { month: "short" });
+                        const day = dateObj.toLocaleDateString("id-ID", { day: "2-digit" });
+                        const displayTitle = locale === "en" && ev.titleEn ? ev.titleEn : ev.title;
+                        const displayLoc = locale === "en" && ev.locationEn ? ev.locationEn : ev.location;
 
-                    <div className="flex items-start gap-3.5 p-3 rounded-xl bg-card border border-border">
-                      <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-accent text-accent-foreground shrink-0 font-bold">
-                        <span className="text-[10px] uppercase tracking-wider">Sep</span>
-                        <span className="text-base leading-none">06</span>
-                      </div>
-                      <div className="space-y-0.5">
-                        <span className="text-xs font-bold text-foreground block">Hari Mitra & Sahabat ESM</span>
-                        <span className="text-[11px] text-muted-foreground block">Temu keakraban & warta perkembangan misi (Serang)</span>
-                      </div>
-                    </div>
+                        return (
+                          <div key={ev.id} className="flex items-start gap-3.5 p-3 rounded-xl bg-card border border-border">
+                            <div className={`flex flex-col items-center justify-center size-12 rounded-lg ${
+                              idx === 0 ? "bg-primary text-white" : "bg-accent text-accent-foreground"
+                            } shrink-0 font-bold`}>
+                              <span className="text-[10px] uppercase tracking-wider">{month}</span>
+                              <span className="text-base leading-none">{day}</span>
+                            </div>
+                            <div className="space-y-0.5">
+                              <span className="text-xs font-bold text-foreground block">{displayTitle}</span>
+                              <span className="text-[11px] text-muted-foreground block line-clamp-1">
+                                {displayLoc || ev.description}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <>
+                        <div className="flex items-start gap-3.5 p-3 rounded-xl bg-card border border-border">
+                          <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-primary text-white shrink-0 font-bold">
+                            <span className="text-[10px] uppercase tracking-wider">Agt</span>
+                            <span className="text-base leading-none">23</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-xs font-bold text-foreground block">Annual Movement Prayer</span>
+                            <span className="text-[11px] text-muted-foreground block">Doa serentak lintas komunitas (Online Zoom)</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-3.5 p-3 rounded-xl bg-card border border-border">
+                          <div className="flex flex-col items-center justify-center size-12 rounded-lg bg-accent text-accent-foreground shrink-0 font-bold">
+                            <span className="text-[10px] uppercase tracking-wider">Sep</span>
+                            <span className="text-base leading-none">06</span>
+                          </div>
+                          <div className="space-y-0.5">
+                            <span className="text-xs font-bold text-foreground block">Hari Mitra & Sahabat ESM</span>
+                            <span className="text-[11px] text-muted-foreground block">Temu keakraban & warta perkembangan misi (Serang)</span>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <Button asChild variant="default" className="w-full justify-center rounded-xl text-xs font-bold">

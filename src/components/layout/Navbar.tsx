@@ -9,7 +9,6 @@ import {
   X,
   ChevronDown,
   Heart,
-  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/context/LanguageContext";
@@ -195,16 +194,6 @@ export function Navbar() {
               <span>{t.nav.partnerCta}</span>
             </Link>
           </Button>
-
-          {/* Superadmin Portal Shortcut */}
-          <Link
-            href="/admin"
-            className="flex items-center gap-1 text-xs font-bold text-muted-foreground hover:text-primary transition-colors px-2.5 py-1.5 rounded-full border border-border/80 bg-card hover:bg-canvas shadow-warm-sm"
-            title="Portal Superadmin ESM"
-          >
-            <ShieldCheck className="size-3.5 text-primary" />
-            <span>Admin</span>
-          </Link>
         </div>
 
         {/* Mobile Hamburger Toggle */}
@@ -288,16 +277,6 @@ export function Navbar() {
                 <Link href="/kemitraan#doa" onClick={() => setMobileMenuOpen(false)}>
                   <Heart className="size-3.5 text-primary mr-1" />
                   {t.nav.prayerRequest}
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="ghost"
-                className="w-full justify-center rounded-xl text-xs text-muted-foreground"
-              >
-                <Link href="/admin" onClick={() => setMobileMenuOpen(false)}>
-                  <ShieldCheck className="size-3.5 text-primary mr-1" />
-                  <span>Portal Superadmin</span>
                 </Link>
               </Button>
             </div>
