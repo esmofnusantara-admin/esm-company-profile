@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:studio": "prisma studio",
-    "seed": "tsx prisma/seed.ts"
+    "seed": "tsx prisma/seed.ts",
+    "git:auth": "powershell -ExecutionPolicy Bypass -File ./scripts/switch-git-account.ps1"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

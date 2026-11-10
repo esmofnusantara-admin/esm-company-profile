@@ -26,6 +26,9 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+git-credentials.env
+*.credentials
+.git-credentials
 
 # cache & mcp
 .playwright-mcp/
