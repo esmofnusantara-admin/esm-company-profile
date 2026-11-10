@@ -21,14 +21,25 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
+import { submitDonation } from "@/actions/donation";
+
 export default function KemitraanPage() {
   const { t, locale } = useLanguage();
   const k = t.partnershipPage;
 
   const [copied, setCopied] = React.useState(false);
-  const [donationType, setDonationType] = React.useState<"SEKALI" | "BULANAN">("BULANAN");
+  const [donationType, setDonationType] = React.useState<"SEKALI_BERI" | "MITRA_BULANAN">("MITRA_BULANAN");
   const [selectedNominal, setSelectedNominal] = React.useState("100.000");
   const [customNominal, setCustomNominal] = React.useState("");
+
+  // Form states
+  const [donorName, setDonorName] = React.useState("");
+  const [donorPhone, setDonorPhone] = React.useState("");
+  const [donorEmail, setDonorEmail] = React.useState("");
+  const [message, setMessage] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitSuccess, setSubmitSuccess] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const bankAccount = "1234567890";
   const bankName = "Bank Central Asia (BCA)";
@@ -38,6 +49,44 @@ export default function KemitraanPage() {
     navigator.clipboard.writeText(bankAccount);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage(null);
+
+    const rawNominal = customNominal
+      ? customNominal.replace(/[^0-9]/g, "")
+      : selectedNominal.replace(/[^0-9]/g, "");
+    const amount = parseInt(rawNominal, 10);
+
+    if (!amount || amount < 10000) {
+      setErrorMessage(locale === "en" ? "Minimum donation amount is Rp 10.000" : "Nominal donasi minimal Rp 10.000");
+      setIsSubmitting(false);
+      return;
+    }
+
+    const res = await submitDonation({
+      donorName,
+      donorPhone,
+      donorEmail,
+      amount,
+      type: donationType,
+      message,
+    });
+
+    setIsSubmitting(false);
+
+    if (res.success) {
+      setSubmitSuccess(true);
+      setDonorName("");
+      setDonorPhone("");
+      setDonorEmail("");
+      setMessage("");
+    } else {
+      setErrorMessage(res.error || "Gagal mengirim komitmen donasi");
+    }
   };
 
   return (
@@ -132,100 +181,153 @@ export default function KemitraanPage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Form Input */}
               <div className="lg:col-span-7 rounded-2xl border border-border bg-canvas p-6 sm:p-8 space-y-6 shadow-warm-sm">
-                {/* Tipe Donasi Tabs */}
-                <div className="flex rounded-xl bg-card p-1 border border-border">
-                  <button
-                    type="button"
-                    onClick={() => setDonationType("BULANAN")}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
-                      donationType === "BULANAN"
-                        ? "bg-primary text-white shadow-warm-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {k.monthlyTab}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDonationType("SEKALI")}
-                    className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
-                      donationType === "SEKALI"
-                        ? "bg-primary text-white shadow-warm-sm"
-                        : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {k.oneTimeTab}
-                  </button>
-                </div>
+                {submitSuccess ? (
+                  <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-6 text-center space-y-4">
+                    <div className="size-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
+                      <Check className="size-6" />
+                    </div>
+                    <h3 className="text-lg font-bold text-emerald-900">
+                      {locale === "en" ? "Thank You for Your Commitment!" : "Terima Kasih atas Komitmen Anda!"}
+                    </h3>
+                    <p className="text-xs text-emerald-700 leading-relaxed max-w-md mx-auto">
+                      {locale === "en"
+                        ? "Your partnership commitment has been recorded in our system. May God bless your generosity as we labor together for student discipleship across Indonesia."
+                        : "Komitmen kemitraan Anda telah tercatat langsung di sistem database ESM. Kiranya Tuhan memberkati kesetiaan Anda dalam memajukan pemuridan siswa dan mahasiswa di pelosok Nusantara."}
+                    </p>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSubmitSuccess(false)}
+                      className="rounded-xl text-xs bg-white text-emerald-800 border-emerald-300"
+                    >
+                      {locale === "en" ? "Submit Another Commitment" : "Kirim Komitmen Lainnya"}
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {errorMessage && (
+                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                        {errorMessage}
+                      </div>
+                    )}
 
-                {/* Preset Nominal */}
-                <div className="space-y-2">
-                  <label className="text-xs font-bold text-foreground">{k.amountLabel}</label>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {["50.000", "100.000", "250.000", "500.000", "1.000.000"].map((nom) => (
+                    {/* Tipe Donasi Tabs */}
+                    <div className="flex rounded-xl bg-card p-1 border border-border">
                       <button
-                        key={nom}
                         type="button"
-                        onClick={() => {
-                          setSelectedNominal(nom);
-                          setCustomNominal("");
-                        }}
-                        className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
-                          selectedNominal === nom && !customNominal
-                            ? "border-primary bg-primary-50 text-primary"
-                            : "border-border bg-card text-foreground hover:bg-canvas-subtle"
+                        onClick={() => setDonationType("MITRA_BULANAN")}
+                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
+                          donationType === "MITRA_BULANAN"
+                            ? "bg-primary text-white shadow-warm-sm"
+                            : "text-muted-foreground hover:text-foreground"
                         }`}
                       >
-                        Rp {nom}
+                        {k.monthlyTab}
                       </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Input Formulir Donatur */}
-                <div className="space-y-4">
-                  <div>
-                    <label className="text-xs font-bold text-foreground block mb-1">{k.nameLabel}</label>
-                    <input
-                      type="text"
-                      placeholder={k.namePlaceholder}
-                      className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-bold text-foreground block mb-1">{k.phoneLabel}</label>
-                      <input
-                        type="tel"
-                        placeholder="08xxxxxxxxxx"
-                        className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => setDonationType("SEKALI_BERI")}
+                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
+                          donationType === "SEKALI_BERI"
+                            ? "bg-primary text-white shadow-warm-sm"
+                            : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {k.oneTimeTab}
+                      </button>
                     </div>
-                    <div>
-                      <label className="text-xs font-bold text-foreground block mb-1">{k.emailLabel}</label>
-                      <input
-                        type="email"
-                        placeholder="email@example.com"
-                        className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                      />
+
+                    {/* Preset Nominal */}
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-foreground">{k.amountLabel}</label>
+                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                        {["50.000", "100.000", "250.000", "500.000", "1.000.000"].map((nom) => (
+                          <button
+                            key={nom}
+                            type="button"
+                            onClick={() => {
+                              setSelectedNominal(nom);
+                              setCustomNominal("");
+                            }}
+                            className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
+                              selectedNominal === nom && !customNominal
+                                ? "border-primary bg-primary-50 text-primary"
+                                : "border-border bg-card text-foreground hover:bg-canvas-subtle"
+                            }`}
+                          >
+                            Rp {nom}
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="text-xs font-bold text-foreground block mb-1">{k.messageLabel}</label>
-                    <textarea
-                      rows={3}
-                      placeholder={k.messagePlaceholder}
-                      className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
+                    {/* Input Formulir Donatur */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-xs font-bold text-foreground block mb-1">{k.nameLabel} *</label>
+                        <input
+                          type="text"
+                          required
+                          value={donorName}
+                          onChange={(e) => setDonorName(e.target.value)}
+                          placeholder={k.namePlaceholder}
+                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
 
-                  <Button className="w-full justify-center rounded-xl font-bold text-xs py-3 shadow-warm-sm">
-                    <Send className="size-3.5 mr-2" />
-                    <span>{k.submitBtn}</span>
-                  </Button>
-                </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-foreground block mb-1">{k.phoneLabel} *</label>
+                          <input
+                            type="tel"
+                            required
+                            value={donorPhone}
+                            onChange={(e) => setDonorPhone(e.target.value)}
+                            placeholder="08xxxxxxxxxx"
+                            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-foreground block mb-1">{k.emailLabel}</label>
+                          <input
+                            type="email"
+                            value={donorEmail}
+                            onChange={(e) => setDonorEmail(e.target.value)}
+                            placeholder="email@example.com"
+                            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="text-xs font-bold text-foreground block mb-1">{k.messageLabel}</label>
+                        <textarea
+                          rows={3}
+                          value={message}
+                          onChange={(e) => setMessage(e.target.value)}
+                          placeholder={k.messagePlaceholder}
+                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full justify-center rounded-xl font-bold text-xs py-3 shadow-warm-sm"
+                      >
+                        {isSubmitting ? (
+                          <span>{locale === "en" ? "Submitting..." : "Menyimpan Komitmen..."}</span>
+                        ) : (
+                          <>
+                            <Send className="size-3.5 mr-2" />
+                            <span>{k.submitBtn}</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </form>
+                )}
               </div>
 
               {/* Bank Transfer Info & QRIS Card */}
