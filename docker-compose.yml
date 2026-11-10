@@ -1,0 +1,80 @@
+services:
+  # -------------------------------------------------------------
+  # 1. DATABASE POSTGRESQL PRODUCTION
+  # -------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: esm_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-esm_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-esm_password}
+      POSTGRES_DB: ${POSTGRES_DB:-esm_db}
+    ports:
+      # Port 5433 pada host dipetakan ke 5432 container untuk mencegah konflik port lokal
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      # Data persisten database tidak akan hilang saat container dimatikan/di-rebuild
+      - esm_pgdata:/var/lib/postgresql/data
+    networks:
+      - esm_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-esm_user} -d ${POSTGRES_DB:-esm_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # 2. APLIKASI NEXT.JS 15 (STANDALONE RUNTIME)
+  # -------------------------------------------------------------
+  nextjs:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: esm_nextjs
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-esm_user}:${POSTGRES_PASSWORD:-esm_password}@postgres:5432/${POSTGRES_DB:-esm_db}?schema=public
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
+      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-esm-production-secret-key-32-chars-long}
+      PORT: 3000
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    volumes:
+      # Upload foto/berkas media persisten aman dari restart container
+      - esm_uploads:/app/public/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - esm_network
+
+  # -------------------------------------------------------------
+  # 3. REVERSE PROXY NGINX (WEB SERVER & SSL GATEWAY)
+  # -------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: esm_nginx
+    restart: always
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+      - "${HTTPS_PORT:-8443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - esm_uploads:/var/www/esm/public/uploads:ro
+      - ./nginx/certs:/etc/letsencrypt:ro
+    depends_on:
+      - nextjs
+    networks:
+      - esm_network
+
+networks:
+  esm_network:
+    name: esm_network
+    driver: bridge
+
+volumes:
+  esm_pgdata:
+    name: esm_pgdata
+  esm_uploads:
+    name: esm_uploads

@@ -1,0 +1,158 @@
+[     764ms] [ERROR] Failed to load resource: the server responded with a status of 403 () @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=2-3686&p=f&t=X4vbK240Q5wH1P8U-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=2%3A3686:1
+[     796ms] [LOG] Running frontend commit 4c16b2700385ce7159d1925b880f14e2087bfd61 @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=2-3686&p=f&t=X4vbK240Q5wH1P8U-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=2%3A3686:499
+[    6209ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[    6209ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[   15708ms] [WARNING] Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://marketing.figma.com') does not match the recipient window's origin ('https://www.figma.com'). @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:393
+[   15709ms] [WARNING] Failed to execute 'postMessage' on 'DOMWindow': The target origin provided ('https://marketing.figma.com') does not match the recipient window's origin ('https://www.figma.com'). @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:393
+[   16343ms] [WARNING] pixel already configured. @ https://pixel.byspotify.com/ping.min.js:1
+[   16756ms] [WARNING] Unrecognized feature: 'join-ad-interest-group'. @ https://acdn.adnxs.com/dmp/up/pixie.js:1
+[   60758ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[   60758ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[   62053ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[   62053ms] [ERROR] Cross-Origin-Opener-Policy policy would block the window.closed call. @ https://www.figma.com/webpack-artifacts/assets/request_permissions-c57bde50086b02e0.min.js.br:711
+[   66713ms] [LOG] Running frontend commit 4c16b2700385ce7159d1925b880f14e2087bfd61 @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=2-3686&p=f&t=X4vbK240Q5wH1P8U-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=2%3A3686&fuid=1701251365254610856:568
+[   75783ms] [WARNING] Statsig is not ready to log exposures, will retry in 1 seconds @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   75786ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ https://browser-intake-datadoghq.com/api/v2/rum:1
+[   76066ms] [WARNING] [LaunchDarkly] The waitForInitialization function was called without a timeout specified. In a future version a default timeout will be applied. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   76088ms] [INFO] [LaunchDarkly] LaunchDarkly client initialized @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   76132ms] [INFO] [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   76145ms] [LOG] [import] git: 4c16b2700385ce7159d1925b880f14e2087bfd61, stamp: 044D7BD38A4BC291 @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   76534ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1672
+[   77262ms] [INFO] [PrototypeLib] Booting... (emscripten version 4.0.21) @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   77638ms] [INFO] [GPU] graphicsAPI:"WebGL 2", vendor:"Google Inc. (Intel)", renderer:"ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)" version:"OpenGL ES 2.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))" @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[   83598ms] [WARNING] Origin trial controlled feature not enabled: 'focus-without-user-activation'. @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1807
+[   85629ms] [INFO] [Sprigma] Sprig SDK is ready @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  261547ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :3642
+[  261551ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :3275
+[  261553ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :3275
+[  261554ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :3275
+[  416205ms] [WARNING] [LaunchDarkly] Error on stream connection: {"isTrusted":true}, will continue retrying after 948 milliseconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  416206ms] [INFO] [LaunchDarkly] Closing stream connection @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  416207ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_CLOSED @ https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ:1
+[  417159ms] [INFO] [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  643728ms] [LOG] Running frontend commit 4c16b2700385ce7159d1925b880f14e2087bfd61 @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=134-3&p=f&scaling=min-zoom&content-scaling=fixed:568
+[  647158ms] [WARNING] Statsig is not ready to log exposures, will retry in 1 seconds @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  647202ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ https://browser-intake-datadoghq.com/api/v2/rum:1
+[  647546ms] [WARNING] [LaunchDarkly] The waitForInitialization function was called without a timeout specified. In a future version a default timeout will be applied. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  647558ms] [INFO] [LaunchDarkly] LaunchDarkly client initialized @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  647769ms] [INFO] [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  647781ms] [LOG] [import] git: 4c16b2700385ce7159d1925b880f14e2087bfd61, stamp: 044D7BD38A4BC291 @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  647933ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1672
+[  649251ms] [INFO] [PrototypeLib] Booting... (emscripten version 4.0.21) @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  649600ms] [INFO] [GPU] graphicsAPI:"WebGL 2", vendor:"Google Inc. (Intel)", renderer:"ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)" version:"OpenGL ES 2.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))" @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  651666ms] [WARNING] Origin trial controlled feature not enabled: 'focus-without-user-activation'. @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1807
+[  652784ms] [INFO] [Sprigma] Sprig SDK is ready @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  732155ms] [WARNING] This API is intended only for debugging. Please wait 5 seconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  747752ms] [WARNING] This API is intended only for debugging. Please wait 5 seconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  760767ms] [WARNING] This API is intended only for debugging. Please wait 5 seconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  794474ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794477ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794478ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794479ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794480ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  794481ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ :4
+[  837342ms] [LOG] Running frontend commit 4c16b2700385ce7159d1925b880f14e2087bfd61 @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=134-3&p=f&scaling=width:568
+[  839035ms] [WARNING] Statsig is not ready to log exposures, will retry in 1 seconds @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  839050ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ https://browser-intake-datadoghq.com/api/v2/rum:1
+[  839855ms] [WARNING] [LaunchDarkly] The waitForInitialization function was called without a timeout specified. In a future version a default timeout will be applied. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  839870ms] [INFO] [LaunchDarkly] LaunchDarkly client initialized @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  839927ms] [LOG] [import] git: 4c16b2700385ce7159d1925b880f14e2087bfd61, stamp: 044D7BD38A4BC291 @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  840204ms] [INFO] [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  840297ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1672
+[  841672ms] [INFO] [PrototypeLib] Booting... (emscripten version 4.0.21) @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  841756ms] [INFO] [GPU] graphicsAPI:"WebGL 2", vendor:"Google Inc. (Intel)", renderer:"ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)" version:"OpenGL ES 2.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))" @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  841925ms] [INFO] [Sprigma] Sprig SDK is ready @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  842647ms] [ERROR] Failed to load resource: the server responded with a status of 429 () @ https://events.launchdarkly.com/events/bulk/62e9cfc83c59501226eae584:1
+[  842947ms] [WARNING] Origin trial controlled feature not enabled: 'focus-without-user-activation'. @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1807
+[  843423ms] [ERROR] Failed to load resource: the server responded with a status of 429 () @ https://events.launchdarkly.com/events/bulk/62e9cfc83c59501226eae584:1
+[  843604ms] [ERROR] [LaunchDarkly] Received error 429 for event posting - some events were dropped @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  907779ms] [LOG] Running frontend commit 4c16b2700385ce7159d1925b880f14e2087bfd61 @ https://www.figma.com/proto/3G4w1ACWXEwOEm6PsmHLQf/web-esm?node-id=23-2&p=f&scaling=min-zoom&content-scaling=fixed:568
+[  909406ms] [WARNING] Statsig is not ready to log exposures, will retry in 1 seconds @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  909416ms] [ERROR] Failed to load resource: the server responded with a status of 403 (Forbidden) @ https://browser-intake-datadoghq.com/api/v2/rum:1
+[  909885ms] [WARNING] [LaunchDarkly] The waitForInitialization function was called without a timeout specified. In a future version a default timeout will be applied. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  909946ms] [INFO] [LaunchDarkly] LaunchDarkly client initialized @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  909969ms] [LOG] [import] git: 4c16b2700385ce7159d1925b880f14e2087bfd61, stamp: 044D7BD38A4BC291 @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  909992ms] [INFO] [LaunchDarkly] Opening stream connection to https://clientstream.launchdarkly.com/eval/62e9cfc83c59501226eae584/eyJraW5kIjoibXVsdGkiLCJ1c2VyIjp7ImtleSI6IjE3MDEyNTEzNjUyNTQ2MTA4NTYiLCJzZXJ2aWNlIjoid2ViIiwiaXNfZGVza3RvcCI6ZmFsc2V9LCJhbm9uX2tleSI6eyJrZXkiOiJhN2QwODM4ZS01MGQ4LTRkZWYtOGY5NC1lY2Q3NWNlNzEzMTAiLCJhbm9ueW1vdXMiOnRydWUsInNlcnZpY2UiOiJ3ZWIiLCJpc19kZXNrdG9wIjpmYWxzZX0sInBsYW5fa2V5Ijp7ImtleSI6InRlYW06OjEzNTM3NzEyNzgxNjU4NTkzOTQiLCJzZXJ2aWNlIjoid2ViIiwicGxhbl90aWVyIjoic3RhcnRlciJ9fQ @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  910189ms] [WARNING] Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1672
+[  911804ms] [INFO] [PrototypeLib] Booting... (emscripten version 4.0.21) @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  911941ms] [INFO] [GPU] graphicsAPI:"WebGL 2", vendor:"Google Inc. (Intel)", renderer:"ANGLE (Intel, Intel(R) UHD Graphics (0x000046A3) Direct3D11 vs_5_0 ps_5_0, D3D11)" version:"OpenGL ES 2.0 (WebGL 2.0 (OpenGL ES 3.0 Chromium))" @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  912120ms] [INFO] [Sprigma] Sprig SDK is ready @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  912567ms] [WARNING] Origin trial controlled feature not enabled: 'focus-without-user-activation'. @ https://www.figma.com/webpack-artifacts/assets/54997-41ab7aa4bc739bb0.min.js.br:1807
+[  934483ms] [WARNING] This API is intended only for debugging. Please wait 5 seconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144
+[  948873ms] [WARNING] This API is intended only for debugging. Please wait 5 seconds. @ https://www.figma.com/webpack-artifacts/assets/vendor-c15f52e6076f1f49.min.js.br:144

@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 38 33% 97%; /* #FAF7F2 Warm Alabaster */
+    --foreground: 350 15% 10%; /* #1E1617 Deep Espresso */
+
+    --card: 0 0% 100%;
+    --card-foreground: 350 15% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 350 15% 10%;
+
+    --primary: 351 58% 35%; /* #8B2635 Warm Dignified Crimson */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 38 20% 92%;
+    --secondary-foreground: 350 15% 15%;
+
+    --muted: 36 20% 90%;
+    --muted-foreground: 347 4% 46%;
+
+    --accent: 39 62% 55%; /* #D4A346 Warm Kingdom Gold */
+    --accent-foreground: 350 15% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 36 20% 89%; /* #EBE5DD Subtle Warm Stone */
+    --input: 36 20% 89%;
+    --ring: 351 58% 35%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 350 20% 8%; /* #160D0F */
+    --foreground: 38 20% 95%;
+
+    --card: 350 18% 12%;
+    --card-foreground: 38 20% 95%;
+
+    --popover: 350 18% 12%;
+    --popover-foreground: 38 20% 95%;
+
+    --primary: 351 58% 48%; /* A bit brighter in dark mode for contrast */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 350 15% 18%;
+    --secondary-foreground: 38 20% 95%;
+
+    --muted: 350 15% 20%;
+    --muted-foreground: 347 10% 65%;
+
+    --accent: 39 62% 55%;
+    --accent-foreground: 350 15% 10%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 350 15% 20%;
+    --input: 350 15% 20%;
+    --ring: 351 58% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+  }
+}
