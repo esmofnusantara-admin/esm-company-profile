@@ -27,6 +27,10 @@ yarn-error.log*
 .env*.local
 .env
 
+# cache & mcp
+.playwright-mcp/
+backups/
+
 # vercel
 .vercel
 

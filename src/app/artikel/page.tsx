@@ -158,7 +158,7 @@ export default function ArtikelPage() {
                       locale === "en" && item.excerptEn ? item.excerptEn : item.excerpt;
 
                     return (
-                      <Card key={item.id} className="p-6 hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between">
+                      <Card key={item.id} className="p-6 hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group">
                         <div className="space-y-3">
                           <div className="flex items-center gap-2">
                             <Badge variant={item.category === "KABAR_LADANG" ? "amber" : "primarySoft"}>
@@ -166,19 +166,24 @@ export default function ArtikelPage() {
                             </Badge>
                             <span className="text-xs text-muted-foreground">5 min read</span>
                           </div>
-                          <h3 className="text-lg font-bold text-foreground leading-snug hover:text-primary transition-colors cursor-pointer">
-                            {displayTitle}
-                          </h3>
-                          <p className="text-xs text-muted-foreground leading-relaxed">
+                          <Link href={`/artikel/${item.slug}`} className="block">
+                            <h3 className="text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors cursor-pointer">
+                              {displayTitle}
+                            </h3>
+                          </Link>
+                          <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
                             {displayExcerpt}
                           </p>
                         </div>
 
                         <div className="pt-4 mt-4 border-t border-border flex items-center justify-between">
-                          <span className="text-xs font-bold text-primary flex items-center gap-1 cursor-pointer hover:underline">
-                            {t.common.readMore}
-                            <ArrowRight className="size-3.5" />
-                          </span>
+                          <Link
+                            href={`/artikel/${item.slug}`}
+                            className="text-xs font-bold text-primary flex items-center gap-1 cursor-pointer hover:underline"
+                          >
+                            <span>{t.common.readMore}</span>
+                            <ArrowRight className="size-3.5 transition-transform group-hover:translate-x-1" />
+                          </Link>
                         </div>
                       </Card>
                     );
