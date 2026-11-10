@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "20");
 
     const where: any = {};
-    if (status) where.status = status;
+    if (status !== "ALL") where.status = status;
     if (category) where.category = category;
 
     const articles = await prisma.article.findMany({
@@ -21,8 +21,12 @@ export async function GET(request: NextRequest) {
       select: {
         id: true,
         title: true,
+        titleEn: true,
         slug: true,
         excerpt: true,
+        excerptEn: true,
+        content: true,
+        contentEn: true,
         category: true,
         coverImage: true,
         status: true,
@@ -45,11 +49,21 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/articles
+// POST /api/articles (Bilingual ID & EN)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, excerpt, content, category, coverImage, status } = body;
+    const {
+      title,
+      titleEn,
+      excerpt,
+      excerptEn,
+      content,
+      contentEn,
+      category,
+      coverImage,
+      status,
+    } = body;
 
     if (!title || !content) {
       return NextResponse.json(
@@ -64,9 +78,12 @@ export async function POST(request: NextRequest) {
     const article = await prisma.article.create({
       data: {
         title,
+        titleEn: titleEn || null,
         slug,
         excerpt: excerpt || content.slice(0, 160),
+        excerptEn: excerptEn || null,
         content,
+        contentEn: contentEn || null,
         category: category || "REFLEKSI",
         coverImage: coverImage || null,
         status: status || "PUBLISHED",

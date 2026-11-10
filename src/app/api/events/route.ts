@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get("status") || "PUBLISHED";
 
     const where: any = {};
-    if (status) where.status = status;
+    if (status !== "ALL") where.status = status;
     if (community && community !== "ALL") where.community = community;
 
     const events = await prisma.event.findMany({
@@ -32,12 +32,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/events
+// POST /api/events (Bilingual ID & EN)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { title, description, community, location, startDate, endDate, coverImage, status } =
-      body;
+    const {
+      title,
+      titleEn,
+      description,
+      descriptionEn,
+      community,
+      location,
+      locationEn,
+      startDate,
+      endDate,
+      coverImage,
+      status,
+    } = body;
 
     if (!title || !startDate) {
       return NextResponse.json(
@@ -52,10 +63,13 @@ export async function POST(request: NextRequest) {
     const event = await prisma.event.create({
       data: {
         title,
+        titleEn: titleEn || null,
         slug,
         description: description || "",
+        descriptionEn: descriptionEn || null,
         community: community || "ALL",
         location: location || null,
+        locationEn: locationEn || null,
         startDate: new Date(startDate),
         endDate: endDate ? new Date(endDate) : null,
         coverImage: coverImage || null,

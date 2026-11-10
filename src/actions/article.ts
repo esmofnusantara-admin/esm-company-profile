@@ -6,14 +6,17 @@ import { revalidatePath } from "next/cache";
 
 export interface ArticleInput {
   title: string;
-  excerpt: string;
+  titleEn?: string;
+  excerpt?: string;
+  excerptEn?: string;
   content: string;
+  contentEn?: string;
   category: "DEVOTIONAL" | "BERITA" | "KESAKSIAN" | "REFLEKSI" | "MISI" | "LAINNYA";
   coverImage?: string;
   status: "DRAFT" | "PUBLISHED";
 }
 
-// 1. Buat Artikel Baru
+// 1. Buat Artikel Baru (Bilingual ID & EN)
 export async function createArticle(input: ArticleInput) {
   try {
     if (!input.title || !input.content) {
@@ -26,9 +29,12 @@ export async function createArticle(input: ArticleInput) {
     const article = await prisma.article.create({
       data: {
         title: input.title,
+        titleEn: input.titleEn || null,
         slug: uniqueSlug,
         excerpt: input.excerpt || input.content.slice(0, 160),
+        excerptEn: input.excerptEn || (input.contentEn ? input.contentEn.slice(0, 160) : null),
         content: input.content,
+        contentEn: input.contentEn || null,
         category: input.category,
         coverImage: input.coverImage || null,
         status: input.status,
@@ -38,6 +44,7 @@ export async function createArticle(input: ArticleInput) {
 
     revalidatePath("/artikel");
     revalidatePath("/admin/artikel");
+    revalidatePath("/admin");
     revalidatePath("/");
 
     return { success: true, id: article.id, slug: article.slug };
@@ -56,6 +63,7 @@ export async function deleteArticle(id: string) {
 
     revalidatePath("/artikel");
     revalidatePath("/admin/artikel");
+    revalidatePath("/admin");
     revalidatePath("/");
 
     return { success: true };
