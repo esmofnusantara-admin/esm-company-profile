@@ -24,21 +24,18 @@ export function PageHero({
   return (
     <section
       className={cn(
-        "relative overflow-hidden bg-gradient-to-b from-[#561727] via-[#3A101C] to-[#200810] text-white py-20 md:py-28",
+        "relative overflow-hidden bg-gradient-to-b from-[#1E0508] via-[#2A080E] to-[#120305] text-white py-20 md:py-28",
         className
       )}
     >
-      {/* 1. Cahaya Inti Pusat yang Sangat Terang (Brilliant Center Core Glow) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] sm:w-[580px] h-[240px] sm:h-[300px] bg-amber-400/50 rounded-full blur-[75px] pointer-events-none" />
+      {/* 1. Cahaya Inti Ruby Crimson Luminous */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[900px] h-[340px] sm:h-[450px] bg-gradient-to-tr from-primary/60 via-red-600/40 to-rose-500/25 rounded-full blur-[120px] pointer-events-none opacity-80" />
 
-      {/* 2. Pendaran Sayap Crimson & Amber (Luminous Radial Spotlight) */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[1000px] h-[360px] sm:h-[480px] bg-gradient-to-r from-primary/80 via-amber-500/50 to-primary/80 rounded-full blur-[110px] pointer-events-none opacity-90" />
+      {/* 2. Top Red Highlight */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] sm:w-[700px] h-[200px] bg-red-500/20 rounded-full blur-[90px] pointer-events-none" />
 
-      {/* 3. Cahaya Puncak Emas (Top Golden Ambient Light) */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] sm:w-[750px] h-[240px] bg-amber-300/35 rounded-full blur-[90px] pointer-events-none" />
-
-      {/* 4. Radial Ellipse Highlight (Pendaran Gradasi Terang di Tengah) */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,225,160,0.25)_0%,rgba(163,44,61,0.20)_40%,transparent_75%)] pointer-events-none" />
+      {/* 3. Delicate Pearl/Red Radial Highlight */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,rgba(186,36,33,0.18)_40%,transparent_75%)] pointer-events-none" />
 
       {/* Konten Hero */}
       <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
@@ -46,7 +43,7 @@ export function PageHero({
           <div className="inline-block">
             <Badge
               variant={badgeVariant}
-              className="text-xs px-3.5 py-1 font-semibold tracking-wide bg-amber-400/20 text-amber-200 border-amber-300/40 shadow-xs"
+              className="text-xs px-3.5 py-1 font-semibold tracking-wide bg-primary/20 text-red-200 border-primary/30 shadow-xs"
             >
               {badge}
             </Badge>

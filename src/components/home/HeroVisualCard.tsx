@@ -253,19 +253,19 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
   };
 
   return (
-    <div className="relative mx-auto max-w-md rounded-3xl border border-white/15 bg-white/5 p-5 sm:p-6 backdrop-blur-xl shadow-2xl space-y-4">
+    <div className="relative mx-auto max-w-md rounded-3xl border border-white/15 bg-black/40 p-5 sm:p-6 backdrop-blur-xl shadow-2xl space-y-4 ring-1 ring-white/10">
       {/* Interactive Tabs Header if in TABS mode */}
       {c.displayMode === "TABS" && (
         <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-1">
-          <div className="flex items-center p-1 rounded-xl bg-black/20 border border-white/10 w-full justify-between">
+          <div className="flex items-center p-1 rounded-xl bg-black/30 border border-white/10 w-full justify-between">
             <button
               type="button"
               onClick={() => setActiveTab("pillars")}
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 justify-center",
                 activeTab === "pillars"
-                  ? "bg-accent text-accent-foreground shadow-sm font-extrabold"
-                  : "text-white/70 hover:text-white hover:bg-white/5"
+                  ? "bg-primary text-white shadow-md shadow-primary/30 font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               )}
             >
               <Layers className="size-3.5" />
@@ -277,8 +277,8 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 justify-center",
                 activeTab === "slider"
-                  ? "bg-accent text-accent-foreground shadow-sm font-extrabold"
-                  : "text-white/70 hover:text-white hover:bg-white/5"
+                  ? "bg-primary text-white shadow-md shadow-primary/30 font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               )}
             >
               <Images className="size-3.5" />
@@ -290,8 +290,8 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex-1 justify-center",
                 activeTab === "video"
-                  ? "bg-accent text-accent-foreground shadow-sm font-extrabold"
-                  : "text-white/70 hover:text-white hover:bg-white/5"
+                  ? "bg-primary text-white shadow-md shadow-primary/30 font-bold"
+                  : "text-white/75 hover:text-white hover:bg-white/10"
               )}
             >
               <Film className="size-3.5" />
@@ -308,7 +308,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
         <div className="space-y-4 animate-in fade-in-50 duration-200">
           <div className="flex items-center justify-between border-b border-white/10 pb-3">
             <div className="flex items-center gap-3">
-              <div className="size-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent shadow-xs">
+              <div className="size-10 rounded-xl bg-primary/20 border border-primary/30 flex items-center justify-center text-red-400 shadow-xs">
                 <Flame className="size-5" />
               </div>
               <div>
@@ -320,7 +320,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
                 </p>
               </div>
             </div>
-            <Badge variant="amber" className="text-[10px] px-2.5 py-0.5">
+            <Badge variant="primarySoft" className="text-[10px] px-2.5 py-0.5 bg-primary/20 text-red-200 border border-primary/30">
               {locale === "en" ? c.badgeTextEn || c.badgeTextId : c.badgeTextId}
             </Badge>
           </div>
@@ -334,18 +334,15 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
                 <Link
                   key={idx}
                   href={p.url || "/pelayanan"}
-                  className="flex items-start gap-3 rounded-2xl bg-white/5 p-3.5 border border-white/5 hover:border-white/20 hover:bg-white/10 transition-all group block"
+                  className="flex items-start gap-3 rounded-2xl bg-white/[0.06] p-3.5 border border-white/10 hover:border-primary/50 hover:bg-white/[0.12] transition-all group block shadow-xs"
                 >
                   <div
-                    className={cn(
-                      "size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-xs transition-transform group-hover:scale-105",
-                      idx === 1 ? "bg-accent/30 text-accent" : "bg-primary/40 text-white"
-                    )}
+                    className="size-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 shadow-xs transition-transform group-hover:scale-105 bg-primary/25 border border-primary/40 text-red-300"
                   >
                     {renderPillarIcon(p.icon)}
                   </div>
                   <div className="flex-1">
-                    <span className="text-xs font-bold text-white block group-hover:text-amber-300 transition-colors">
+                    <span className="text-xs font-bold text-white block group-hover:text-red-200 transition-colors">
                       {title}
                     </span>
                     <span className="text-[11px] text-white/70 leading-snug block mt-0.5">
@@ -357,13 +354,13 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
             })}
           </div>
 
-          <div className="rounded-2xl bg-accent/10 border border-accent/20 p-3 flex items-center justify-between text-xs">
+          <div className="rounded-2xl bg-white/5 border border-white/10 p-3 flex items-center justify-between text-xs">
             <span className="text-white/85 font-medium">
               {locale === "en" ? c.ctaTextEn || c.ctaTextId : c.ctaTextId}
             </span>
             <Link
               href={c.ctaUrl || "/pelayanan"}
-              className="text-accent font-bold hover:underline flex items-center gap-1 group"
+              className="text-red-300 font-bold hover:text-white hover:underline flex items-center gap-1 group"
             >
               <span>{t.common.readMore}</span>
               <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-0.5" />
@@ -379,7 +376,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
         <div className="space-y-3 animate-in fade-in-50 duration-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Images className="size-4 text-accent" />
+              <Images className="size-4 text-red-400" />
               <h4 className="text-sm font-bold text-white">
                 {locale === "en" ? "Activity Gallery" : "Dokumentasi Kegiatan"}
               </h4>
@@ -422,7 +419,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
                   <div className="absolute bottom-0 inset-x-0 p-4 space-y-1 text-left z-20">
                     {title && (
                       <p className="text-xs sm:text-sm font-bold text-white drop-shadow-sm flex items-center gap-1.5">
-                        <Sparkles className="size-3 text-amber-300 shrink-0" />
+                        <Sparkles className="size-3 text-red-300 shrink-0" />
                         <span>{title}</span>
                       </p>
                     )}
@@ -470,7 +467,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
                   aria-label={`Go to slide ${idx + 1}`}
                   className={cn(
                     "h-1.5 rounded-full transition-all",
-                    currentSlide === idx ? "w-6 bg-accent" : "w-1.5 bg-white/30 hover:bg-white/60"
+                    currentSlide === idx ? "w-6 bg-primary" : "w-1.5 bg-white/30 hover:bg-white/60"
                   )}
                 />
               ))}
@@ -481,7 +478,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
             <span className="text-white/70 italic">
               {locale === "en" ? "Swipe on mobile or click arrows to explore" : "Geser foto atau klik panah untuk melihat"}
             </span>
-            <Link href="/artikel" className="text-accent font-bold hover:underline flex items-center gap-1">
+            <Link href="/artikel" className="text-red-300 font-bold hover:text-white hover:underline flex items-center gap-1">
               <span>{locale === "en" ? "All Gallery" : "Galeri Lengkap"}</span>
               <ChevronRight className="size-3" />
             </Link>
@@ -496,12 +493,12 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
         <div className="space-y-3 animate-in fade-in-50 duration-200">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Film className="size-4 text-accent" />
+              <Film className="size-4 text-red-400" />
               <h4 className="text-sm font-bold text-white">
                 {locale === "en" ? c.videoTitleEn || c.videoTitleId : c.videoTitleId || "Video Gerakan"}
               </h4>
             </div>
-            <Badge variant="amber" className="text-[10px]">
+            <Badge variant="primarySoft" className="text-[10px] bg-primary/20 text-red-200 border-primary/30">
               HD Video
             </Badge>
           </div>
@@ -545,7 +542,7 @@ export function HeroVisualCard({ config }: HeroVisualCardProps) {
 
                 {/* Big Center Play Button */}
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="size-14 rounded-full bg-accent/90 text-accent-foreground flex items-center justify-center shadow-warm-lg group-hover:scale-110 group-hover:bg-accent transition-all">
+                  <div className="size-14 rounded-full bg-primary/95 text-white flex items-center justify-center shadow-lg shadow-primary/40 group-hover:scale-110 group-hover:bg-primary transition-all">
                     <Play className="size-6 ml-1 fill-current" />
                   </div>
                 </div>

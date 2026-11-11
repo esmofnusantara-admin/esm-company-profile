@@ -112,9 +112,9 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* ============================================================
-            1. HERO SECTION (Luminous Warm Crimson & Golden Spotlight)
+            1. HERO SECTION (Luminous Royal Ruby & Crimson Glow)
             ============================================================ */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#541726] via-[#380F1A] to-[#200910] text-white pt-24 pb-20 md:pt-32 md:pb-28">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#1E0508] via-[#2A080E] to-[#120305] text-white pt-24 pb-20 md:pt-32 md:pb-28">
           {/* Background Image / Video if configured in CMS */}
           {hero?.mediaUrl && (
             <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
@@ -139,17 +139,17 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Cahaya Pusat Terang (Luminous Spotlight & Ambient Gold) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[950px] h-[360px] sm:h-[460px] bg-gradient-to-r from-primary/75 via-amber-400/50 to-primary/75 rounded-full blur-[110px] pointer-events-none opacity-90" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] sm:w-[700px] h-[220px] bg-amber-300/30 rounded-full blur-[85px] pointer-events-none" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,215,150,0.20)_0%,rgba(139,38,53,0.15)_45%,transparent_75%)] pointer-events-none" />
+          {/* Cahaya Pusat Luminous Ruby & Rose */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[950px] h-[360px] sm:h-[460px] bg-gradient-to-tr from-primary/60 via-red-600/40 to-rose-500/25 rounded-full blur-[130px] pointer-events-none opacity-80" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] sm:w-[700px] h-[220px] bg-red-500/20 rounded-full blur-[90px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,rgba(186,36,33,0.18)_40%,transparent_75%)] pointer-events-none" />
 
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
               {/* Left Column: Headline & Action */}
               <div className="space-y-6 lg:col-span-7">
-                <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1 text-xs font-semibold tracking-wide text-accent">
-                  <Sparkles className="size-3.5" />
+                <div className="inline-flex items-center gap-2 rounded-full border border-red-500/30 bg-red-500/15 px-3.5 py-1 text-xs font-semibold tracking-wide text-red-200 backdrop-blur-sm shadow-xs">
+                  <Sparkles className="size-3.5 text-red-300" />
                   <span>{heroKicker}</span>
                 </div>
 
@@ -159,7 +159,7 @@ export default function HomePage() {
                   ) : (
                     <>
                       {t.hero.titleLine1} <br />
-                      <span className="text-accent font-serif italic font-normal">{t.hero.titleLine2}</span>
+                      <span className="font-serif italic font-normal text-red-100/95 drop-shadow-sm">{t.hero.titleLine2}</span>
                     </>
                   )}
                 </h1>
@@ -185,15 +185,15 @@ export default function HomePage() {
                 {/* Regional Presence Badges */}
                 <div className="pt-6 border-t border-white/10 flex flex-wrap items-center gap-6 text-xs text-white/70">
                   <div className="flex items-center gap-2">
-                    <MapPin className="size-4 text-accent" />
+                    <MapPin className="size-4 text-red-400" />
                     <span>{t.hero.regionBanten}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="size-4 text-accent" />
+                    <MapPin className="size-4 text-red-400" />
                     <span>{t.hero.regionTernate}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Users className="size-4 text-accent" />
+                    <Users className="size-4 text-red-400" />
                     <span>{t.hero.communityList}</span>
                   </div>
                 </div>
@@ -726,12 +726,12 @@ export default function HomePage() {
         {/* ============================================================
             8. CTA KEMITRAAN & DUKUNG MISI
             ============================================================ */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#541726] via-[#380F1A] to-[#200910] text-white py-20 md:py-24">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[850px] h-[320px] bg-gradient-to-r from-primary/70 via-amber-400/50 to-primary/70 rounded-full blur-[100px] pointer-events-none opacity-85" />
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,215,150,0.18)_0%,transparent_70%)] pointer-events-none" />
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#1E0508] via-[#2A080E] to-[#120305] text-white py-20 md:py-24">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[850px] h-[320px] bg-gradient-to-r from-primary/60 via-red-600/40 to-rose-500/30 rounded-full blur-[100px] pointer-events-none opacity-80" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.06)_0%,rgba(186,36,33,0.16)_40%,transparent_70%)] pointer-events-none" />
 
           <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <span className="text-xs font-bold uppercase tracking-wider text-accent">
+            <span className="text-xs font-bold uppercase tracking-wider text-red-300">
               {t.ctaFooter.kicker}
             </span>
             <h2 className="font-sans text-3xl sm:text-5xl font-extrabold tracking-tight">
