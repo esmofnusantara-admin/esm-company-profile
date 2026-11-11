@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -18,9 +19,9 @@ import {
   Mail,
   QrCode,
   ShieldCheck,
+  CheckCircle,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-
 import { submitDonation } from "@/actions/donation";
 
 export default function KemitraanPage() {
@@ -41,12 +42,32 @@ export default function KemitraanPage() {
   const [submitSuccess, setSubmitSuccess] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
-  const bankAccount = "1234567890";
-  const bankName = "Bank Central Asia (BCA)";
-  const accountName = "Yayasan ESM Indonesia";
+  // Dynamic CMS Data
+  const [kemitraanData, setKemitraanData] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    fetch("/api/content?section=kemitraan")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setKemitraanData(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const bank = kemitraanData?.bank;
+  const prayers = kemitraanData?.prayers;
+  const settings = kemitraanData?.settings;
+
+  const bankAccount = bank?.accountNumber || "8420-991-888";
+  const bankName = bank?.bankName || "Bank Central Asia (BCA)";
+  const accountName = bank?.accountHolder || "Yayasan Evangelical Student Movement";
+  const qrisUrl = bank?.qrisUrl || null;
+  const waContact = bank?.waConfirmNumber || settings?.phone?.replace(/[^0-9]/g, "") || "6281296106611";
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(bankAccount);
+    navigator.clipboard.writeText(bankAccount.replace(/-/g, ""));
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -194,15 +215,29 @@ export default function KemitraanPage() {
                         ? "Your partnership commitment has been recorded in our system. May God bless your generosity as we labor together for student discipleship across Indonesia."
                         : "Komitmen kemitraan Anda telah tercatat langsung di sistem database ESM. Kiranya Tuhan memberkati kesetiaan Anda dalam memajukan pemuridan siswa dan mahasiswa di pelosok Nusantara."}
                     </p>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setSubmitSuccess(false)}
-                      className="rounded-xl text-xs bg-white text-emerald-800 border-emerald-300"
-                    >
-                      {locale === "en" ? "Submit Another Commitment" : "Kirim Komitmen Lainnya"}
-                    </Button>
+                    <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setSubmitSuccess(false)}
+                        className="rounded-xl text-xs bg-white text-emerald-800 border-emerald-300"
+                      >
+                        {locale === "en" ? "Submit Another Commitment" : "Kirim Komitmen Lainnya"}
+                      </Button>
+                      <Button asChild size="sm" className="rounded-xl text-xs bg-emerald-700 hover:bg-emerald-800 text-white">
+                        <a
+                          href={`https://wa.me/${waContact}?text=${encodeURIComponent(
+                            `Halo Admin ESM, saya ingin konfirmasi komitmen donasi kemitraan misi.`
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <Phone className="size-3.5 mr-1" />
+                          <span>Konfirmasi via WhatsApp</span>
+                        </a>
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
@@ -250,20 +285,36 @@ export default function KemitraanPage() {
                               setSelectedNominal(nom);
                               setCustomNominal("");
                             }}
-                            className={`py-2 px-3 text-xs font-bold rounded-lg border transition-all ${
+                            className={`rounded-xl border py-2.5 text-xs font-bold transition-all ${
                               selectedNominal === nom && !customNominal
-                                ? "border-primary bg-primary-50 text-primary"
-                                : "border-border bg-card text-foreground hover:bg-canvas-subtle"
+                                ? "border-primary bg-primary text-white shadow-warm-xs"
+                                : "border-border bg-card text-foreground hover:border-primary/40"
                             }`}
                           >
                             Rp {nom}
                           </button>
                         ))}
                       </div>
+
+                      <div className="pt-2">
+                        <label className="text-xs text-muted-foreground block mb-1">
+                          {locale === "en" ? "Or enter other amount (IDR):" : "Atau masukkan nominal lainnya (Rp):"}
+                        </label>
+                        <input
+                          type="text"
+                          value={customNominal}
+                          onChange={(e) => {
+                            setCustomNominal(e.target.value);
+                            setSelectedNominal("");
+                          }}
+                          placeholder="Rp 0"
+                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                        />
+                      </div>
                     </div>
 
-                    {/* Input Formulir Donatur */}
-                    <div className="space-y-4">
+                    {/* Identitas Donatur */}
+                    <div className="space-y-4 pt-4 border-t border-border">
                       <div>
                         <label className="text-xs font-bold text-foreground block mb-1">{k.nameLabel} *</label>
                         <input
@@ -271,7 +322,7 @@ export default function KemitraanPage() {
                           required
                           value={donorName}
                           onChange={(e) => setDonorName(e.target.value)}
-                          placeholder={k.namePlaceholder}
+                          placeholder="Nama Lengkap / Inisial"
                           className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                         />
                       </div>
@@ -370,10 +421,17 @@ export default function KemitraanPage() {
                     </span>
                   </div>
 
+                  {/* QRIS Display */}
                   <div className="rounded-xl border border-border bg-card p-4 space-y-3 text-center">
-                    <div className="size-28 mx-auto rounded-xl border border-border bg-white flex items-center justify-center p-2">
-                      <QrCode className="size-24 text-foreground/80" />
-                    </div>
+                    {qrisUrl ? (
+                      <div className="size-48 mx-auto rounded-xl border border-border bg-white flex items-center justify-center p-2 relative overflow-hidden">
+                        <Image src={qrisUrl} alt="Barcode QRIS ESM" fill className="object-contain p-1" />
+                      </div>
+                    ) : (
+                      <div className="size-28 mx-auto rounded-xl border border-border bg-white flex items-center justify-center p-2">
+                        <QrCode className="size-24 text-foreground/80" />
+                      </div>
+                    )}
                     <p className="text-[11px] text-muted-foreground">
                       {k.qrisNote}
                     </p>
@@ -389,7 +447,7 @@ export default function KemitraanPage() {
           </div>
         </section>
 
-        {/* POKOK DOA SECTION */}
+        {/* POKOK DOA SECTION (Dynamic from Database) */}
         <section id="doa" className="py-20 bg-canvas">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="text-center space-y-2">
@@ -403,29 +461,59 @@ export default function KemitraanPage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-              <Card className="p-5 space-y-2">
-                <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr1Tag}</span>
-                <h4 className="font-bold text-sm text-foreground">{k.pr1Title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.pr1Desc}
-                </p>
-              </Card>
+              {prayers && Array.isArray(prayers) && prayers.length > 0 ? (
+                prayers.map((pr: any) => {
+                  const title = locale === "en" ? pr.titleEn || pr.title : pr.title;
+                  const desc = locale === "en" ? pr.descriptionEn || pr.description : pr.description;
+                  return (
+                    <Card key={pr.id} className="p-5 space-y-2 flex flex-col justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{pr.category}</span>
+                          {pr.isAnswered && (
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                              <CheckCircle className="size-3" /> Terjawab
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="font-bold text-sm text-foreground">{title}</h4>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {desc}
+                        </p>
+                      </div>
+                      <span className="text-[10px] text-muted-foreground/60 pt-2 block border-t border-border/50">
+                        Periode: {pr.month}
+                      </span>
+                    </Card>
+                  );
+                })
+              ) : (
+                <>
+                  <Card className="p-5 space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr1Tag}</span>
+                    <h4 className="font-bold text-sm text-foreground">{k.pr1Title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {k.pr1Desc}
+                    </p>
+                  </Card>
 
-              <Card className="p-5 space-y-2">
-                <span className="text-[10px] font-bold uppercase text-accent tracking-wider">{k.pr2Tag}</span>
-                <h4 className="font-bold text-sm text-foreground">{k.pr2Title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.pr2Desc}
-                </p>
-              </Card>
+                  <Card className="p-5 space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-accent tracking-wider">{k.pr2Tag}</span>
+                    <h4 className="font-bold text-sm text-foreground">{k.pr2Title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {k.pr2Desc}
+                    </p>
+                  </Card>
 
-              <Card className="p-5 space-y-2">
-                <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr3Tag}</span>
-                <h4 className="font-bold text-sm text-foreground">{k.pr3Title}</h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.pr3Desc}
-                </p>
-              </Card>
+                  <Card className="p-5 space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr3Tag}</span>
+                    <h4 className="font-bold text-sm text-foreground">{k.pr3Title}</h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      {k.pr3Desc}
+                    </p>
+                  </Card>
+                </>
+              )}
             </div>
           </div>
         </section>
@@ -441,15 +529,15 @@ export default function KemitraanPage() {
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <Button asChild size="default" className="rounded-full shadow-warm-sm">
-                <a href="https://wa.me/6281296106611" target="_blank" rel="noopener noreferrer">
+                <a href={`https://wa.me/${waContact}`} target="_blank" rel="noopener noreferrer">
                   <Phone className="size-4 mr-1.5" />
-                  <span>WhatsApp (+62 812-9610-6611)</span>
+                  <span>WhatsApp (+{waContact})</span>
                 </a>
               </Button>
               <Button asChild variant="outline" size="default" className="rounded-full">
-                <a href="mailto:halo@esm.or.id">
+                <a href={`mailto:${settings?.email || "halo@esm.or.id"}`}>
                   <Mail className="size-4 mr-1.5" />
-                  <span>halo@esm.or.id</span>
+                  <span>{settings?.email || "halo@esm.or.id"}</span>
                 </a>
               </Button>
             </div>

@@ -3,13 +3,17 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+const MAX_SIZE = 50 * 1024 * 1024; // 50MB (mendukung video pendek & dokumen)
 const ALLOWED_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
   "image/svg+xml",
+  "image/gif",
   "application/pdf",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
 ];
 
 export async function POST(request: NextRequest) {

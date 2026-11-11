@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import {
   ChevronRight,
   MapPin,
   CheckCircle2,
+  Play,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -28,8 +30,10 @@ export default function HomePage() {
   const { t, locale } = useLanguage();
   const [featuredArticles, setFeaturedArticles] = React.useState<any[]>([]);
   const [upcomingEvents, setUpcomingEvents] = React.useState<any[]>([]);
+  const [homeContent, setHomeContent] = React.useState<any>(null);
 
   React.useEffect(() => {
+    // 1. Fetch Featured Articles
     fetch("/api/articles?limit=2&status=PUBLISHED")
       .then((r) => r.json())
       .then((data) => {
@@ -39,6 +43,7 @@ export default function HomePage() {
       })
       .catch(() => {});
 
+    // 2. Fetch Upcoming Events
     fetch("/api/events?limit=2&status=PUBLISHED")
       .then((r) => r.json())
       .then((data) => {
@@ -47,7 +52,58 @@ export default function HomePage() {
         }
       })
       .catch(() => {});
+
+    // 3. Fetch Dynamic CMS Content for Home
+    fetch("/api/content?section=home")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setHomeContent(res.data);
+        }
+      })
+      .catch(() => {});
   }, []);
+
+  const hero = homeContent?.hero;
+  const values = homeContent?.values;
+  const stats = homeContent?.stats;
+  const testimonies = homeContent?.testimonies;
+  const faqs = homeContent?.faqs;
+
+  // Hero Display Text
+  const heroKicker = hero
+    ? locale === "en"
+      ? hero.kickerEn || hero.kickerId
+      : hero.kickerId
+    : t.hero.kicker;
+
+  const heroHeadline = hero
+    ? locale === "en"
+      ? hero.headlineEn || hero.headlineId
+      : hero.headlineId
+    : null;
+
+  const heroSubheadline = hero
+    ? locale === "en"
+      ? hero.subheadlineEn || hero.subheadlineId
+      : hero.subheadlineId
+    : t.hero.description;
+
+  const primaryCtaText = hero
+    ? locale === "en"
+      ? hero.primaryCtaTextEn || hero.primaryCtaTextId
+      : hero.primaryCtaTextId
+    : t.hero.ctaPrimary;
+
+  const primaryCtaUrl = hero?.primaryCtaUrl || "/pelayanan";
+
+  const secondaryCtaText = hero
+    ? locale === "en"
+      ? hero.secondaryCtaTextEn || hero.secondaryCtaTextId
+      : hero.secondaryCtaTextId
+    : t.hero.ctaSecondary;
+
+  const secondaryCtaUrl = hero?.secondaryCtaUrl || "/tentang-kami";
 
   return (
     <>
@@ -58,6 +114,30 @@ export default function HomePage() {
             1. HERO SECTION (Warm Dignified Dark Mesh, Bukan Merah Pekat)
             ============================================================ */}
         <section className="relative overflow-hidden bg-gradient-to-br from-[#241416] via-[#3D1C22] to-[#1E1012] text-white pt-24 pb-20 md:pt-32 md:pb-28">
+          {/* Background Image / Video if configured in CMS */}
+          {hero?.mediaUrl && (
+            <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
+              {hero.mediaType === "VIDEO" && !hero.mediaUrl.includes("youtube") ? (
+                <video
+                  src={hero.mediaUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <Image
+                  src={hero.mediaUrl}
+                  alt="Hero Background"
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              )}
+            </div>
+          )}
+
           <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/25 rounded-full blur-[120px] pointer-events-none" />
           <div className="absolute -bottom-20 right-10 w-[400px] h-[300px] bg-accent/15 rounded-full blur-[100px] pointer-events-none" />
 
@@ -67,28 +147,34 @@ export default function HomePage() {
               <div className="space-y-6 lg:col-span-7">
                 <div className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-1 text-xs font-semibold tracking-wide text-accent">
                   <Sparkles className="size-3.5" />
-                  <span>{t.hero.kicker}</span>
+                  <span>{heroKicker}</span>
                 </div>
 
                 <h1 className="font-sans text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl leading-[1.12]">
-                  {t.hero.titleLine1} <br />
-                  <span className="text-accent font-serif italic font-normal">{t.hero.titleLine2}</span>
+                  {heroHeadline ? (
+                    heroHeadline
+                  ) : (
+                    <>
+                      {t.hero.titleLine1} <br />
+                      <span className="text-accent font-serif italic font-normal">{t.hero.titleLine2}</span>
+                    </>
+                  )}
                 </h1>
 
                 <p className="max-w-xl text-base sm:text-lg text-white/80 leading-relaxed">
-                  {t.hero.description}
+                  {heroSubheadline}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   <Button asChild size="lg" className="rounded-xl shadow-warm-md">
-                    <Link href="/pelayanan">
-                      <span>{t.hero.ctaPrimary}</span>
+                    <Link href={primaryCtaUrl}>
+                      <span>{primaryCtaText}</span>
                       <ArrowRight className="size-4 ml-1" />
                     </Link>
                   </Button>
                   <Button asChild size="lg" variant="outlineWhite" className="rounded-xl">
-                    <Link href="/tentang-kami">
-                      <span>{t.hero.ctaSecondary}</span>
+                    <Link href={secondaryCtaUrl}>
+                      <span>{secondaryCtaText}</span>
                     </Link>
                   </Button>
                 </div>
@@ -165,13 +251,12 @@ export default function HomePage() {
                     </div>
                   </div>
 
-                  <div className="pt-2">
-                    <Button asChild variant="white" className="w-full justify-center rounded-xl text-xs font-bold">
-                      <Link href="/kemitraan">
-                        <span>{t.hero.cardCta}</span>
-                        <ArrowRight className="size-3.5 ml-1" />
-                      </Link>
-                    </Button>
+                  <div className="rounded-2xl bg-accent/10 border border-accent/20 p-3.5 flex items-center justify-between text-xs">
+                    <span className="text-white/80 font-medium">{t.hero.cardFooterText}</span>
+                    <Link href="/pelayanan" className="text-accent font-bold hover:underline flex items-center gap-1">
+                      <span>{t.hero.cardFooterLink}</span>
+                      <ChevronRight className="size-3.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -180,155 +265,170 @@ export default function HomePage() {
         </section>
 
         {/* ============================================================
-            2. MENGAPA ESM HADIR? (Editorial 2-Kolom Seimbang)
+            2. STATISTIK ANGKA DAMPAK (Impact Numbers)
             ============================================================ */}
-        <section className="py-20 md:py-28 bg-canvas">
+        <section className="border-y border-border/80 bg-card py-10">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 items-start">
-              {/* Left: Narrative Philosophy */}
-              <div className="lg:col-span-5 space-y-5">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                  {t.whyEsm.kicker}
-                </span>
-                <h2 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground leading-tight">
-                  {t.whyEsm.headlineStart}
-                  <span className="text-primary underline decoration-accent decoration-2 underline-offset-4">
-                    {t.whyEsm.discipleship}
-                  </span>
-                  {t.whyEsm.and}
-                  <span className="text-primary underline decoration-accent decoration-2 underline-offset-4">
-                    {t.whyEsm.mission}
-                  </span>
-                  {t.whyEsm.headlineEnd}
-                </h2>
-                <p className="text-base text-muted-foreground leading-relaxed">
-                  {t.whyEsm.description}
-                </p>
-                <div className="pt-2">
-                  <Button asChild variant="link" className="px-0 font-bold text-primary group">
-                    <Link href="/tentang-kami#sejarah" className="flex items-center gap-1.5">
-                      <span>{t.whyEsm.historyLink}</span>
-                      <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Right: 3 Value Proposition Cards */}
-              <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <Card className="hover:border-primary/40 transition-colors shadow-warm-sm">
-                  <CardHeader className="p-5 pb-3">
-                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center mb-3">
-                      <Flame className="size-5" />
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {stats && Array.isArray(stats) && stats.length > 0 ? (
+                stats.map((st: any, idx: number) => {
+                  const label = locale === "en" ? st.labelEn || st.labelId : st.labelId;
+                  return (
+                    <div key={idx} className="text-center space-y-1">
+                      <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">
+                        {st.number}
+                      </span>
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                        {label}
+                      </p>
                     </div>
-                    <CardTitle className="text-base">{t.whyEsm.card1Title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {t.whyEsm.card1Desc}
+                  );
+                })
+              ) : (
+                <>
+                  <div className="text-center space-y-1">
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">15+</span>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {t.stats.years}
                     </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:border-primary/40 transition-colors shadow-warm-sm">
-                  <CardHeader className="p-5 pb-3">
-                    <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center mb-3">
-                      <Target className="size-5" />
-                    </div>
-                    <CardTitle className="text-base">{t.whyEsm.card2Title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {t.whyEsm.card2Desc}
+                  </div>
+                  <div className="text-center space-y-1">
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">2</span>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {t.stats.regions}
                     </p>
-                  </CardContent>
-                </Card>
-
-                <Card className="hover:border-primary/40 transition-colors shadow-warm-sm">
-                  <CardHeader className="p-5 pb-3">
-                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center mb-3">
-                      <Users className="size-5" />
-                    </div>
-                    <CardTitle className="text-base">{t.whyEsm.card3Title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0">
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {t.whyEsm.card3Desc}
+                  </div>
+                  <div className="text-center space-y-1">
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">500+</span>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {t.stats.students}
                     </p>
-                  </CardContent>
-                </Card>
-              </div>
+                  </div>
+                  <div className="text-center space-y-1">
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">100+</span>
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {t.stats.partners}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </section>
 
         {/* ============================================================
-            3. METRIK DAMPAK & TRANSPARANSI
+            3. NILAI POKOK / VALUE PROPOSITION (3 Cards)
             ============================================================ */}
-        <section className="py-14 bg-card border-y border-border">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-              <div className="space-y-1">
-                <span className="font-sans text-3xl sm:text-4xl font-extrabold text-primary">{t.impact.stat1Number}</span>
-                <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t.impact.stat1Title}
-                </p>
-                <p className="text-[11px] text-muted-foreground/80">{t.impact.stat1Desc}</p>
-              </div>
-
-              <div className="space-y-1">
-                <span className="font-sans text-3xl sm:text-4xl font-extrabold text-accent">{t.impact.stat2Number}</span>
-                <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t.impact.stat2Title}
-                </p>
-                <p className="text-[11px] text-muted-foreground/80">{t.impact.stat2Desc}</p>
-              </div>
-
-              <div className="space-y-1">
-                <span className="font-sans text-3xl sm:text-4xl font-extrabold text-primary">{t.impact.stat3Number}</span>
-                <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t.impact.stat3Title}
-                </p>
-                <p className="text-[11px] text-muted-foreground/80">{t.impact.stat3Desc}</p>
-              </div>
-
-              <div className="space-y-1">
-                <span className="font-sans text-3xl sm:text-4xl font-extrabold text-accent">{t.impact.stat4Number}</span>
-                <p className="text-xs sm:text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-                  {t.impact.stat4Title}
-                </p>
-                <p className="text-[11px] text-muted-foreground/80">{t.impact.stat4Desc}</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================================
-            4. TIGA LADANG PELAYANAN (Explore, Encounter, Connect)
-            ============================================================ */}
-        <section className="py-20 md:py-28 bg-canvas">
+        <section className="py-20 bg-canvas">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-3">
-              <Badge variant="primarySoft">{t.communities.kicker}</Badge>
+              <span className="text-xs font-bold uppercase tracking-wider text-primary">
+                {t.values.kicker}
+              </span>
               <h2 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                {t.communities.title}
+                {t.values.title}
               </h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {t.communities.subtitle}
+              <p className="text-sm text-muted-foreground">
+                {t.values.subtitle}
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {values && Array.isArray(values) && values.length === 3 ? (
+                values.map((v: any, idx: number) => {
+                  const title = locale === "en" ? v.titleEn || v.titleId : v.titleId;
+                  const desc = locale === "en" ? v.descEn || v.descId : v.descId;
+                  const icons = [Compass, Flame, Users];
+                  const Icon = icons[idx % icons.length];
+
+                  return (
+                    <Card key={idx} className="p-8 border-border hover:border-primary/40 transition-colors shadow-warm-sm flex flex-col justify-between">
+                      <div className="space-y-4">
+                        <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
+                          <Icon className="size-6" />
+                        </div>
+                        <h3 className="text-xl font-bold text-foreground">{title}</h3>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {desc}
+                        </p>
+                      </div>
+                    </Card>
+                  );
+                })
+              ) : (
+                <>
+                  <Card className="p-8 border-border hover:border-primary/40 transition-colors shadow-warm-sm flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
+                        <Compass className="size-6" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground">{t.values.v1Title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {t.values.v1Desc}
+                      </p>
+                    </div>
+                  </Card>
+
+                  <Card className="p-8 border-border hover:border-accent/60 transition-colors shadow-warm-sm flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="size-12 rounded-2xl bg-accent-50 text-accent flex items-center justify-center font-bold">
+                        <Flame className="size-6" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground">{t.values.v2Title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {t.values.v2Desc}
+                      </p>
+                    </div>
+                  </Card>
+
+                  <Card className="p-8 border-border hover:border-primary/40 transition-colors shadow-warm-sm flex flex-col justify-between">
+                    <div className="space-y-4">
+                      <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
+                        <Users className="size-6" />
+                      </div>
+                      <h3 className="text-xl font-bold text-foreground">{t.values.v3Title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        {t.values.v3Desc}
+                      </p>
+                    </div>
+                  </Card>
+                </>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================
+            4. TIGA KOMUNITAS PELAYANAN (Explore, Encounter, Connect)
+            ============================================================ */}
+        <section className="py-20 bg-card border-y border-border">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-primary">{t.communities.kicker}</span>
+                <h2 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+                  {t.communities.title}
+                </h2>
+              </div>
+              <Button asChild variant="outline" size="sm" className="rounded-xl">
+                <Link href="/pelayanan">
+                  <span>{t.communities.viewAll}</span>
+                  <ArrowRight className="size-3.5 ml-1" />
+                </Link>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Explore */}
-              <Card className="flex flex-col justify-between hover:shadow-warm-md hover:border-primary/50 transition-all">
+              <Card className="hover:border-primary/50 transition-colors shadow-warm-sm flex flex-col justify-between">
                 <CardHeader className="space-y-3">
-                  <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center">
-                    <Compass className="size-6" />
+                  <div className="flex items-center justify-between">
+                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold">
+                      <Compass className="size-5" />
+                    </div>
+                    <Badge variant="outline">{t.communities.exploreBadge}</Badge>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-primary uppercase tracking-wider">Explore Community</span>
-                    <CardTitle className="text-2xl mt-1">{t.communities.exploreTitle}</CardTitle>
-                  </div>
+                  <CardTitle className="text-xl font-bold text-foreground">Explore</CardTitle>
                   <CardDescription className="text-sm">
                     {t.communities.exploreDesc}
                   </CardDescription>
@@ -344,15 +444,15 @@ export default function HomePage() {
               </Card>
 
               {/* Encounter */}
-              <Card className="flex flex-col justify-between hover:shadow-warm-md hover:border-accent/60 transition-all border-accent/30 bg-card">
+              <Card className="hover:border-accent/60 transition-colors shadow-warm-sm flex flex-col justify-between border-accent/30">
                 <CardHeader className="space-y-3">
-                  <div className="size-12 rounded-2xl bg-accent-50 text-accent flex items-center justify-center">
-                    <GraduationCap className="size-6" />
+                  <div className="flex items-center justify-between">
+                    <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center font-bold">
+                      <GraduationCap className="size-5" />
+                    </div>
+                    <Badge variant="amber">{t.communities.encounterBadge}</Badge>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-accent uppercase tracking-wider">Encounter Community</span>
-                    <CardTitle className="text-2xl mt-1">{t.communities.encounterTitle}</CardTitle>
-                  </div>
+                  <CardTitle className="text-xl font-bold text-foreground">Encounter</CardTitle>
                   <CardDescription className="text-sm">
                     {t.communities.encounterDesc}
                   </CardDescription>
@@ -368,15 +468,15 @@ export default function HomePage() {
               </Card>
 
               {/* Connect */}
-              <Card className="flex flex-col justify-between hover:shadow-warm-md hover:border-primary/50 transition-all">
+              <Card className="hover:border-primary/50 transition-colors shadow-warm-sm flex flex-col justify-between">
                 <CardHeader className="space-y-3">
-                  <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center">
-                    <Briefcase className="size-6" />
+                  <div className="flex items-center justify-between">
+                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold">
+                      <Briefcase className="size-5" />
+                    </div>
+                    <Badge variant="outline">{t.communities.connectBadge}</Badge>
                   </div>
-                  <div>
-                    <span className="text-xs font-bold text-primary uppercase tracking-wider">Connect Community</span>
-                    <CardTitle className="text-2xl mt-1">{t.communities.connectTitle}</CardTitle>
-                  </div>
+                  <CardTitle className="text-xl font-bold text-foreground">Connect</CardTitle>
                   <CardDescription className="text-sm">
                     {t.communities.connectDesc}
                   </CardDescription>
@@ -567,27 +667,51 @@ export default function HomePage() {
         </section>
 
         {/* ============================================================
-            6. TESTIMONI (Warm Quote Card)
+            6. TESTIMONI (Warm Quote Card - Connected to Database)
             ============================================================ */}
         <section className="py-20 bg-canvas">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <Card className="relative overflow-hidden border-border/80 bg-gradient-to-br from-card to-canvas-subtle p-8 md:p-12 shadow-warm-md text-center space-y-6">
-              <div className="size-12 mx-auto rounded-full bg-accent/15 text-accent flex items-center justify-center font-serif text-2xl font-bold">
-                &ldquo;
+            {testimonies && Array.isArray(testimonies) && testimonies.length > 0 ? (
+              <div className="space-y-6">
+                {testimonies.slice(0, 1).map((tItem: any) => {
+                  const quote = locale === "en" ? tItem.quoteEn || tItem.quote : tItem.quote;
+                  return (
+                    <Card key={tItem.id} className="relative overflow-hidden border-border/80 bg-gradient-to-br from-card to-canvas-subtle p-8 md:p-12 shadow-warm-md text-center space-y-6">
+                      {tItem.photo && (
+                        <div className="size-16 mx-auto rounded-full border-2 border-primary/20 overflow-hidden relative">
+                          <Image src={tItem.photo} alt={tItem.name} fill className="object-cover" />
+                        </div>
+                      )}
+                      <blockquote className="font-serif italic text-xl md:text-2xl text-foreground/90 leading-relaxed font-normal">
+                        &ldquo;{quote}&rdquo;
+                      </blockquote>
+                      <div className="space-y-0.5">
+                        <p className="font-sans font-bold text-foreground">{tItem.name}</p>
+                        <p className="text-xs text-muted-foreground">{tItem.role || "Alumni / Murid ESM"}</p>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
-              <blockquote className="font-serif italic text-xl md:text-2xl text-foreground/90 leading-relaxed font-normal">
-                &ldquo;Melalui kelompok pemuridan di ESM, aku belajar bahwa mengikut Yesus bukan cuma soal apa yang aku percaya di dalam gereja, tetapi bagaimana aku hadir di sekolah, menghargai sesama, dan berani bersaksi dengan hidup nyata.&rdquo;
-              </blockquote>
-              <div className="space-y-0.5">
-                <p className="font-sans font-bold text-foreground">Andreas Pratama</p>
-                <p className="text-xs text-muted-foreground">Siswa SMA • Komunitas Explore Banten</p>
-              </div>
-            </Card>
+            ) : (
+              <Card className="relative overflow-hidden border-border/80 bg-gradient-to-br from-card to-canvas-subtle p-8 md:p-12 shadow-warm-md text-center space-y-6">
+                <div className="size-12 mx-auto rounded-full bg-accent/15 text-accent flex items-center justify-center font-serif text-2xl font-bold">
+                  &ldquo;
+                </div>
+                <blockquote className="font-serif italic text-xl md:text-2xl text-foreground/90 leading-relaxed font-normal">
+                  &ldquo;Melalui kelompok pemuridan di ESM, aku belajar bahwa mengikut Yesus bukan cuma soal apa yang aku percaya di dalam gereja, tetapi bagaimana aku hadir di sekolah, menghargai sesama, dan berani bersaksi dengan hidup nyata.&rdquo;
+                </blockquote>
+                <div className="space-y-0.5">
+                  <p className="font-sans font-bold text-foreground">Andreas Pratama</p>
+                  <p className="text-xs text-muted-foreground">Siswa SMA • Komunitas Explore Banten</p>
+                </div>
+              </Card>
+            )}
           </div>
         </section>
 
         {/* ============================================================
-            7. FAQ (Focused Max-w-3xl)
+            7. FAQ (Focused Max-w-3xl - Connected to Database)
             ============================================================ */}
         <section className="py-20 bg-card border-t border-border">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 space-y-8">
@@ -599,35 +723,55 @@ export default function HomePage() {
             </div>
 
             <div className="space-y-4">
-              <Card className="p-5">
-                <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
-                  <span>{t.faq.q1}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed pl-6">
-                  {t.faq.a1}
-                </p>
-              </Card>
+              {faqs && Array.isArray(faqs) && faqs.length > 0 ? (
+                faqs.map((f: any) => {
+                  const question = locale === "en" ? f.questionEn || f.question : f.question;
+                  const answer = locale === "en" ? f.answerEn || f.answer : f.answer;
+                  return (
+                    <Card key={f.id} className="p-5">
+                      <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
+                        <CheckCircle2 className="size-4 text-primary shrink-0" />
+                        <span>{question}</span>
+                      </h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                        {answer}
+                      </p>
+                    </Card>
+                  );
+                })
+              ) : (
+                <>
+                  <Card className="p-5">
+                    <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-primary shrink-0" />
+                      <span>{t.faq.q1}</span>
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                      {t.faq.a1}
+                    </p>
+                  </Card>
 
-              <Card className="p-5">
-                <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
-                  <span>{t.faq.q2}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed pl-6">
-                  {t.faq.a2}
-                </p>
-              </Card>
+                  <Card className="p-5">
+                    <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-primary shrink-0" />
+                      <span>{t.faq.q2}</span>
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                      {t.faq.a2}
+                    </p>
+                  </Card>
 
-              <Card className="p-5">
-                <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary shrink-0" />
-                  <span>{t.faq.q3}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed pl-6">
-                  {t.faq.a3}
-                </p>
-              </Card>
+                  <Card className="p-5">
+                    <h4 className="font-bold text-sm text-foreground mb-1.5 flex items-center gap-2">
+                      <CheckCircle2 className="size-4 text-primary shrink-0" />
+                      <span>{t.faq.q3}</span>
+                    </h4>
+                    <p className="text-xs text-muted-foreground leading-relaxed pl-6">
+                      {t.faq.a3}
+                    </p>
+                  </Card>
+                </>
+              )}
             </div>
           </div>
         </section>

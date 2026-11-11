@@ -107,6 +107,9 @@ enum Community {
   ENCOUNTER
   CONNECT
   ALL
+  LEADERSHIP
+  STAFF
+  ADVISORY
 }
 
 model TeamMember {
@@ -114,9 +117,10 @@ model TeamMember {
   name      String
   role      String
   roleEn    String?
-  community Community
+  community Community @default(ALL)
   photo     String?
-  bio       String?
+  bio       String?   @db.Text
+  bioEn     String?   @db.Text
   whatsapp  String?
   sortOrder Int       @default(0)
   isActive  Boolean   @default(true)
@@ -159,6 +163,52 @@ model FAQ {
 enum FAQPage {
   GENERAL
   KEMITRAAN
+  PELAYANAN
+}
+
+// =====================
+// MEDIA & DOKUMENTASI (FOTO & VIDEO)
+// =====================
+
+model MediaItem {
+  id          String    @id @default(cuid())
+  title       String
+  titleEn     String?
+  type        MediaType @default(IMAGE)
+  url         String    @db.Text // Local path or external/YouTube URL
+  thumbnail   String?   @db.Text
+  category    String    @default("GENERAL") // BERANDA, BANTEN, TERNATE, RETREAT, CAMP, EXPLORE, ENCOUNTER, CONNECT
+  description String?   @db.Text
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("media_items")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+}
+
+// =====================
+// POKOK DOA BULANAN
+// =====================
+
+model PrayerRequest {
+  id            String   @id @default(cuid())
+  month         String   // e.g. "November 2026"
+  title         String
+  titleEn       String?
+  description   String   @db.Text
+  descriptionEn String?  @db.Text
+  category      String   @default("MISI") // MISI, PELAYANAN, GENERASI, KEBUTUHAN
+  isAnswered    Boolean  @default(false)
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("prayer_requests")
 }
 
 // =====================
