@@ -287,27 +287,27 @@ export default function HomePage() {
               ) : (
                 <>
                   <div className="text-center space-y-1">
-                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">15+</span>
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">{t.impact.stat1Number}</span>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {t.stats.years}
+                      {t.impact.stat1Title}
                     </p>
                   </div>
                   <div className="text-center space-y-1">
-                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">2</span>
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">{t.impact.stat2Number}</span>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {t.stats.regions}
+                      {t.impact.stat2Title}
                     </p>
                   </div>
                   <div className="text-center space-y-1">
-                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">500+</span>
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-primary">{t.impact.stat3Number}</span>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {t.stats.students}
+                      {t.impact.stat3Title}
                     </p>
                   </div>
                   <div className="text-center space-y-1">
-                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">100+</span>
+                    <span className="font-mono text-3xl sm:text-4xl font-extrabold text-accent">{t.impact.stat4Number}</span>
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                      {t.stats.partners}
+                      {t.impact.stat4Title}
                     </p>
                   </div>
                 </>
@@ -323,13 +323,17 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
             <div className="text-center max-w-2xl mx-auto space-y-3">
               <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                {t.values.kicker}
+                {t.whyEsm.kicker}
               </span>
               <h2 className="font-sans text-3xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                {t.values.title}
+                {t.whyEsm.headlineStart}
+                <span className="text-primary italic font-serif">{t.whyEsm.discipleship}</span>
+                {t.whyEsm.and}
+                <span className="text-accent italic font-serif">{t.whyEsm.mission}</span>
+                {t.whyEsm.headlineEnd}
               </h2>
               <p className="text-sm text-muted-foreground">
-                {t.values.subtitle}
+                {t.whyEsm.description}
               </p>
             </div>
 
@@ -362,9 +366,9 @@ export default function HomePage() {
                       <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
                         <Compass className="size-6" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">{t.values.v1Title}</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t.whyEsm.card1Title}</h3>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {t.values.v1Desc}
+                        {t.whyEsm.card1Desc}
                       </p>
                     </div>
                   </Card>
@@ -374,9 +378,9 @@ export default function HomePage() {
                       <div className="size-12 rounded-2xl bg-accent-50 text-accent flex items-center justify-center font-bold">
                         <Flame className="size-6" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">{t.values.v2Title}</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t.whyEsm.card2Title}</h3>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {t.values.v2Desc}
+                        {t.whyEsm.card2Desc}
                       </p>
                     </div>
                   </Card>
@@ -386,9 +390,9 @@ export default function HomePage() {
                       <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
                         <Users className="size-6" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground">{t.values.v3Title}</h3>
+                      <h3 className="text-xl font-bold text-foreground">{t.whyEsm.card3Title}</h3>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        {t.values.v3Desc}
+                        {t.whyEsm.card3Desc}
                       </p>
                     </div>
                   </Card>
