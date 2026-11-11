@@ -416,7 +416,7 @@ export default function HomePage() {
               </div>
               <Button asChild variant="outline" size="sm" className="rounded-xl">
                 <Link href="/pelayanan">
-                  <span>{t.communities.viewAll}</span>
+                  <span>{t.common.viewAll}</span>
                   <ArrowRight className="size-3.5 ml-1" />
                 </Link>
               </Button>
