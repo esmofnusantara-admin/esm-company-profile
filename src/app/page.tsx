@@ -252,9 +252,9 @@ export default function HomePage() {
                   </div>
 
                   <div className="rounded-2xl bg-accent/10 border border-accent/20 p-3.5 flex items-center justify-between text-xs">
-                    <span className="text-white/80 font-medium">{t.hero.cardFooterText}</span>
+                    <span className="text-white/80 font-medium">{t.hero.cardCta}</span>
                     <Link href="/pelayanan" className="text-accent font-bold hover:underline flex items-center gap-1">
-                      <span>{t.hero.cardFooterLink}</span>
+                      <span>{t.common.readMore}</span>
                       <ChevronRight className="size-3.5" />
                     </Link>
                   </div>
