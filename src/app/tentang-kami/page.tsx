@@ -7,7 +7,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PageHero } from "@/components/common/PageHero";
 import {
   Compass,
   Flame,
@@ -93,17 +93,11 @@ export default function TentangKamiPage() {
 
       <main className="flex-1">
         {/* Header Hero */}
-        <section className="bg-gradient-to-br from-[#241416] via-[#3D1C22] to-[#1E1012] text-white py-20 md:py-24">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
-            <Badge variant="amber" className="text-xs">{p.heroBadge}</Badge>
-            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold tracking-tight">
-              {p.heroTitle}
-            </h1>
-            <p className="max-w-2xl mx-auto text-base sm:text-lg text-white/80 leading-relaxed font-serif italic">
-              &ldquo;{p.heroQuote}&rdquo;
-            </p>
-          </div>
-        </section>
+        <PageHero
+          badge={p.heroBadge}
+          title={p.heroTitle}
+          quote={p.heroQuote}
+        />
 
         {/* Sejarah & Panggilan Awal */}
         <section id="sejarah" className="py-20 bg-canvas">

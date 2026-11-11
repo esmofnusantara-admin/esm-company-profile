@@ -111,9 +111,9 @@ export default function HomePage() {
 
       <main className="flex-1">
         {/* ============================================================
-            1. HERO SECTION (Warm Dignified Dark Mesh, Bukan Merah Pekat)
+            1. HERO SECTION (Luminous Warm Crimson & Golden Spotlight)
             ============================================================ */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#241416] via-[#3D1C22] to-[#1E1012] text-white pt-24 pb-20 md:pt-32 md:pb-28">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#541726] via-[#380F1A] to-[#200910] text-white pt-24 pb-20 md:pt-32 md:pb-28">
           {/* Background Image / Video if configured in CMS */}
           {hero?.mediaUrl && (
             <div className="absolute inset-0 pointer-events-none opacity-20 overflow-hidden">
@@ -138,10 +138,12 @@ export default function HomePage() {
             </div>
           )}
 
-          <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[350px] bg-primary/25 rounded-full blur-[120px] pointer-events-none" />
-          <div className="absolute -bottom-20 right-10 w-[400px] h-[300px] bg-accent/15 rounded-full blur-[100px] pointer-events-none" />
+          {/* Cahaya Pusat Terang (Luminous Spotlight & Ambient Gold) */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] sm:w-[950px] h-[360px] sm:h-[460px] bg-gradient-to-r from-primary/75 via-amber-400/50 to-primary/75 rounded-full blur-[110px] pointer-events-none opacity-90" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[550px] sm:w-[700px] h-[220px] bg-amber-300/30 rounded-full blur-[85px] pointer-events-none" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,215,150,0.20)_0%,rgba(139,38,53,0.15)_45%,transparent_75%)] pointer-events-none" />
 
-          <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-12">
               {/* Left Column: Headline & Action */}
               <div className="space-y-6 lg:col-span-7">
@@ -783,8 +785,11 @@ export default function HomePage() {
         {/* ============================================================
             8. CTA KEMITRAAN & DUKUNG MISI
             ============================================================ */}
-        <section className="relative overflow-hidden bg-gradient-to-br from-[#241416] via-[#3D1C22] to-[#1E1012] text-white py-20 md:py-24">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#541726] via-[#380F1A] to-[#200910] text-white py-20 md:py-24">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] sm:w-[850px] h-[320px] bg-gradient-to-r from-primary/70 via-amber-400/50 to-primary/70 rounded-full blur-[100px] pointer-events-none opacity-85" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(255,215,150,0.18)_0%,transparent_70%)] pointer-events-none" />
+
+          <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <span className="text-xs font-bold uppercase tracking-wider text-accent">
               {t.ctaFooter.kicker}
             </span>

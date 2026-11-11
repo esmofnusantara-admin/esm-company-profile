@@ -5,7 +5,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { PageHero } from "@/components/common/PageHero";
 import { Building, ShieldCheck, HeartHandshake, Phone } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -19,17 +19,11 @@ export default function ConnectPage() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-[#241416] via-[#3D1C22] to-[#1E1012] text-white py-20">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-4">
-            <Badge variant="primarySoft" className="text-xs">{c.badge}</Badge>
-            <h1 className="font-sans text-4xl sm:text-5xl font-extrabold tracking-tight">
-              {c.title}
-            </h1>
-            <p className="max-w-2xl mx-auto text-base text-white/80 leading-relaxed font-serif italic">
-              &ldquo;{c.quote}&rdquo;
-            </p>
-          </div>
-        </section>
+        <PageHero
+          badge={c.badge}
+          title={c.title}
+          quote={c.quote}
+        />
 
         {/* 3 Pilar Marketplace Impact */}
         <section className="py-20 bg-canvas">
