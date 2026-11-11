@@ -44,6 +44,91 @@ async function main() {
       }),
     },
     {
+      key: "home_hero_card",
+      value: JSON.stringify({
+        displayMode: "TABS",
+        badgeTextId: "Aktif",
+        badgeTextEn: "Active",
+        titleId: "Kerangka Pelayanan 3C",
+        titleEn: "3C Ministry Framework",
+        subtitleId: "Communion • Community • Commission",
+        subtitleEn: "Communion • Community • Commission",
+        pillars: [
+          {
+            icon: "compass",
+            titleId: "Explore Community (Siswa SMA)",
+            titleEn: "Explore Community (High School)",
+            descId: "Menemani siswa mengenal Kristus di masa pencarian identitas dan berani bersaksi di sekolah.",
+            descEn: "Walking alongside students discovering identity in Christ and boldly testifying in school.",
+            url: "/pelayanan/explore",
+          },
+          {
+            icon: "graduation",
+            titleId: "Encounter Community (Mahasiswa)",
+            titleEn: "Encounter Community (University)",
+            descId: "Membangun kelompok pemuridan kampus yang kritis, beriman teguh, dan siap diutus.",
+            descEn: "Building robust, discerning campus discipleship groups ready to be sent into mission.",
+            url: "/pelayanan/encounter",
+          },
+          {
+            icon: "briefcase",
+            titleId: "Connect Community (Alumni)",
+            titleEn: "Connect Community (Marketplace)",
+            descId: "Menghubungkan profesional dan alumni untuk integritas iman dan misi di marketplace.",
+            descEn: "Connecting alumni and marketplace professionals for living out faith with integrity.",
+            url: "/pelayanan/connect",
+          },
+        ],
+        ctaTextId: "Bergabung atau Jadi Mitra Gerakan",
+        ctaTextEn: "Join or Partner With Us",
+        ctaUrl: "/pelayanan",
+        singleImageUrl:
+          "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80",
+        singleImageTitleId: "Dokumentasi Kampus & Pelayanan Misi",
+        singleImageTitleEn: "Campus Ministry & Mission Documentation",
+        singleImageCaptionId: "Membangun generasi muda yang berakar dalam firman Tuhan dan berintegritas.",
+        singleImageCaptionEn: "Equipping the young generation rooted in God's word and living with integrity.",
+        videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+        videoThumbnail:
+          "https://images.unsplash.com/photo-1511632765486-a01980e01a18?auto=format&fit=crop&w=1000&q=80",
+        videoTitleId: "Video Profil Gerakan ESM",
+        videoTitleEn: "ESM Movement Profile Video",
+        videoCaptionId: "Kilas perjalanan pelayanan pemuridan di Banten & Ternate.",
+        videoCaptionEn: "Snapshots of the discipleship journey across Banten & Ternate.",
+        slides: [
+          {
+            id: "slide-1",
+            imageUrl:
+              "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80",
+            titleId: "Explore Camp Siswa Banten",
+            titleEn: "Banten High School Explore Camp",
+            captionId: "Retret pembinaan kepemimpinan siswa SMP & SMA di Banten.",
+            captionEn: "Youth leadership and discipleship retreat for Banten students.",
+          },
+          {
+            id: "slide-2",
+            imageUrl:
+              "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1000&q=80",
+            titleId: "Encounter Mahasiswa Ternate",
+            titleEn: "Ternate Campus Encounter Fellowship",
+            captionId: "Kelompok pemuridan mahasiswa di sekitar Universitas Khairun.",
+            captionEn: "Campus discipleship group around Khairun University, North Maluku.",
+          },
+          {
+            id: "slide-3",
+            imageUrl:
+              "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1000&q=80",
+            titleId: "Connect Fellowship Alumni",
+            titleEn: "Marketplace Alumni Connect Fellowship",
+            captionId: "Persekutuan profesional muda untuk integritas iman di tempat kerja.",
+            captionEn: "Young professional fellowship upholding biblical integrity in marketplace.",
+          },
+        ],
+        autoSlide: true,
+        slideIntervalSeconds: 5,
+      }),
+    },
+    {
       key: "home_values",
       value: JSON.stringify([
         {

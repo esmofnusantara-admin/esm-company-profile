@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       const [configs, testimonies, faqs] = await Promise.all([
         prisma.siteConfig.findMany({
           where: {
-            key: { in: ["home_hero", "home_values", "home_stats", "site_settings"] },
+            key: { in: ["home_hero", "home_hero_card", "home_values", "home_stats", "site_settings"] },
           },
         }),
         prisma.testimony.findMany({
@@ -49,6 +49,7 @@ export async function GET(request: NextRequest) {
         success: true,
         data: {
           hero: configMap["home_hero"] || null,
+          heroCard: configMap["home_hero_card"] || null,
           values: configMap["home_values"] || null,
           stats: configMap["home_stats"] || null,
           settings: configMap["site_settings"] || null,

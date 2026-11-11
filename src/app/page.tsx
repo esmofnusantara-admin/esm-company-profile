@@ -8,6 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { HeroVisualCard } from "@/components/home/HeroVisualCard";
 import {
   ArrowRight,
   Compass,
@@ -198,69 +199,9 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right Column: Visual Highlight Card */}
+              {/* Right Column: Visual Highlight Card (Dynamic: Text/Pillars, Swipe Images, Video) */}
               <div className="lg:col-span-5">
-                <div className="relative mx-auto max-w-md rounded-3xl border border-white/15 bg-white/5 p-6 backdrop-blur-xl shadow-2xl space-y-5">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4">
-                    <div className="flex items-center gap-3">
-                      <div className="size-10 rounded-xl bg-accent/20 flex items-center justify-center text-accent">
-                        <Flame className="size-5" />
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-bold text-white">{t.hero.cardTitle}</h4>
-                        <p className="text-xs text-white/60">{t.hero.cardSubtitle}</p>
-                      </div>
-                    </div>
-                    <Badge variant="amber" className="text-[10px]">{t.hero.cardBadge}</Badge>
-                  </div>
-
-                  {/* 3 Pillars Compact Cards */}
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-3 rounded-2xl bg-white/5 p-3.5 border border-white/5 hover:border-white/20 transition-colors">
-                      <div className="size-8 rounded-lg bg-primary/40 flex items-center justify-center text-white shrink-0 mt-0.5">
-                        <Compass className="size-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-white block">{t.hero.cardExplore}</span>
-                        <span className="text-[11px] text-white/70 leading-snug block">
-                          {t.hero.cardExploreDesc}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 rounded-2xl bg-white/5 p-3.5 border border-white/5 hover:border-white/20 transition-colors">
-                      <div className="size-8 rounded-lg bg-accent/30 flex items-center justify-center text-accent shrink-0 mt-0.5">
-                        <GraduationCap className="size-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-white block">{t.hero.cardEncounter}</span>
-                        <span className="text-[11px] text-white/70 leading-snug block">
-                          {t.hero.cardEncounterDesc}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3 rounded-2xl bg-white/5 p-3.5 border border-white/5 hover:border-white/20 transition-colors">
-                      <div className="size-8 rounded-lg bg-primary/40 flex items-center justify-center text-white shrink-0 mt-0.5">
-                        <Briefcase className="size-4" />
-                      </div>
-                      <div>
-                        <span className="text-xs font-bold text-white block">{t.hero.cardConnect}</span>
-                        <span className="text-[11px] text-white/70 leading-snug block">
-                          {t.hero.cardConnectDesc}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl bg-accent/10 border border-accent/20 p-3.5 flex items-center justify-between text-xs">
-                    <span className="text-white/80 font-medium">{t.hero.cardCta}</span>
-                    <Link href="/pelayanan" className="text-accent font-bold hover:underline flex items-center gap-1">
-                      <span>{t.common.readMore}</span>
-                      <ChevronRight className="size-3.5" />
-                    </Link>
-                  </div>
-                </div>
+                <HeroVisualCard config={homeContent?.heroCard} />
               </div>
             </div>
           </div>
