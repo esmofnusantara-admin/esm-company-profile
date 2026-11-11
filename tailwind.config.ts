@@ -92,7 +92,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        serif: ["var(--font-fraunces)", "Georgia", "serif"],
+        serif: ["Georgia", "Cambria", "serif"],
       },
       boxShadow: {
         "warm-sm": "0 1px 3px 0 rgba(36, 20, 22, 0.05), 0 1px 2px -1px rgba(36, 20, 22, 0.05)",
