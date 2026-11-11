@@ -30,6 +30,11 @@ export const metadata: Metadata = {
     "Banten",
     "Ternate",
   ],
+  icons: {
+    icon: "/logo-esm.png",
+    shortcut: "/logo-esm.png",
+    apple: "/logo-esm.png",
+  },
 };
 
 export default function RootLayout({

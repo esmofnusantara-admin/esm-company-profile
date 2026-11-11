@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
@@ -87,8 +88,15 @@ export function Navbar() {
       <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary text-white shadow-warm-sm transition-transform group-hover:scale-105">
-            <span className="font-serif text-xl font-bold tracking-wider">E</span>
+          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-warm-sm ring-1 ring-border/60 transition-transform group-hover:scale-105">
+            <Image
+              src="/logo-esm.png"
+              alt="Logo ESM Indonesia"
+              width={40}
+              height={40}
+              className="h-9 w-9 object-contain"
+              priority
+            />
           </div>
           <div className="flex flex-col">
             <span className="text-lg font-extrabold tracking-tight text-foreground group-hover:text-primary transition-colors">

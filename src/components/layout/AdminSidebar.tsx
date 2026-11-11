@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
@@ -156,8 +157,14 @@ export function AdminSidebar() {
       <div className="p-5 space-y-6 overflow-y-auto max-h-screen scrollbar-none">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="size-10 rounded-xl bg-primary text-white flex items-center justify-center font-serif text-lg font-bold shadow-warm-sm">
-            E
+          <div className="relative size-10 shrink-0 rounded-xl bg-white p-1 flex items-center justify-center shadow-warm-sm ring-1 ring-border/60">
+            <Image
+              src="/logo-esm.png"
+              alt="Logo ESM Indonesia"
+              width={36}
+              height={36}
+              className="h-8 w-8 object-contain"
+            />
           </div>
           <div>
             <h2 className="text-sm font-extrabold text-foreground tracking-tight">

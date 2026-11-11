@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone, MapPin, Instagram, Youtube, Facebook } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -37,8 +38,14 @@ export function Footer() {
           {/* Brand Column */}
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-white shadow-warm-sm">
-                <span className="font-serif text-lg font-bold">E</span>
+              <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-warm-sm ring-1 ring-border/60">
+                <Image
+                  src="/logo-esm.png"
+                  alt="Logo ESM Indonesia"
+                  width={36}
+                  height={36}
+                  className="h-8 w-8 object-contain"
+                />
               </div>
               <div className="flex flex-col">
                 <span className="text-lg font-extrabold tracking-tight text-foreground">

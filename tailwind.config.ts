@@ -22,21 +22,21 @@ const config: Config = {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        // ESM Refined Brand Palette (Warm Dignified Crimson - Bukan Merah Pekat Gelap)
+        // ESM Official Brand Palette (Diselaraskan dengan Logo ESM - Vibrant Crimson, Tidak Terlalu Gelap)
         primary: {
-          DEFAULT: "#8B2635",
+          DEFAULT: "#BA2421",
           foreground: "#FFFFFF",
-          50:  "#FDF2F4",
-          100: "#F9E2E5",
-          200: "#F4C4CB",
-          300: "#EBA0AB",
-          400: "#DE7283",
-          500: "#B8384C",
-          600: "#8B2635", // BRAND CORE (Hangat & Berwibawa)
-          700: "#721F2B",
-          800: "#5A1822",
-          900: "#3A1217",
-          950: "#240A0E",
+          50:  "#FEF2F2",
+          100: "#FEE2E2",
+          200: "#FECACA",
+          300: "#FCA5A5",
+          400: "#F87171",
+          500: "#EF4444",
+          600: "#BA2421", // BRAND CORE (ESM Logo Red - Segar, Wibawa, & Nyaman)
+          700: "#A41D1A", // Tone Logo Asli
+          800: "#7F1D1D",
+          900: "#450A0A",
+          950: "#2D0606",
         },
         // Warm Kingdom Gold (Aksen Kemuliaan & Terang)
         accent: {
