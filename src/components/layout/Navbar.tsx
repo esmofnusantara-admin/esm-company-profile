@@ -22,94 +22,117 @@ export function Navbar() {
 
   const navigationItems = [
     {
-      title: t.nav.about,
+      title: locale === "en" ? "About" : "Tentang",
       href: "/tentang-kami",
       children: [
         {
-          title: t.nav.aboutDropdown.intro,
-          description: t.nav.aboutDropdown.introDesc,
+          title: locale === "en" ? "Story & Vision" : "Kisah & Visi Misi",
+          description: locale === "en" ? "Heart and calling of ESM" : "Hati, sejarah, dan panggilan awal gerakan",
           href: "/tentang-kami#sejarah",
         },
         {
-          title: t.nav.aboutDropdown.vision,
-          description: t.nav.aboutDropdown.visionDesc,
-          href: "/tentang-kami#visi-misi",
-        },
-        {
-          title: t.nav.aboutDropdown.faith,
-          description: t.nav.aboutDropdown.faithDesc,
+          title: locale === "en" ? "3C Foundation" : "Dasar Iman & Nilai 3C",
+          description: locale === "en" ? "Communion, Community, Commission" : "Communion, Community, Commission",
           href: "/tentang-kami#dasar-iman",
         },
         {
-          title: t.nav.aboutDropdown.regions,
-          description: t.nav.aboutDropdown.regionsDesc,
+          title: locale === "en" ? "Banten & Ternate" : "Ladang: Banten & Ternate",
+          description: locale === "en" ? "Regional mission profiles" : "Profil perintisan di Tanah Jawara & Kota Rempah",
           href: "/tentang-kami#wilayah",
         },
       ],
     },
     {
-      title: t.nav.ministry,
+      title: locale === "en" ? "Ministries" : "Pelayanan",
       href: "/pelayanan",
       children: [
         {
-          title: t.nav.ministryDropdown.strategy,
-          description: t.nav.ministryDropdown.strategyDesc,
-          href: "/pelayanan",
-        },
-        {
-          title: t.nav.ministryDropdown.explore,
-          description: t.nav.ministryDropdown.exploreDesc,
+          title: "Explore (Siswa SMA)",
+          description: locale === "en" ? "High school discipleship" : "Mendampingi masa pencarian identitas di sekolah",
           href: "/pelayanan/explore",
         },
         {
-          title: t.nav.ministryDropdown.encounter,
-          description: t.nav.ministryDropdown.encounterDesc,
+          title: "Encounter (Mahasiswa)",
+          description: locale === "en" ? "Campus discipleship" : "Membangun murid berakar & kritis di kampus",
           href: "/pelayanan/encounter",
         },
         {
-          title: t.nav.ministryDropdown.connect,
-          description: t.nav.ministryDropdown.connectDesc,
+          title: "Connect (Alumni)",
+          description: locale === "en" ? "Marketplace ministry" : "Menjadi saksi Kristus di dunia profesional",
           href: "/pelayanan/connect",
         },
       ],
     },
     {
-      title: t.nav.mobilization,
-      href: "/mobilisasi",
+      title: locale === "en" ? "News & Prayer" : "Kabar & Doa",
+      href: "/artikel",
+      children: [
+        {
+          title: locale === "en" ? "Reflections" : "Renungan & Refleksi Firman",
+          description: locale === "en" ? "Spiritual nourishment" : "Santapan rohani & catatan pembinaan",
+          href: "/artikel",
+        },
+        {
+          title: locale === "en" ? "Prayer Wall" : "Pokok Doa Bersama",
+          description: locale === "en" ? "Monthly prayer bulletin" : "Mezbah doa bulanan untuk sekolah & kampus",
+          href: "/doa",
+        },
+        {
+          title: locale === "en" ? "Field Stories" : "Warta Misi Lapangan",
+          description: locale === "en" ? "Snapshots from the field" : "Dinamika pelayanan di Banten & Ternate",
+          href: "/artikel",
+        },
+      ],
     },
     {
-      title: t.nav.media,
-      href: "/artikel",
+      title: locale === "en" ? "Resources" : "Sumber Daya",
+      href: "/sumber-daya",
+      children: [
+        {
+          title: locale === "en" ? "Bible Study Guides" : "Bahan PA & Saat Teduh",
+          description: locale === "en" ? "Free downloadable materials" : "Modul Alkitab gratis untuk siswa & mahasiswa",
+          href: "/sumber-daya",
+        },
+        {
+          title: locale === "en" ? "Leader Handbook" : "Panduan Pembuat Murid",
+          description: locale === "en" ? "Practical mentor guides" : "Buku saku praktis bagi pembina & mentor",
+          href: "/sumber-daya#mentor",
+        },
+      ],
+    },
+    {
+      title: locale === "en" ? "Agenda" : "Agenda",
+      href: "/agenda",
     },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/70 bg-canvas/90 backdrop-blur-md transition-all">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-canvas/95 backdrop-blur-md transition-all">
+      <div className="mx-auto flex h-16 sm:h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 flex-nowrap">
         {/* Brand Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-warm-sm ring-1 ring-border/60 transition-transform group-hover:scale-105">
+        <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+          <div className="relative flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-white p-1 shadow-warm-xs ring-1 ring-border/50 transition-transform group-hover:scale-105">
             <Image
               src="/logo-esm.png"
               alt="Logo ESM Indonesia"
-              width={40}
-              height={40}
-              className="h-9 w-9 object-contain"
+              width={36}
+              height={36}
+              className="h-8 w-8 object-contain"
               priority
             />
           </div>
           <div className="flex flex-col">
-            <span className="text-lg font-extrabold tracking-tight text-foreground group-hover:text-primary transition-colors">
+            <span className="text-base sm:text-lg font-black tracking-tight text-foreground group-hover:text-primary transition-colors leading-none">
               ESM
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-muted-foreground uppercase">
+            <span className="text-[9px] font-semibold tracking-wider text-muted-foreground uppercase leading-tight mt-0.5 hidden sm:block">
               Evangelical Student Movement
             </span>
           </div>
         </Link>
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+        {/* Desktop Navigation Links (Strictly 1 Row, Compact & Clean) */}
+        <nav className="hidden lg:flex items-center gap-1 xl:gap-2 shrink-0">
           {navigationItems.map((item) => (
             <div
               key={item.title}
@@ -120,32 +143,32 @@ export function Navbar() {
               <Link
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold rounded-lg transition-colors",
+                  "flex items-center gap-1 px-3 py-1.5 text-[13px] xl:text-sm font-semibold rounded-lg transition-colors whitespace-nowrap",
                   pathname === item.href || pathname?.startsWith(item.href + "/")
-                    ? "text-primary bg-primary-50/80"
+                    ? "text-primary bg-primary-50/70"
                     : "text-foreground/80 hover:text-primary hover:bg-canvas-subtle"
                 )}
               >
-                {item.title}
+                <span>{item.title}</span>
                 {item.children && (
-                  <ChevronDown className="size-3.5 opacity-60 transition-transform group-hover:rotate-180" />
+                  <ChevronDown className="size-3 opacity-60 transition-transform group-hover:rotate-180" />
                 )}
               </Link>
 
               {/* Mega / Dropdown Menu */}
               {item.children && activeDropdown === item.title && (
                 <div className="absolute left-0 top-full pt-2 w-72 animate-in fade-in-50 zoom-in-95 duration-150">
-                  <div className="rounded-2xl border border-border bg-card p-3 shadow-warm-lg">
+                  <div className="rounded-2xl border border-border/80 bg-card p-2.5 shadow-warm-lg">
                     {item.children.map((sub) => (
                       <Link
                         key={sub.title}
                         href={sub.href}
                         className="block rounded-xl p-2.5 transition-colors hover:bg-canvas-subtle group/item"
                       >
-                        <p className="text-sm font-bold text-foreground group-hover/item:text-primary transition-colors">
+                        <p className="text-xs font-bold text-foreground group-hover/item:text-primary transition-colors">
                           {sub.title}
                         </p>
-                        <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                        <p className="text-[11px] text-muted-foreground line-clamp-1 mt-0.5">
                           {sub.description}
                         </p>
                       </Link>
@@ -157,26 +180,17 @@ export function Navbar() {
           ))}
         </nav>
 
-        {/* Desktop Utility & Action CTA */}
-        <div className="hidden md:flex items-center gap-3">
-          {/* Quick link Minta Doa */}
-          <Link
-            href="/kemitraan#doa"
-            className="hidden lg:flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary transition-colors px-2 py-1"
-          >
-            <Heart className="size-3.5 text-primary" />
-            <span>{t.nav.prayerRequest}</span>
-          </Link>
-
+        {/* Desktop Utility & Action CTA (Single Row, No Wrap) */}
+        <div className="hidden lg:flex items-center gap-2.5 shrink-0">
           {/* Interactive Language Switcher (ID | EN) */}
-          <div className="flex items-center rounded-full border border-border/80 bg-card p-0.5 text-xs font-medium shadow-warm-sm">
+          <div className="flex items-center rounded-full border border-border/70 bg-card p-0.5 text-xs font-medium shadow-warm-xs">
             <button
               type="button"
               onClick={() => setLocale("id")}
               className={cn(
-                "px-2.5 py-1 rounded-full transition-all text-xs font-bold",
+                "px-2 py-0.5 rounded-full transition-all text-[11px] font-bold",
                 locale === "id"
-                  ? "bg-primary text-white shadow-sm"
+                  ? "bg-primary text-white shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -186,9 +200,9 @@ export function Navbar() {
               type="button"
               onClick={() => setLocale("en")}
               className={cn(
-                "px-2.5 py-1 rounded-full transition-all text-xs font-bold",
+                "px-2 py-0.5 rounded-full transition-all text-[11px] font-bold",
                 locale === "en"
-                  ? "bg-primary text-white shadow-sm"
+                  ? "bg-primary text-white shadow-xs"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
@@ -197,7 +211,7 @@ export function Navbar() {
           </div>
 
           {/* Primary Action Button */}
-          <Button asChild size="default" className="rounded-full shadow-warm-sm">
+          <Button asChild size="sm" className="rounded-full shadow-warm-xs text-xs font-bold px-4 py-1.5 h-8">
             <Link href="/kemitraan">
               <span>{t.nav.partnerCta}</span>
             </Link>

@@ -47,3 +47,11 @@ next-env.d.ts
 # uploads
 /public/uploads/*
 !/public/uploads/.gitkeep
+!/public/uploads/books/
+!/public/uploads/books/*
+!/public/uploads/agenda/
+!/public/uploads/agenda/*
+!/public/uploads/hero/
+!/public/uploads/hero/*
+!/public/uploads/pelayanan/
+!/public/uploads/pelayanan/*

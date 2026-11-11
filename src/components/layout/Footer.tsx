@@ -143,8 +143,19 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/kemitraan#doa" className="hover:text-primary transition-colors">
-                  {t.footer.prayerItems}
+                <Link href="/doa" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <span>Pokok Doa Bersama</span>
+                  <span className="size-1.5 rounded-full bg-primary" />
+                </Link>
+              </li>
+              <li>
+                <Link href="/sumber-daya" className="hover:text-primary transition-colors">
+                  Bahan PA & Modul Pemuridan
+                </Link>
+              </li>
+              <li>
+                <Link href="/gabung" className="hover:text-primary transition-colors font-semibold text-accent">
+                  Gabung Kelompok Pemuridan
                 </Link>
               </li>
               <li>

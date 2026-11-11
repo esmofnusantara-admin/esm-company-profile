@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { PageHero } from "@/components/common/PageHero";
+import { Badge } from "@/components/ui/badge";
 import {
   Heart,
   HandCoins,
@@ -20,9 +21,16 @@ import {
   QrCode,
   ShieldCheck,
   CheckCircle,
+  Sparkles,
+  ArrowRight,
+  TrendingUp,
+  MapPin,
+  BookOpen,
+  Home,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { submitDonation } from "@/actions/donation";
+import { cn } from "@/lib/utils";
 
 export default function KemitraanPage() {
   const { t, locale } = useLanguage();
@@ -114,100 +122,140 @@ export default function KemitraanPage() {
     <>
       <Navbar />
 
-      <main className="flex-1">
-        {/* Hero Banner */}
-        <PageHero
-          badge={k.badge}
-          title={k.title}
-          quote={k.quote}
-        />
+      <main className="flex-1 bg-[#FAF7F2]">
+        {/* ============================================================
+            1. PHOTO-DRIVEN MISSION STEWARDSHIP HERO
+            Featuring real photo of smiling students with books in learning center
+            ============================================================ */}
+        <section className="relative min-h-[460px] sm:min-h-[520px] flex items-center justify-center text-white overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/uploads/hero/kemitraan_hero.jpg"
+              alt="Dukungan Misi dan Kemitraan Pemuridan ESM"
+              fill
+              priority
+              className="object-cover object-center scale-105"
+            />
+            {/* Multi-stop Deep Vignette */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#140305] via-[#24060A]/85 to-[#120204]/75" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#140305]/60 to-[#140305]/95" />
+          </div>
 
-        {/* 3 Pillars of Partnership */}
-        <section className="py-16 bg-canvas">
+          <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-amber-200 shadow-sm">
+              <Heart className="size-3.5 text-amber-300" />
+              <span>Kemitraan Misi & Penatalayanan Gerakan</span>
+            </div>
+
+            <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white max-w-4xl mx-auto">
+              Menjadi Rekan Sekerja Allah untuk{" "}
+              <span className="font-serif italic font-normal text-amber-200">
+                Menjangkau Generasi Muda
+              </span>
+            </h1>
+
+            <p className="font-serif italic text-sm sm:text-base lg:text-lg text-stone-200 max-w-2xl mx-auto font-normal leading-relaxed">
+              &ldquo;Hendaklah masing-masing memberikan menurut kerelaan hatinya, jangan dengan sedih hati atau karena paksaan, sebab Allah mengasihi orang yang memberi dengan sukacita.&rdquo; — 2 Korintus 9:7
+            </p>
+
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4 text-xs font-semibold text-stone-300">
+              <span className="flex items-center gap-1.5">
+                <ShieldCheck className="size-4 text-emerald-400" />
+                100% Akuntabel & Terbuka
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5">
+                <MapPin className="size-4 text-amber-400" />
+                Penyaluran Langsung: Banten & Maluku Utara
+              </span>
+              <span>•</span>
+              <span className="flex items-center gap-1.5">
+                <Users2 className="size-4 text-blue-400" />
+                Menopang Siswa, Mahasiswa, & Asrama
+              </span>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================
+            2. TRANSPARANSI DAMPAK: KE MANA SETIAP DUKUNGAN MENGALIR?
+            Concrete financial stewardship impact cards
+            ============================================================ */}
+        <section className="py-16 sm:py-20 -mt-10 sm:-mt-14 relative z-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Doa */}
-              <Card className="p-6 space-y-4 hover:border-primary/40 transition-colors shadow-warm-sm">
-                <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
-                  <Heart className="size-6" />
+              <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-md space-y-4">
+                <div className="size-12 rounded-2xl bg-red-50 text-primary flex items-center justify-center font-bold">
+                  <BookOpen className="size-6" />
                 </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary">{k.p1Number}</span>
-                  <h3 className="text-xl font-bold text-foreground mt-1">{k.p1Title}</h3>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Dampak Rp 50.000 / bln</span>
+                  <h3 className="font-bold text-lg text-foreground">Modul PA & Alkitab Siswa</h3>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.p1Desc}
+                <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                  Menyediakan 1 paket buku panduan pemuridan dan Alkitab saku gratis bagi siswa SMA yang rindu belajar firman di Banten dan Ternate.
                 </p>
-                <Button variant="outline" size="sm" asChild className="w-full rounded-xl text-xs">
-                  <a href="#doa">{k.p1Btn}</a>
-                </Button>
               </Card>
 
-              {/* Finansial */}
-              <Card className="p-6 space-y-4 hover:border-accent/60 transition-colors shadow-warm-sm border-accent/40 bg-card">
-                <div className="size-12 rounded-2xl bg-accent-50 text-accent flex items-center justify-center font-bold">
-                  <HandCoins className="size-6" />
+              <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-md space-y-4">
+                <div className="size-12 rounded-2xl bg-amber-50 text-amber-800 flex items-center justify-center font-bold">
+                  <Home className="size-6" />
                 </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-accent">{k.p2Number}</span>
-                  <h3 className="text-xl font-bold text-foreground mt-1">{k.p2Title}</h3>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">Dampak Rp 250.000 / bln</span>
+                  <h3 className="font-bold text-lg text-foreground">Subsidi Asrama Mahasiswa</h3>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.p2Desc}
+                <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                  Membantu biaya sewa asrama dan fasilitas belajar bagi 1 orang mahasiswa perantau dari kepulauan Halmahera di Ministry House Ternate.
                 </p>
-                <Button variant="amber" size="sm" asChild className="w-full rounded-xl text-xs">
-                  <a href="#donasi">{k.p2Btn}</a>
-                </Button>
               </Card>
 
-              {/* Partisipasi / Relawan */}
-              <Card className="p-6 space-y-4 hover:border-primary/40 transition-colors shadow-warm-sm">
-                <div className="size-12 rounded-2xl bg-primary-50 text-primary flex items-center justify-center font-bold">
-                  <Users2 className="size-6" />
+              <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-md space-y-4">
+                <div className="size-12 rounded-2xl bg-emerald-50 text-emerald-800 flex items-center justify-center font-bold">
+                  <TrendingUp className="size-6" />
                 </div>
-                <div>
-                  <span className="text-xs font-bold uppercase tracking-wider text-primary">{k.p3Number}</span>
-                  <h3 className="text-xl font-bold text-foreground mt-1">{k.p3Title}</h3>
+                <div className="space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800">Dampak Rp 500.000+ / bln</span>
+                  <h3 className="font-bold text-lg text-foreground">Operasional Staf Perintis Misi</h3>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {k.p3Desc}
+                <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                  Mendukung biaya transportasi antar-pulau, kesehatan, dan bekal hidup para staf penuh waktu yang mengabdi memuridkan generasi muda.
                 </p>
-                <Button variant="outline" size="sm" asChild className="w-full rounded-xl text-xs">
-                  <a href="#kontak">{k.p3Btn}</a>
-                </Button>
               </Card>
             </div>
           </div>
         </section>
 
-        {/* Form Donasi & Rekening Bank */}
-        <section id="donasi" className="py-20 bg-card border-y border-border">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-12">
-            <div className="text-center space-y-2 max-w-xl mx-auto">
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">{k.donationKicker}</span>
-              <h2 className="font-sans text-3xl font-extrabold text-foreground">
-                {k.donationTitle}
+        {/* ============================================================
+            3. FORM KOMITMEN DONASI & REKENING BANK TERINTEGRASI
+            ============================================================ */}
+        <section id="donasi" className="py-16 sm:py-24 bg-white border-y border-stone-200/90">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center space-y-3 max-w-2xl mx-auto">
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                Saluran Kemitraan Finansial
+              </span>
+              <h2 className="font-sans text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+                Komitmen Dukungan & Rekening Resmi
               </h2>
-              <p className="text-xs text-muted-foreground">
-                {k.donationSubtitle}
+              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Pilih frekuensi dan nominal yang sesuai dengan kerelaan hati Anda. Seluruh persembahan dialokasikan langsung bagi pelayanan siswa, mahasiswa, dan staf perintis.
               </p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
               {/* Form Input */}
-              <div className="lg:col-span-7 rounded-2xl border border-border bg-canvas p-6 sm:p-8 space-y-6 shadow-warm-sm">
+              <div className="lg:col-span-7 rounded-3xl border border-stone-200/90 bg-[#FAF7F2] p-6 sm:p-9 space-y-6 shadow-warm-xs">
                 {submitSuccess ? (
-                  <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-6 text-center space-y-4">
-                    <div className="size-12 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
-                      <Check className="size-6" />
+                  <div className="rounded-2xl bg-emerald-50 border border-emerald-200 p-8 text-center space-y-4 animate-in fade-in duration-300">
+                    <div className="size-14 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center">
+                      <Check className="size-7" />
                     </div>
-                    <h3 className="text-lg font-bold text-emerald-900">
-                      {locale === "en" ? "Thank You for Your Commitment!" : "Terima Kasih atas Komitmen Anda!"}
+                    <h3 className="text-xl font-bold text-emerald-900">
+                      Terima Kasih atas Komitmen Anda!
                     </h3>
-                    <p className="text-xs text-emerald-700 leading-relaxed max-w-md mx-auto">
-                      {locale === "en"
-                        ? "Your partnership commitment has been recorded in our system. May God bless your generosity as we labor together for student discipleship across Indonesia."
-                        : "Komitmen kemitraan Anda telah tercatat langsung di sistem database ESM. Kiranya Tuhan memberkati kesetiaan Anda dalam memajukan pemuridan siswa dan mahasiswa di pelosok Nusantara."}
+                    <p className="text-xs sm:text-sm text-emerald-700 leading-relaxed max-w-md mx-auto">
+                      Komitmen kemitraan Anda telah tercatat di sistem ESM. Kiranya Tuhan yang empunya ladang memberkati setiap benih yang Anda tabur bagi generasi murid di Nusantara.
                     </p>
                     <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
                       <Button
@@ -215,11 +263,11 @@ export default function KemitraanPage() {
                         variant="outline"
                         size="sm"
                         onClick={() => setSubmitSuccess(false)}
-                        className="rounded-xl text-xs bg-white text-emerald-800 border-emerald-300"
+                        className="rounded-full text-xs bg-white text-emerald-800 border-emerald-300"
                       >
-                        {locale === "en" ? "Submit Another Commitment" : "Kirim Komitmen Lainnya"}
+                        Kirim Komitmen Lain
                       </Button>
-                      <Button asChild size="sm" className="rounded-xl text-xs bg-emerald-700 hover:bg-emerald-800 text-white">
+                      <Button asChild size="sm" className="rounded-full text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold">
                         <a
                           href={`https://wa.me/${waContact}?text=${encodeURIComponent(
                             `Halo Admin ESM, saya ingin konfirmasi komitmen donasi kemitraan misi.`
@@ -227,7 +275,7 @@ export default function KemitraanPage() {
                           target="_blank"
                           rel="noreferrer"
                         >
-                          <Phone className="size-3.5 mr-1" />
+                          <Phone className="size-3.5 mr-1.5" />
                           <span>Konfirmasi via WhatsApp</span>
                         </a>
                       </Button>
@@ -236,41 +284,45 @@ export default function KemitraanPage() {
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {errorMessage && (
-                      <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+                      <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs font-semibold">
                         {errorMessage}
                       </div>
                     )}
 
                     {/* Tipe Donasi Tabs */}
-                    <div className="flex rounded-xl bg-card p-1 border border-border">
+                    <div className="flex rounded-2xl bg-white p-1 border border-stone-200">
                       <button
                         type="button"
                         onClick={() => setDonationType("MITRA_BULANAN")}
-                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
+                        className={cn(
+                          "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer",
                           donationType === "MITRA_BULANAN"
-                            ? "bg-primary text-white shadow-warm-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
+                            ? "bg-[#2D060B] text-white shadow-warm-xs"
+                            : "text-stone-600 hover:text-stone-900"
+                        )}
                       >
-                        {k.monthlyTab}
+                        Mitra Bulanan (Rutin)
                       </button>
                       <button
                         type="button"
                         onClick={() => setDonationType("SEKALI_BERI")}
-                        className={`flex-1 py-2 text-xs font-bold rounded-lg transition-colors ${
+                        className={cn(
+                          "flex-1 py-2.5 text-xs font-bold rounded-xl transition-all cursor-pointer",
                           donationType === "SEKALI_BERI"
-                            ? "bg-primary text-white shadow-warm-sm"
-                            : "text-muted-foreground hover:text-foreground"
-                        }`}
+                            ? "bg-[#2D060B] text-white shadow-warm-xs"
+                            : "text-stone-600 hover:text-stone-900"
+                        )}
                       >
-                        {k.oneTimeTab}
+                        Dukungan Sekali Waktu
                       </button>
                     </div>
 
                     {/* Preset Nominal */}
-                    <div className="space-y-2">
-                      <label className="text-xs font-bold text-foreground">{k.amountLabel}</label>
-                      <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div className="space-y-2.5">
+                      <label className="text-xs font-bold text-foreground block">
+                        Pilih Nominal Dukungan:
+                      </label>
+                      <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                         {["50.000", "100.000", "250.000", "500.000", "1.000.000"].map((nom) => (
                           <button
                             key={nom}
@@ -279,11 +331,12 @@ export default function KemitraanPage() {
                               setSelectedNominal(nom);
                               setCustomNominal("");
                             }}
-                            className={`rounded-xl border py-2.5 text-xs font-bold transition-all ${
+                            className={cn(
+                              "rounded-xl border py-2 text-xs font-bold transition-all cursor-pointer",
                               selectedNominal === nom && !customNominal
-                                ? "border-primary bg-primary text-white shadow-warm-xs"
-                                : "border-border bg-card text-foreground hover:border-primary/40"
-                            }`}
+                                ? "border-[#2D060B] bg-[#2D060B] text-white shadow-warm-xs"
+                                : "border-stone-200 bg-white text-stone-700 hover:border-stone-400"
+                            )}
                           >
                             Rp {nom}
                           </button>
@@ -291,8 +344,8 @@ export default function KemitraanPage() {
                       </div>
 
                       <div className="pt-2">
-                        <label className="text-xs text-muted-foreground block mb-1">
-                          {locale === "en" ? "Or enter other amount (IDR):" : "Atau masukkan nominal lainnya (Rp):"}
+                        <label className="text-[11px] text-stone-500 block mb-1">
+                          Atau masukkan nominal lainnya (Rp):
                         </label>
                         <input
                           type="text"
@@ -301,72 +354,80 @@ export default function KemitraanPage() {
                             setCustomNominal(e.target.value);
                             setSelectedNominal("");
                           }}
-                          placeholder="Rp 0"
-                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          placeholder="Contoh: 1.500.000"
+                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
                         />
                       </div>
                     </div>
 
                     {/* Identitas Donatur */}
-                    <div className="space-y-4 pt-4 border-t border-border">
+                    <div className="space-y-4 pt-4 border-t border-stone-200">
                       <div>
-                        <label className="text-xs font-bold text-foreground block mb-1">{k.nameLabel} *</label>
+                        <label className="text-xs font-bold text-foreground block mb-1">
+                          Nama Lengkap / Inisial *
+                        </label>
                         <input
                           type="text"
                           required
                           value={donorName}
                           onChange={(e) => setDonorName(e.target.value)}
-                          placeholder="Nama Lengkap / Inisial"
-                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          placeholder="Nama Anda atau Anonim"
+                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
                         />
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <label className="text-xs font-bold text-foreground block mb-1">{k.phoneLabel} *</label>
+                          <label className="text-xs font-bold text-foreground block mb-1">
+                            Nomor WhatsApp / HP *
+                          </label>
                           <input
                             type="tel"
                             required
                             value={donorPhone}
                             onChange={(e) => setDonorPhone(e.target.value)}
                             placeholder="08xxxxxxxxxx"
-                            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
                           />
                         </div>
                         <div>
-                          <label className="text-xs font-bold text-foreground block mb-1">{k.emailLabel}</label>
+                          <label className="text-xs font-bold text-foreground block mb-1">
+                            Alamat Email (Opsional)
+                          </label>
                           <input
                             type="email"
                             value={donorEmail}
                             onChange={(e) => setDonorEmail(e.target.value)}
-                            placeholder="email@example.com"
-                            className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                            placeholder="nama@email.com"
+                            className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="text-xs font-bold text-foreground block mb-1">{k.messageLabel}</label>
+                        <label className="text-xs font-bold text-foreground block mb-1">
+                          Pesan Doa atau Kerinduan Anda
+                        </label>
                         <textarea
                           rows={3}
                           value={message}
                           onChange={(e) => setMessage(e.target.value)}
-                          placeholder={k.messagePlaceholder}
-                          className="w-full rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          placeholder="Tuliskan doa atau permohonan khusus bagi ladang misi..."
+                          className="w-full rounded-xl border border-stone-200 bg-white px-4 py-2.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 font-medium leading-relaxed"
                         />
                       </div>
 
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full justify-center rounded-xl font-bold text-xs py-3 shadow-warm-sm"
+                        className="w-full justify-center rounded-full font-bold text-xs py-5 shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white"
                       >
                         {isSubmitting ? (
-                          <span>{locale === "en" ? "Submitting..." : "Menyimpan Komitmen..."}</span>
+                          <span>Menyimpan Komitmen...</span>
                         ) : (
                           <>
-                            <Send className="size-3.5 mr-2" />
-                            <span>{k.submitBtn}</span>
+                            <Send className="size-4 mr-2" />
+                            <span>Simpan Komitmen Donasi Misi</span>
                           </>
                         )}
                       </Button>
@@ -377,63 +438,63 @@ export default function KemitraanPage() {
 
               {/* Bank Transfer Info & QRIS Card */}
               <div className="lg:col-span-5 space-y-6">
-                <Card className="p-6 border-border bg-canvas-subtle space-y-4 shadow-warm-sm">
+                <Card className="p-7 rounded-3xl border border-stone-200/90 bg-[#FAF7F2] space-y-5 shadow-warm-xs">
                   <div className="flex items-center gap-2 text-primary font-bold text-sm">
                     <Building2 className="size-4" />
-                    <span>{k.bankTitle}</span>
+                    <span>Rekening Resmi Yayasan</span>
                   </div>
 
-                  <div className="space-y-1 rounded-xl bg-card p-4 border border-border">
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground">
+                  <div className="space-y-1.5 rounded-2xl bg-white p-5 border border-stone-200">
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-stone-500">
                       {bankName}
                     </span>
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-xl font-extrabold text-foreground tracking-wider">
+                      <span className="font-mono text-xl sm:text-2xl font-black text-foreground tracking-wider">
                         {bankAccount}
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={handleCopy}
-                        className="h-8 rounded-lg text-xs"
+                        className="h-8 rounded-full text-xs font-bold border-stone-300"
                       >
                         {copied ? (
                           <>
                             <Check className="size-3.5 text-emerald-600 mr-1" />
-                            <span className="text-emerald-600">{t.common.copied}</span>
+                            <span className="text-emerald-600">Tersalin</span>
                           </>
                         ) : (
                           <>
                             <Copy className="size-3.5 mr-1" />
-                            <span>{t.common.copy}</span>
+                            <span>Salin No.</span>
                           </>
                         )}
                       </Button>
                     </div>
-                    <span className="text-xs text-muted-foreground block pt-1">
-                      a.n. <strong>{accountName}</strong>
+                    <span className="text-xs text-stone-600 block pt-1 font-medium">
+                      Atas Nama: <strong>{accountName}</strong>
                     </span>
                   </div>
 
                   {/* QRIS Display */}
-                  <div className="rounded-xl border border-border bg-card p-4 space-y-3 text-center">
+                  <div className="rounded-2xl border border-stone-200 bg-white p-5 space-y-3 text-center">
                     {qrisUrl ? (
-                      <div className="size-48 mx-auto rounded-xl border border-border bg-white flex items-center justify-center p-2 relative overflow-hidden">
+                      <div className="size-48 mx-auto rounded-xl border border-stone-200 bg-white flex items-center justify-center p-2 relative overflow-hidden">
                         <Image src={qrisUrl} alt="Barcode QRIS ESM" fill className="object-contain p-1" />
                       </div>
                     ) : (
-                      <div className="size-28 mx-auto rounded-xl border border-border bg-white flex items-center justify-center p-2">
-                        <QrCode className="size-24 text-foreground/80" />
+                      <div className="size-28 mx-auto rounded-xl border border-stone-200 bg-stone-50 flex items-center justify-center p-2">
+                        <QrCode className="size-20 text-stone-600" />
                       </div>
                     )}
-                    <p className="text-[11px] text-muted-foreground">
-                      {k.qrisNote}
+                    <p className="text-[11px] text-stone-500 font-medium">
+                      Scan via GoPay, OVO, Dana, BCA Mobile, atau aplikasi perbankan apa pun
                     </p>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 text-xs text-stone-500 font-medium pt-1">
                     <ShieldCheck className="size-4 text-emerald-600 shrink-0" />
-                    <span>{k.securityNote}</span>
+                    <span>Laporan pertanggungjawaban donasi dikirimkan secara berkala kepada seluruh mitra terdaftar.</span>
                   </div>
                 </Card>
               </div>
@@ -441,26 +502,30 @@ export default function KemitraanPage() {
           </div>
         </section>
 
-        {/* POKOK DOA SECTION (Dynamic from Database) */}
-        <section id="doa" className="py-20 bg-canvas">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* ============================================================
+            4. POKOK DOA MITRA (Dynamic from Database)
+            ============================================================ */}
+        <section id="doa" className="py-16 sm:py-20 bg-[#FAF7F2]">
+          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">
             <div className="text-center space-y-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-primary">{k.prayerKicker}</span>
-              <h2 className="font-sans text-3xl font-extrabold text-foreground">
-                {k.prayerTitle}
+              <span className="text-xs font-bold uppercase tracking-widest text-primary">
+                Syafaat Mitra & Penopang
+              </span>
+              <h2 className="font-sans text-2xl sm:text-3xl font-black text-foreground">
+                Pokok Doa Khusus Kemitraan Misi
               </h2>
-              <p className="text-xs text-muted-foreground max-w-xl mx-auto">
-                {k.prayerSubtitle}
+              <p className="text-xs sm:text-sm text-stone-600 max-w-lg mx-auto">
+                Selain dukungan materi, topangan doa Anda adalah fondasi utama yang memungkinkan tim staf tetap bertahan melayani di lapangan.
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {prayers && Array.isArray(prayers) && prayers.length > 0 ? (
                 prayers.map((pr: any) => {
                   const title = locale === "en" ? pr.titleEn || pr.title : pr.title;
                   const desc = locale === "en" ? pr.descriptionEn || pr.description : pr.description;
                   return (
-                    <Card key={pr.id} className="p-5 space-y-2 flex flex-col justify-between">
+                    <Card key={pr.id} className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-3 flex flex-col justify-between">
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
                           <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{pr.category}</span>
@@ -471,11 +536,11 @@ export default function KemitraanPage() {
                           )}
                         </div>
                         <h4 className="font-bold text-sm text-foreground">{title}</h4>
-                        <p className="text-xs text-muted-foreground leading-relaxed">
+                        <p className="text-xs text-stone-600 leading-relaxed font-normal">
                           {desc}
                         </p>
                       </div>
-                      <span className="text-[10px] text-muted-foreground/60 pt-2 block border-t border-border/50">
+                      <span className="text-[10px] text-stone-400 pt-3 block border-t border-stone-100">
                         Periode: {pr.month}
                       </span>
                     </Card>
@@ -483,27 +548,27 @@ export default function KemitraanPage() {
                 })
               ) : (
                 <>
-                  <Card className="p-5 space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr1Tag}</span>
-                    <h4 className="font-bold text-sm text-foreground">{k.pr1Title}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {k.pr1Desc}
+                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">Perintisan Banten</span>
+                    <h4 className="font-bold text-sm text-foreground">Penyediaan Asrama Siswa di Serang</h4>
+                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                      Doakan kecukupan biaya sewa rumah binaan untuk menampung adik-adik siswa yang rindu dididik dalam kelompok KTB.
                     </p>
                   </Card>
 
-                  <Card className="p-5 space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-accent tracking-wider">{k.pr2Tag}</span>
-                    <h4 className="font-bold text-sm text-foreground">{k.pr2Title}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {k.pr2Desc}
+                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-amber-800 tracking-wider">Misi Ternate</span>
+                    <h4 className="font-bold text-sm text-foreground">Kesehatan & Perlindungan Staf Lapangan</h4>
+                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                      Doakan stamina fisik dan perlindungan rohani bagi keluarga staf perintis yang melintasi pulau-pulau di Maluku Utara.
                     </p>
                   </Card>
 
-                  <Card className="p-5 space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{k.pr3Tag}</span>
-                    <h4 className="font-bold text-sm text-foreground">{k.pr3Title}</h4>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {k.pr3Desc}
+                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
+                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">Kurikulum Firman</span>
+                    <h4 className="font-bold text-sm text-foreground">Pencetakan 1.000 Modul KTB Gratis</h4>
+                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                      Doakan dana pengadaan pencetakan buku modul bimbingan firman agar dapat dibagikan cuma-cuma ke sekolah dan kampus mitra.
                     </p>
                   </Card>
                 </>
@@ -512,25 +577,27 @@ export default function KemitraanPage() {
           </div>
         </section>
 
-        {/* KONTAK HUB */}
-        <section id="kontak" className="py-16 bg-card border-t border-border">
+        {/* ============================================================
+            5. KONTAK HUB TIM KEMITRAAN
+            ============================================================ */}
+        <section id="kontak" className="py-16 bg-white border-t border-stone-200/90">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
             <h3 className="font-sans text-2xl font-bold text-foreground">
-              {k.contactTitle}
+              Butuh Konsultasi atau Konfirmasi Transfer Kemitraan?
             </h3>
-            <p className="text-xs text-muted-foreground max-w-md mx-auto">
-              {k.contactSubtitle}
+            <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto leading-relaxed">
+              Tim sekretariat dan penatalayanan donasi kami siap membantu verifikasi atau mengirimkan bukti tanda terima donasi Anda.
             </p>
-            <div className="flex flex-wrap items-center justify-center gap-4">
-              <Button asChild size="default" className="rounded-full shadow-warm-sm">
-                <a href={`https://wa.me/${waContact}`} target="_blank" rel="noopener noreferrer">
-                  <Phone className="size-4 mr-1.5" />
-                  <span>WhatsApp (+{waContact})</span>
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+              <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white">
+                <a href={`https://wa.me/${waContact}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                  <Phone className="size-4" />
+                  <span>WhatsApp Bendahara (+{waContact})</span>
                 </a>
               </Button>
-              <Button asChild variant="outline" size="default" className="rounded-full">
-                <a href={`mailto:${settings?.email || "halo@esm.or.id"}`}>
-                  <Mail className="size-4 mr-1.5" />
+              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-stone-300">
+                <a href={`mailto:${settings?.email || "halo@esm.or.id"}`} className="flex items-center gap-2">
+                  <Mail className="size-4" />
                   <span>{settings?.email || "halo@esm.or.id"}</span>
                 </a>
               </Button>

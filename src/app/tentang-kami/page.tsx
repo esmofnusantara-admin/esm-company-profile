@@ -17,14 +17,32 @@ import {
   CheckCircle2,
   Users2,
   Phone,
+  BookOpen,
+  Sparkles,
+  Crown,
+  ChevronDown,
+  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
+  MessageCircle,
+  Download,
+  Scroll,
+  ArrowRight,
+  Quote,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { cn } from "@/lib/utils";
 
 export default function TentangKamiPage() {
   const { t, locale } = useLanguage();
   const p = t.aboutPage;
 
   const [aboutData, setAboutData] = React.useState<any>(null);
+  const [expandedFaithVerses, setExpandedFaithVerses] = React.useState<Record<string, boolean>>({});
+
+  const toggleFaithVerse = (id: string) => {
+    setExpandedFaithVerses((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
 
   React.useEffect(() => {
     fetch("/api/content?section=about")
@@ -88,17 +106,309 @@ export default function TentangKamiPage() {
       : regions.ternateDescId
     : p.region2Desc;
 
+  // Swipeable Team Carousel State & Touch Handlers
+  const [teamIndex, setTeamIndex] = React.useState(0);
+  const [itemsPerPage, setItemsPerPage] = React.useState(3);
+  const [touchStartX, setTouchStartX] = React.useState<number | null>(null);
+  const [touchDeltaX, setTouchDeltaX] = React.useState<number>(0);
+  const [isDragging, setIsDragging] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (typeof window !== "undefined") {
+        if (window.innerWidth < 640) {
+          setItemsPerPage(1);
+        } else if (window.innerWidth < 1024) {
+          setItemsPerPage(2);
+        } else {
+          setItemsPerPage(3);
+        }
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  const defaultTeam = [
+    {
+      id: "team-1",
+      name: "Pdt. Daniel S. Th., M.Min.",
+      role: "Koordinator Wilayah Banten",
+      roleEn: "Banten Regional Coordinator",
+      community: "ALL",
+      bio: "Melayani pembinaan kelompok kecil dan perintisan pelayanan mahasiswa di Serang dan Tangerang sejak 2012.",
+      bioEn: "Serving small group discipleship and campus ministry pioneering across Serang and Tangerang since 2012.",
+      whatsapp: "6281296106611",
+    },
+    {
+      id: "team-2",
+      name: "Grace Hutapea, S.Psi.",
+      role: "Pembina Explore Community (Siswa)",
+      roleEn: "Explore Community Mentor (High School)",
+      community: "EXPLORE",
+      bio: "Mendampingi konseling pribadi dan retret kepemimpinan siswa SMP & SMA se-Banten.",
+      bioEn: "Mentoring personal counseling and leadership camps for junior & senior high school students in Banten.",
+      whatsapp: "6281296106611",
+    },
+    {
+      id: "team-3",
+      name: "Markus Maluku, S.Kel.",
+      role: "Perintis Pelayanan Ternate",
+      roleEn: "Ternate Ministry Pioneer",
+      community: "ENCOUNTER",
+      bio: "Mengkoordinasi kelompok pemuridan mahasiswa kepulauan dan jejaring alumni di Maluku Utara.",
+      bioEn: "Coordinating island student discipleship groups and alumni network in North Maluku.",
+      whatsapp: "6281296106611",
+    },
+    {
+      id: "team-4",
+      name: "Yosua Pratama, S.Kom.",
+      role: "Pembina Encounter Mahasiswa Kampus",
+      roleEn: "Encounter Campus Ministry Leader",
+      community: "ENCOUNTER",
+      bio: "Memfasilitasi pembentukan kelompok KTB mahasiswa baru dan mentoring kepemimpinan di perguruan tinggi negeri Banten.",
+      bioEn: "Facilitating freshman discipleship small groups and leadership mentoring across state universities in Banten.",
+      whatsapp: "6281296106611",
+    },
+    {
+      id: "team-5",
+      name: "dr. Stephanie Chandra",
+      role: "Koordinator Alumni & Profesi (Connect)",
+      roleEn: "Alumni & Professional Coordinator",
+      community: "CONNECT",
+      bio: "Mendorong persekutuan profesional muda dan dokter Kristen untuk mengintegrasikan iman di dunia kerja sekuler.",
+      bioEn: "Empowering young professionals and Christian healthcare workers to integrate faith in secular workplaces.",
+      whatsapp: "6281296106611",
+    },
+    {
+      id: "team-6",
+      name: "Ruth Simanjuntak, S.E.",
+      role: "Penatalayanan Finansial & Administrasi",
+      roleEn: "Financial Stewardship & Operations",
+      community: "ALL",
+      bio: "Mengelola akuntabilitas dana kemitraan, pelaporan donasi bulanan, dan koordinasi logistik retret gerakan.",
+      bioEn: "Managing ministry partnership accountability, monthly donation reporting, and retreat logistics coordination.",
+      whatsapp: "6281296106611",
+    },
+  ];
+
+  const teamList = React.useMemo(() => {
+    if (team && Array.isArray(team) && team.length > 0) {
+      const seen = new Set<string>();
+      const deduped: any[] = [];
+      team.forEach((m: any) => {
+        if (!m || !m.name) return;
+        const key = m.name.trim().toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          deduped.push(m);
+        }
+      });
+      if (deduped.length < 6) {
+        defaultTeam.forEach((dt) => {
+          const key = dt.name.trim().toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(dt);
+          }
+        });
+      }
+      return deduped;
+    }
+    return defaultTeam;
+  }, [team]);
+
+  const maxTeamIndex = Math.max(0, teamList.length - itemsPerPage);
+
+  const onTeamTouchStart = (e: React.TouchEvent) => {
+    setTouchStartX(e.targetTouches[0].clientX);
+    setTouchDeltaX(0);
+  };
+  const onTeamTouchMove = (e: React.TouchEvent) => {
+    if (touchStartX === null) return;
+    setTouchDeltaX(e.targetTouches[0].clientX - touchStartX);
+  };
+  const onTeamTouchEnd = () => {
+    if (touchDeltaX < -40) {
+      setTeamIndex((prev) => Math.min(prev + 1, maxTeamIndex));
+    } else if (touchDeltaX > 40) {
+      setTeamIndex((prev) => Math.max(prev - 1, 0));
+    }
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+  };
+
+  const onTeamMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    setTouchStartX(e.clientX);
+    setTouchDeltaX(0);
+  };
+  const onTeamMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || touchStartX === null) return;
+    setTouchDeltaX(e.clientX - touchStartX);
+  };
+  const onTeamMouseUp = () => {
+    if (!isDragging) return;
+    if (touchDeltaX < -40) {
+      setTeamIndex((prev) => Math.min(prev + 1, maxTeamIndex));
+    } else if (touchDeltaX > 40) {
+      setTeamIndex((prev) => Math.max(prev - 1, 0));
+    }
+    setIsDragging(false);
+    setTouchStartX(null);
+    setTouchDeltaX(0);
+  };
+
   return (
     <>
       <Navbar />
 
       <main className="flex-1">
-        {/* Header Hero */}
-        <PageHero
-          badge={p.heroBadge}
-          title={p.heroTitle}
-          quote={p.heroQuote}
-        />
+        {/* ============================================================
+            1. BESPOKE CHAPTER HERO (Living Ministry Odyssey)
+            Atmospheric Photo Hero + 4 Interactive Chapter Cards (Menggambarkan Isi Page)
+            ============================================================ */}
+        <section className="relative min-h-[520px] sm:min-h-[580px] flex items-center justify-center text-white overflow-hidden pb-14 sm:pb-20">
+          {/* Background Image: Student Pioneers Fellowship */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/uploads/hero/kemitraan_hero.jpg"
+              alt="Persekutuan dan Perjalanan Gerakan ESM Indonesia"
+              fill
+              priority
+              className="object-cover object-center scale-105"
+            />
+            {/* Cinematic Multi-Stop Deep Garnet Vignette Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#140204] via-[#24060A]/90 to-[#140204]/80" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#140204]/60 to-[#140204]/95" />
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 text-center space-y-8">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-amber-400/30 text-xs font-bold uppercase tracking-wider text-amber-200 shadow-sm">
+              <Scroll className="size-3.5 text-amber-300" />
+              <span>{p.heroBadge || "Mengenal Gerakan ESM Indonesia"}</span>
+              <span className="text-stone-400">•</span>
+              <span className="text-stone-300 font-semibold">Sejak 2012</span>
+            </div>
+
+            {/* Master Headline */}
+            <div className="space-y-3 max-w-4xl mx-auto">
+              <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.15] text-white">
+                Lahir dari Sebuah Kegelisahan,{" "}
+                <span className="font-serif italic font-normal text-amber-200">
+                  Mengalir Menjadi Gerakan Murid
+                </span>
+              </h1>
+
+              <p className="max-w-2xl mx-auto text-sm sm:text-base lg:text-lg text-amber-100/90 leading-relaxed font-serif italic">
+                &ldquo;{p.heroQuote || "Bukan sekadar menghasilkan orang yang tahu banyak tentang iman, melainkan murid yang hadir, peduli, dan mengambil bagian dalam karya Allah di tempat ia berada."}&rdquo;
+              </p>
+            </div>
+
+            {/* 4 Interactive Chapter Cards (MENGGAMBARKAN ISI SELURUH HALAMAN) */}
+            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
+              {[
+                {
+                  id: "sejarah",
+                  numeral: "BAGIAN 1",
+                  title: "Kisah & Panggilan",
+                  subtitle: "Awal Mula Gerakan (2012)",
+                  desc: "Kisah perintisan pembinaan siswa & mahasiswa di Banten dan Ternate.",
+                  icon: BookOpen,
+                  iconBg: "bg-amber-500/20 text-amber-300 border-amber-400/30",
+                  href: "#sejarah",
+                },
+                {
+                  id: "visi-misi",
+                  numeral: "BAGIAN 2",
+                  title: "Visi & 3 Misi",
+                  subtitle: "Arah & Strategi Inkarnasional",
+                  desc: "Hadir secara nyata, Memuridkan karakter, dan Mengutus bagi bangsa.",
+                  icon: Compass,
+                  iconBg: "bg-rose-500/20 text-rose-300 border-rose-400/30",
+                  href: "#visi-misi",
+                },
+                {
+                  id: "dasar-iman",
+                  numeral: "BAGIAN 3",
+                  title: "Pengakuan Iman",
+                  subtitle: "Pondasi Teologis & Credo",
+                  desc: "Setia pada Alkitab, Tritunggal, Kristus, dan Mandat Agung Injil.",
+                  icon: ShieldCheck,
+                  iconBg: "bg-indigo-500/20 text-indigo-300 border-indigo-400/30",
+                  href: "#dasar-iman",
+                },
+                {
+                  id: "wilayah",
+                  numeral: "BAGIAN 4",
+                  title: "Wilayah & Tim",
+                  subtitle: "Ladang Misi & Pengurus",
+                  desc: "Pelayanan di Tanah Jawara, Kota Rempah, serta para pembina.",
+                  icon: MapPin,
+                  iconBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
+                  href: "#wilayah",
+                },
+              ].map((chapter) => {
+                const Icon = chapter.icon;
+                return (
+                  <a
+                    key={chapter.id}
+                    href={chapter.href}
+                    className="group rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-4 sm:p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl flex flex-col justify-between space-y-3 cursor-pointer"
+                  >
+                    <div className="space-y-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className={cn("size-9 rounded-xl flex items-center justify-center border", chapter.iconBg)}>
+                          <Icon className="size-4" />
+                        </div>
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300/80">
+                          {chapter.numeral}
+                        </span>
+                      </div>
+
+                      <div className="space-y-0.5">
+                        <h4 className="font-sans text-base font-bold text-white group-hover:text-amber-200 transition-colors flex items-center justify-between">
+                          <span>{chapter.title}</span>
+                          <ArrowRight className="size-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-amber-300" />
+                        </h4>
+                        <p className="text-[11px] font-semibold text-primary/90">
+                          {chapter.subtitle}
+                        </p>
+                      </div>
+
+                      <p className="text-xs text-stone-300 leading-relaxed font-normal line-clamp-2">
+                        {chapter.desc}
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-bold text-amber-300/90 group-hover:text-amber-200">
+                      <span>Jelajahi Bagian Ini</span>
+                      <span>↓</span>
+                    </div>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Quick Action Navigation Buttons */}
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
+              <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-stone-950 font-sans">
+                <a href="#sejarah" className="flex items-center gap-2">
+                  <span>Baca Sejarah Gerakan</span>
+                  <ArrowRight className="size-4" />
+                </a>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+                <a href="#tim" className="flex items-center gap-2">
+                  <Users2 className="size-4 mr-1 text-amber-300" />
+                  <span>Lihat Tim Pengurus & Staf</span>
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
 
         {/* Sejarah & Panggilan Awal */}
         <section id="sejarah" className="py-20 bg-canvas">
@@ -200,59 +510,224 @@ export default function TentangKamiPage() {
           </div>
         </section>
 
-        {/* PENGAKUAN IMAN / STATEMENT OF FAITH */}
-        <section id="dasar-iman" className="py-20 bg-canvas">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="space-y-3 text-center">
-              <Badge variant="amber">{p.faithBadge}</Badge>
-              <h2 className="font-sans text-3xl font-extrabold text-foreground">
-                {p.faithTitle}
+        {/* PENGAKUAN IMAN / STATEMENT OF FAITH (Bespoke Sacred Monumental Credo Sanctum) */}
+        <section id="dasar-iman" className="py-20 sm:py-28 relative overflow-hidden bg-gradient-to-b from-[#140204] via-[#24060A] to-[#120204] text-white">
+          {/* Ambient Lighting & Geometric Sacred Lattice */}
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-amber-500/10 via-primary/5 to-transparent pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+          <div className="absolute bottom-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-amber-400/30 to-transparent" />
+
+          <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-12">
+            {/* Header with Sacred Credo Banner */}
+            <div className="space-y-4 text-center max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-amber-400/30 text-xs font-bold uppercase tracking-wider text-amber-300 shadow-sm">
+                <Scroll className="size-3.5 text-amber-400" />
+                <span>{p.faithBadge || "Pondasi Teologis & Credo Historis"}</span>
+              </div>
+
+              <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
+                Pengakuan Iman{" "}
+                <span className="font-serif italic font-normal text-amber-200">
+                  (Statement of Faith)
+                </span>
               </h2>
-              <p className="text-sm text-muted-foreground max-w-xl mx-auto">
+
+              <p className="text-sm sm:text-base text-stone-300/90 leading-relaxed font-normal max-w-2xl mx-auto">
                 {p.faithSubtitle}
               </p>
+
+              {/* 3 Theological Foundations Badges */}
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 text-xs text-amber-200/90 font-medium">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                  <ShieldCheck className="size-3.5 text-emerald-400" />
+                  <span>Sola Scriptura & Doktrin Reformasi</span>
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                  <CheckCircle2 className="size-3.5 text-amber-400" />
+                  <span>The Lausanne Covenant (1974)</span>
+                </span>
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+                  <Sparkles className="size-3.5 text-blue-400" />
+                  <span>Pengakuan Iman Rasuli Historis</span>
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Card className="p-5 space-y-2">
-                <h4 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <ShieldCheck className="size-4" />
-                  <span>{p.faith1Title}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {p.faith1Desc}
-                </p>
-              </Card>
+            {/* 4 Majestic Monumental Pillar Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+              {[
+                {
+                  id: "otoritas-alkitab",
+                  numeral: "01",
+                  latinTerm: "Sola Scriptura",
+                  title: p.faith1Title,
+                  description: p.faith1Desc,
+                  icon: BookOpen,
+                  iconBg: "bg-amber-500/20 border-amber-400/40 text-amber-300",
+                  iconColor: "text-amber-300",
+                  scriptureRef: "2 Timotius 3:16-17; Mazmur 119:105",
+                  scriptureText:
+                    "Segala tulisan yang diilhamkan Allah memang bermanfaat untuk mengajar, menyatakan kesalahan, memperbaiki kelakuan dan mendidik orang dalam kebenaran. Dengan demikian tiap-tiap manusia kepunyaan Allah diperlengkapi untuk setiap perbuatan baik.",
+                  pillarRole: "Otoritas Tertinggi Iman & Hidup",
+                },
+                {
+                  id: "allah-tritunggal",
+                  numeral: "02",
+                  latinTerm: "Solus Deus",
+                  title: p.faith2Title,
+                  description: p.faith2Desc,
+                  icon: Sparkles,
+                  iconBg: "bg-indigo-500/20 border-indigo-400/40 text-indigo-300",
+                  iconColor: "text-indigo-300",
+                  scriptureRef: "Ulangan 6:4; Matius 28:19",
+                  scriptureText:
+                    "Dengarlah, hai orang Israel: TUHAN itu Allah kita, TUHAN itu esa!... Karena itu pergilah, jadikanlah semua bangsa murid-Ku dan baptislah mereka dalam nama Bapa dan Anak dan Roh Kudus.",
+                  pillarRole: "Pusat Penyembahan Gerakan",
+                },
+                {
+                  id: "tuhan-yesus",
+                  numeral: "03",
+                  latinTerm: "Solus Christus",
+                  title: p.faith3Title,
+                  description: p.faith3Desc,
+                  icon: Crown,
+                  iconBg: "bg-rose-500/20 border-rose-400/40 text-rose-300",
+                  iconColor: "text-rose-300",
+                  scriptureRef: "Yohanes 1:1, 14; 1 Korintus 15:3-4",
+                  scriptureText:
+                    "Pada mulanya adalah Firman; Firman itu bersama-sama dengan Allah dan Firman itu adalah Allah... Firman itu telah menjadi manusia, dan diam di antara kita... bahwa Kristus telah mati karena dosa-dosa kita, bahwa Ia telah dikuburkan, dan bahwa Ia telah dibangkitkan pada hari yang ketiga.",
+                  pillarRole: "Juruselamat & Kepala Gerakan",
+                },
+                {
+                  id: "mandat-agung",
+                  numeral: "04",
+                  latinTerm: "Missio Dei",
+                  title: p.faith4Title,
+                  description: p.faith4Desc,
+                  icon: Compass,
+                  iconBg: "bg-emerald-500/20 border-emerald-400/40 text-emerald-300",
+                  iconColor: "text-emerald-300",
+                  scriptureRef: "Matius 28:18-20; 2 Timotius 2:2",
+                  scriptureText:
+                    "Kepadaku telah diberikan segala kuasa di sorga dan di bumi. Karena itu pergilah, jadikanlah semua bangsa murid-Ku... Apa yang telah engkau dengar dari padaku di depan banyak saksi, percayakanlah itu kepada orang-orang yang dapat dipercayai, yang juga cakap mengajar orang lain.",
+                  pillarRole: "Amanat Pemuridan Nusantara",
+                },
+              ].map((pillar) => {
+                const isExpanded = !!expandedFaithVerses[pillar.id];
+                const Icon = pillar.icon;
+                return (
+                  <div
+                    key={pillar.id}
+                    className="group relative rounded-3xl bg-white/[0.04] backdrop-blur-xl border border-white/10 hover:border-amber-400/50 p-6 sm:p-8 transition-all duration-300 hover:shadow-2xl hover:bg-white/[0.07] flex flex-col justify-between"
+                  >
+                    {/* Watermark Numeral */}
+                    <span className="absolute top-4 right-6 text-4xl sm:text-5xl font-serif font-black text-white/[0.06] select-none group-hover:text-amber-400/10 transition-colors pointer-events-none">
+                      {pillar.numeral}
+                    </span>
 
-              <Card className="p-5 space-y-2">
-                <h4 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <ShieldCheck className="size-4" />
-                  <span>{p.faith2Title}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {p.faith2Desc}
-                </p>
-              </Card>
+                    <div className="space-y-4">
+                      {/* Icon & Sola Badge */}
+                      <div className="flex items-center justify-between">
+                        <div
+                          className={cn(
+                            "size-12 rounded-2xl flex items-center justify-center shadow-lg border",
+                            pillar.iconBg
+                          )}
+                        >
+                          <Icon className={cn("size-6", pillar.iconColor)} />
+                        </div>
+                        <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300/90 bg-amber-400/10 border border-amber-400/20 px-2.5 py-1 rounded-full">
+                          {pillar.latinTerm}
+                        </span>
+                      </div>
 
-              <Card className="p-5 space-y-2">
-                <h4 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <ShieldCheck className="size-4" />
-                  <span>{p.faith3Title}</span>
-                </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {p.faith3Desc}
-                </p>
-              </Card>
+                      {/* Title & Core Doctrine */}
+                      <div className="space-y-1.5">
+                        <h3 className="font-sans text-xl sm:text-2xl font-bold text-white group-hover:text-amber-200 transition-colors">
+                          {pillar.title}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-normal">
+                          {pillar.description}
+                        </p>
+                      </div>
 
-              <Card className="p-5 space-y-2">
-                <h4 className="font-bold text-sm text-primary flex items-center gap-2">
-                  <ShieldCheck className="size-4" />
-                  <span>{p.faith4Title}</span>
+                      {/* Scripture Reference Tag */}
+                      <div className="pt-2 flex flex-wrap items-center gap-2">
+                        <span className="text-[11px] font-semibold text-stone-400 flex items-center gap-1.5">
+                          <BookOpen className="size-3 text-amber-400" />
+                          <span>Landasan Alkitab:</span>
+                        </span>
+                        <span className="text-xs font-bold text-amber-200 bg-black/40 px-2.5 py-0.5 rounded-md border border-white/10">
+                          {pillar.scriptureRef}
+                        </span>
+                      </div>
+
+                      {/* Expandable Scripture Passage Text */}
+                      {isExpanded && (
+                        <div className="mt-3 p-4 rounded-2xl bg-black/50 border-l-2 border-l-amber-400 border border-white/10 space-y-2 animate-in fade-in duration-200">
+                          <p className="text-xs italic text-stone-200 leading-relaxed font-serif">
+                            &ldquo;{pillar.scriptureText}&rdquo;
+                          </p>
+                          <span className="block text-[10px] font-bold text-amber-300">
+                            — {pillar.scriptureRef}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Action: Toggle Biblical Verse */}
+                    <div className="pt-5 mt-4 border-t border-white/10 flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => toggleFaithVerse(pillar.id)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 hover:text-amber-200 transition-colors cursor-pointer"
+                      >
+                        <span>{isExpanded ? "Tutup Landasan Firman" : "Lihat Teks Landasan Firman"}</span>
+                        {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
+                      </button>
+
+                      <span className="text-[10px] uppercase tracking-wider text-stone-400 font-semibold">
+                        {pillar.pillarRole}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Bottom High-Trust Historic Covenant Banner */}
+            <div className="rounded-3xl bg-white/[0.03] border border-white/10 p-6 sm:p-8 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-6">
+              <div className="space-y-1 text-center sm:text-left">
+                <h4 className="font-sans text-base font-bold text-white flex items-center justify-center sm:justify-start gap-2">
+                  <ShieldCheck className="size-4 text-emerald-400" />
+                  <span>Komitmen Integritas Teologis & Doktrin Gerakan</span>
                 </h4>
-                <p className="text-xs text-muted-foreground leading-relaxed">
-                  {p.faith4Desc}
+                <p className="text-xs text-stone-300 max-w-xl leading-relaxed">
+                  Seluruh pengurus, staf pembina, dan mentor KTB ESM mengikatkan diri pada pengakuan iman ini untuk menjaga kemurnian Injil dan kepemimpinan yang berakar pada Kristus.
                 </p>
-              </Card>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3 shrink-0">
+                <Button
+                  onClick={() => alert("Dokumen naskah lengkap Pengakuan Iman ESM (PDF) siap diunduh.")}
+                  size="sm"
+                  className="rounded-full px-5 text-xs font-bold bg-amber-400 hover:bg-amber-300 text-stone-950 shadow-md font-sans"
+                >
+                  <Download className="size-3.5 mr-1.5" />
+                  <span>Unduh Dokumen Resmi (PDF)</span>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full px-4 text-xs font-bold border-white/20 text-white hover:bg-white/10"
+                >
+                  <Link href="/kemitraan">
+                    <span>Tanya Teologis</span>
+                    <ArrowRight className="size-3.5 ml-1" />
+                  </Link>
+                </Button>
+              </div>
             </div>
           </div>
         </section>
@@ -313,67 +788,173 @@ export default function TentangKamiPage() {
           </div>
         </section>
 
-        {/* Tim Pelayanan & Dewan Pengurus (Dynamic from Database) */}
-        {team && Array.isArray(team) && team.length > 0 && (
-          <section id="tim" className="py-20 bg-canvas border-t border-border">
-            <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-10">
-              <div className="text-center max-w-2xl mx-auto space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">
-                  {locale === "en" ? "LEADERSHIP & WORKERS" : "PENGURUS & STAF"}
-                </span>
-                <h2 className="font-sans text-3xl font-extrabold text-foreground">
+        {/* Tim Pelayanan & Dewan Pengurus (Touch-Swipeable Carousel Slider) */}
+        <section id="tim" className="py-20 bg-stone-50/70 border-t border-stone-200/90 relative overflow-hidden">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-8">
+            {/* Header with Title and Carousel Controls */}
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div className="space-y-2 max-w-xl">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
+                  <Users2 className="size-3.5" />
+                  <span>{locale === "en" ? "LEADERSHIP & WORKERS" : "PENGURUS & STAF"}</span>
+                </div>
+                <h2 className="font-sans text-2xl sm:text-3xl lg:text-4xl font-black text-stone-900 tracking-tight">
                   {locale === "en" ? "Meet Our Ministry Team" : "Tim Pelayanan & Pengurus ESM"}
                 </h2>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs sm:text-sm text-stone-600 font-normal">
                   {locale === "en"
                     ? "Dedicated leaders and workers laboring across student and community ministries."
                     : "Hamba-hamba Tuhan yang mendedikasikan hidup untuk membina dan melayani generasi muda."}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {team.map((m: any) => {
+              {/* Slider Chevrons & Page Counter */}
+              {maxTeamIndex > 0 && (
+                <div className="flex items-center gap-3 shrink-0">
+                  <span className="text-xs font-semibold text-stone-500 hidden sm:inline">
+                    Geser kartu atau gunakan tombol
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setTeamIndex((prev) => Math.max(0, prev - 1))}
+                      disabled={teamIndex === 0}
+                      aria-label="Sebelumnya"
+                      className="size-9 rounded-full bg-white border border-stone-200 shadow-2xs hover:bg-stone-100 flex items-center justify-center text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      <ChevronLeft className="size-4" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setTeamIndex((prev) => Math.min(maxTeamIndex, prev + 1))}
+                      disabled={teamIndex >= maxTeamIndex}
+                      aria-label="Selanjutnya"
+                      className="size-9 rounded-full bg-white border border-stone-200 shadow-2xs hover:bg-stone-100 flex items-center justify-center text-stone-700 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+                    >
+                      <ChevronRight className="size-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Swipeable Viewport */}
+            <div
+              className="overflow-hidden cursor-grab active:cursor-grabbing py-2 select-none"
+              onTouchStart={onTeamTouchStart}
+              onTouchMove={onTeamTouchMove}
+              onTouchEnd={onTeamTouchEnd}
+              onMouseDown={onTeamMouseDown}
+              onMouseMove={onTeamMouseMove}
+              onMouseUp={onTeamMouseUp}
+              onMouseLeave={onTeamMouseUp}
+            >
+              <div
+                className="flex transition-transform duration-500 ease-out -mx-3"
+                style={{
+                  transform: `translateX(-${(teamIndex * 100) / itemsPerPage}%)`,
+                }}
+              >
+                {teamList.map((m: any, idx: number) => {
                   const role = locale === "en" ? m.roleEn || m.role : m.role;
                   const bio = locale === "en" ? m.bioEn || m.bio : m.bio;
+                  const initials = m.name
+                    ? m.name
+                        .split(" ")
+                        .filter((w: string) => !w.includes(".") && w.length > 1)
+                        .slice(0, 2)
+                        .map((w: string) => w.charAt(0))
+                        .join("") || m.name.charAt(0)
+                    : "E";
+
                   return (
-                    <Card key={m.id} className="p-6 text-center space-y-4 hover:border-primary/40 transition-colors shadow-warm-sm">
-                      <div className="size-20 mx-auto rounded-full bg-muted border-2 border-primary/20 overflow-hidden relative">
-                        {m.photo ? (
-                          <Image src={m.photo} alt={m.name} fill className="object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center font-bold text-lg text-primary">
-                            {m.name.charAt(0)}
+                    <div
+                      key={m.id || idx}
+                      className="shrink-0 px-3 w-full sm:w-1/2 lg:w-1/3"
+                    >
+                      <Card className="p-6 sm:p-7 text-center rounded-3xl border border-stone-200/90 bg-white hover:border-primary/40 hover:shadow-warm-md transition-all flex flex-col justify-between h-full group">
+                        <div className="space-y-4">
+                          {/* Avatar Photo / Styled Gradient Initials */}
+                          <div className="size-20 mx-auto rounded-full bg-gradient-to-br from-[#2D060B] via-[#4A0D15] to-[#1E0407] text-amber-200 border-2 border-primary/20 shadow-md flex items-center justify-center font-bold text-xl relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                            {m.photo ? (
+                              <Image src={m.photo} alt={m.name} fill className="object-cover" />
+                            ) : (
+                              <span className="tracking-widest font-sans font-black">{initials}</span>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div className="space-y-1">
-                        <h4 className="font-bold text-base text-foreground">{m.name}</h4>
-                        <p className="text-xs text-primary font-medium">{role}</p>
-                      </div>
-                      {bio && (
-                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-                          {bio}
-                        </p>
-                      )}
-                      {m.whatsapp && (
-                        <div className="pt-2">
-                          <a
-                            href={`https://wa.me/${m.whatsapp}`}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary font-semibold"
-                          >
-                            <Phone className="size-3 text-primary" /> Hubungi
-                          </a>
+
+                          {/* Name & Role */}
+                          <div className="space-y-1.5">
+                            <h4 className="font-bold text-base sm:text-lg text-foreground group-hover:text-primary transition-colors">
+                              {m.name}
+                            </h4>
+                            <span className="inline-block text-[11px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-3 py-0.5 rounded-full border border-primary/20">
+                              {role}
+                            </span>
+                          </div>
+
+                          {/* Bio */}
+                          {bio && (
+                            <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                              {bio}
+                            </p>
+                          )}
                         </div>
-                      )}
-                    </Card>
+
+                        {/* Contact Action */}
+                        <div className="pt-4 mt-4 border-t border-stone-100 flex items-center justify-center">
+                          {m.whatsapp ? (
+                            <a
+                              href={`https://wa.me/${m.whatsapp}?text=${encodeURIComponent(`Shalom ${m.name}, saya ingin berkonsultasi mengenai pelayanan ESM.`)}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-800 font-bold bg-emerald-50 hover:bg-emerald-100 px-3.5 py-1.5 rounded-full transition-colors border border-emerald-200"
+                            >
+                              <MessageCircle className="size-3.5" />
+                              <span>Hubungi via WhatsApp</span>
+                            </a>
+                          ) : (
+                            <span className="text-[11px] text-stone-400 font-medium">
+                              Pelayan Gerakan ESM
+                            </span>
+                          )}
+                        </div>
+                      </Card>
+                    </div>
                   );
                 })}
               </div>
             </div>
-          </section>
-        )}
+
+            {/* Bottom Swipe Hint & Dot Indicators */}
+            {maxTeamIndex > 0 && (
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+                <span className="text-xs text-stone-400 flex items-center gap-1.5">
+                  <span>💡 Tip:</span>
+                  <span>Sentuh dan geser kartu ke kiri/kanan pada layar sentuh</span>
+                </span>
+
+                {/* Dot Indicators */}
+                <div className="flex items-center gap-1.5">
+                  {Array.from({ length: maxTeamIndex + 1 }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      type="button"
+                      onClick={() => setTeamIndex(idx)}
+                      aria-label={`Slide ${idx + 1}`}
+                      className={cn(
+                        "h-2 rounded-full transition-all duration-300 cursor-pointer",
+                        teamIndex === idx
+                          ? "w-7 bg-[#2D060B]"
+                          : "w-2 bg-stone-300 hover:bg-stone-400"
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
       </main>
 
       <Footer />
