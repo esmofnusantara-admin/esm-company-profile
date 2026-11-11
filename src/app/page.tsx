@@ -430,7 +430,7 @@ export default function HomePage() {
                     <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold">
                       <Compass className="size-5" />
                     </div>
-                    <Badge variant="outline">{t.communities.exploreBadge}</Badge>
+                    <Badge variant="outline">{t.communities.exploreTitle}</Badge>
                   </div>
                   <CardTitle className="text-xl font-bold text-foreground">Explore</CardTitle>
                   <CardDescription className="text-sm">
@@ -454,7 +454,7 @@ export default function HomePage() {
                     <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center font-bold">
                       <GraduationCap className="size-5" />
                     </div>
-                    <Badge variant="amber">{t.communities.encounterBadge}</Badge>
+                    <Badge variant="amber">{t.communities.encounterTitle}</Badge>
                   </div>
                   <CardTitle className="text-xl font-bold text-foreground">Encounter</CardTitle>
                   <CardDescription className="text-sm">
@@ -478,7 +478,7 @@ export default function HomePage() {
                     <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold">
                       <Briefcase className="size-5" />
                     </div>
-                    <Badge variant="outline">{t.communities.connectBadge}</Badge>
+                    <Badge variant="outline">{t.communities.connectTitle}</Badge>
                   </div>
                   <CardTitle className="text-xl font-bold text-foreground">Connect</CardTitle>
                   <CardDescription className="text-sm">
