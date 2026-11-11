@@ -153,8 +153,8 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 border-r border-border bg-card flex flex-col justify-between shrink-0 min-h-screen">
-      <div className="p-5 space-y-6 overflow-y-auto max-h-screen scrollbar-none">
+    <aside className="sticky top-0 h-screen w-64 border-r border-border bg-card flex flex-col justify-between shrink-0 z-30">
+      <div className="flex-1 overflow-y-auto p-5 space-y-6 min-h-0 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <div className="relative size-10 shrink-0 rounded-xl bg-white p-1 flex items-center justify-center shadow-warm-sm ring-1 ring-border/60">
@@ -213,7 +213,7 @@ export function AdminSidebar() {
       </div>
 
       {/* Footer User & Logout */}
-      <div className="p-4 border-t border-border bg-muted/20">
+      <div className="p-4 border-t border-border bg-card shrink-0">
         <button
           onClick={handleLogout}
           className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-xl transition-colors"

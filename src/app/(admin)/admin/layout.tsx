@@ -19,7 +19,7 @@ export default function AdminRootLayout({
     <div className="flex min-h-screen bg-canvas">
       <AdminSidebar />
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border bg-card px-8 flex items-center justify-between">
+        <header className="sticky top-0 z-20 h-16 border-b border-border bg-card/95 backdrop-blur-md px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
             <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               ESM Internal CMS &bull; Portal Pengelolaan
@@ -35,7 +35,7 @@ export default function AdminRootLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 p-6 md:p-8 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-6 md:p-8">{children}</main>
       </div>
     </div>
   );
