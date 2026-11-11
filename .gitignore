@@ -29,6 +29,9 @@ yarn-error.log*
 git-credentials.env
 *.credentials
 .git-credentials
+SERVER_DEPLOYMENT_INFO.md
+SERVER_*.md
+*server-info*
 
 # cache & mcp
 .playwright-mcp/
