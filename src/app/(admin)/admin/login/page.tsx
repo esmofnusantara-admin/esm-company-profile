@@ -88,28 +88,7 @@ export default function AdminLoginPage() {
         </div>
 
         {/* Login Form Card */}
-        <Card className="p-6 sm:p-8 border-border bg-card shadow-warm-md space-y-5">
-          {/* Autofill Info Box */}
-          <div className="flex items-center justify-between p-3 rounded-xl bg-primary-50/80 border border-primary-200/70 text-xs">
-            <div className="space-y-0.5">
-              <span className="font-bold text-primary block text-[11px]">Kredensial Login Default:</span>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                admin@esm.or.id • Admin@ESM2025!
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setEmail(DEFAULT_EMAIL);
-                setPassword(DEFAULT_PASSWORD);
-              }}
-              className="h-7 text-[10px] font-bold border-primary/30 text-primary hover:bg-primary-100"
-            >
-              Isi Ulang
-            </Button>
-          </div>
+        <Card className="p-6 sm:p-8 border-border bg-card shadow-warm-md space-y-6">
 
           {errorMsg && (
             <div className="flex items-center gap-2 p-3 rounded-xl bg-red-50 text-red-700 text-xs border border-red-200">
