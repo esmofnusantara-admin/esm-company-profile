@@ -118,6 +118,25 @@ export async function GET(request: NextRequest) {
       });
     }
 
+    if (section === "media") {
+      const [bulletins, mediaItems] = await Promise.all([
+        prisma.bulletin.findMany({
+          orderBy: { createdAt: "desc" },
+        }),
+        prisma.mediaItem.findMany({
+          orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+        }),
+      ]);
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          bulletins,
+          mediaItems,
+        },
+      });
+    }
+
     if (section === "kemitraan") {
       const [configs, prayers, faqs] = await Promise.all([
         prisma.siteConfig.findMany({

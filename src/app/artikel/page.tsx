@@ -2,13 +2,14 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PageHero } from "@/components/common/PageHero";
-import { FileText, Download, ArrowRight, RefreshCw, Flame, MapPin } from "lucide-react";
+import { FileText, Download, ArrowRight, RefreshCw, Flame, MapPin, Video, ImageIcon, ExternalLink } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 interface ArticleItem {
@@ -19,7 +20,6 @@ interface ArticleItem {
   excerpt: string;
   excerptEn?: string | null;
   category: string;
-  publishedAt?: string | null;
   createdAt: string;
 }
 
@@ -28,17 +28,21 @@ export default function ArtikelPage() {
   const a = t.articlesPage;
 
   const [articles, setArticles] = React.useState<ArticleItem[]>([]);
+  const [dbBulletins, setDbBulletins] = React.useState<any[]>([]);
+  const [galleryItems, setGalleryItems] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    async function loadArticles() {
+    async function loadData() {
       try {
-        const res = await fetch("/api/articles?status=PUBLISHED");
-        const json = await res.json();
-        if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-          setArticles(json.data);
+        const [artRes, mediaRes] = await Promise.all([
+          fetch("/api/articles?status=PUBLISHED").then((r) => r.json()).catch(() => ({})),
+          fetch("/api/content?section=media").then((r) => r.json()).catch(() => ({})),
+        ]);
+
+        if (artRes.success && Array.isArray(artRes.data) && artRes.data.length > 0) {
+          setArticles(artRes.data);
         } else {
-          // Default fallbacks
           setArticles([
             {
               id: "1",
@@ -78,16 +82,25 @@ export default function ArtikelPage() {
             },
           ]);
         }
+
+        if (mediaRes.success && mediaRes.data) {
+          if (Array.isArray(mediaRes.data.bulletins) && mediaRes.data.bulletins.length > 0) {
+            setDbBulletins(mediaRes.data.bulletins);
+          }
+          if (Array.isArray(mediaRes.data.mediaItems) && mediaRes.data.mediaItems.length > 0) {
+            setGalleryItems(mediaRes.data.mediaItems);
+          }
+        }
       } catch (err) {
-        console.error("Error fetching articles:", err);
+        console.error("Error fetching articles & media:", err);
       } finally {
         setLoading(false);
       }
     }
-    loadArticles();
+    loadData();
   }, []);
 
-  const bulletins = [
+  const fallbackBulletins = [
     {
       id: "b1",
       edition: locale === "en" ? "Issue 03 / Quarter III - 2026" : "Edisi 03 / Kuartal III - 2026",
@@ -95,6 +108,7 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: Unlocking the Gates of North Maluku"
           : "Warta Pelayanan: Membuka Gerbang Misi Maluku Utara",
+      fileUrl: "#",
       pages: locale === "en" ? "16 Pages PDF" : "16 Halaman PDF",
     },
     {
@@ -104,6 +118,7 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: Student Faith Resilience in Banten"
           : "Warta Pelayanan: Ketahanan Iman Siswa Banten di Era Digital",
+      fileUrl: "#",
       pages: locale === "en" ? "14 Pages PDF" : "14 Halaman PDF",
     },
     {
@@ -113,9 +128,12 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: The Call of the 3C Strategy"
           : "Warta Pelayanan: Panggilan Kerangka Strategi 3C",
+      fileUrl: "#",
       pages: locale === "en" ? "12 Pages PDF" : "12 Halaman PDF",
     },
   ];
+
+  const displayBulletins = dbBulletins.length > 0 ? dbBulletins : fallbackBulletins;
 
   return (
     <>
@@ -141,8 +159,8 @@ export default function ArtikelPage() {
               </div>
 
               {loading ? (
-                <div className="py-12 text-center text-xs text-muted-foreground">
-                  {locale === "en" ? "Loading articles from database..." : "Memuat artikel dari database..."}
+                <div className="flex items-center justify-center p-12">
+                  <RefreshCw className="size-6 animate-spin text-primary" />
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -195,31 +213,97 @@ export default function ArtikelPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {bulletins.map((b) => (
+                {displayBulletins.map((b) => (
                   <Card key={b.id} className="p-6 space-y-4 hover:border-accent/60 transition-colors shadow-warm-sm flex flex-col justify-between">
                     <div className="space-y-3">
                       <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center font-bold">
                         <FileText className="size-5" />
                       </div>
                       <span className="text-[11px] font-bold text-accent uppercase tracking-wider block">
-                        {b.edition}
+                        {b.edition || "Edisi Khusus"}
                       </span>
                       <h3 className="text-base font-bold text-foreground leading-snug">
-                        {b.title}
+                        {locale === "en" && b.titleEn ? b.titleEn : b.title}
                       </h3>
-                      <p className="text-xs text-muted-foreground">{b.pages}</p>
+                      {b.description && (
+                        <p className="text-xs text-muted-foreground line-clamp-2">{b.description}</p>
+                      )}
                     </div>
 
                     <div className="pt-4 border-t border-border">
-                      <Button variant="outline" size="sm" className="w-full rounded-xl text-xs">
-                        <Download className="size-3.5 mr-1 text-primary" />
-                        <span>{t.common.download} PDF</span>
+                      <Button asChild variant="outline" size="sm" className="w-full rounded-xl text-xs">
+                        <a href={b.fileUrl} target="_blank" rel="noreferrer" download>
+                          <Download className="size-3.5 mr-1 text-primary" />
+                          <span>{t.common.download} PDF</span>
+                        </a>
                       </Button>
                     </div>
                   </Card>
                 ))}
               </div>
             </div>
+
+            {/* Galeri Dokumentasi Foto & Video (Dynamic from Database) */}
+            {galleryItems.length > 0 && (
+              <div className="space-y-8 pt-8 border-t border-border">
+                <div>
+                  <h2 className="text-2xl font-extrabold text-foreground">
+                    {locale === "en" ? "Ministry Media & Gallery" : "Galeri Foto & Video Pelayanan"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {locale === "en"
+                      ? "Visual documentation of student gatherings, missions, and community retreats."
+                      : "Dokumentasi visual persekutuan siswa, mahasiswa, dan perintisan misi di Banten & Ternate."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {galleryItems.map((item) => {
+                    const title = locale === "en" && item.titleEn ? item.titleEn : item.title;
+                    const isVideo = item.type === "VIDEO";
+
+                    return (
+                      <Card key={item.id} className="overflow-hidden border-border hover:border-primary/40 transition-colors shadow-warm-sm flex flex-col justify-between">
+                        <div className="relative aspect-video bg-muted overflow-hidden">
+                          {isVideo ? (
+                            item.url.includes("youtube") || item.url.includes("youtu.be") ? (
+                              <div className="w-full h-full bg-black/90 flex flex-col items-center justify-center text-white/80 p-4">
+                                <Video className="size-8 text-red-500 mb-1" />
+                                <span className="text-[11px] font-bold">YouTube Video</span>
+                              </div>
+                            ) : (
+                              <video src={item.url} controls className="w-full h-full object-cover" />
+                            )
+                          ) : (
+                            <Image src={item.url} alt={title} fill className="object-cover" />
+                          )}
+                          <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/60 text-white backdrop-blur-sm">
+                            {item.category}
+                          </span>
+                        </div>
+                        <div className="p-4 space-y-1">
+                          <h4 className="text-sm font-bold text-foreground line-clamp-1">{title}</h4>
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground line-clamp-2">{item.description}</p>
+                          )}
+                          <div className="pt-2">
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center gap-1 text-xs text-primary font-bold hover:underline"
+                            >
+                              <span>{locale === "en" ? "View Media" : "Lihat Media"}</span>
+                              <ExternalLink className="size-3" />
+                            </a>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </section>
       </main>
