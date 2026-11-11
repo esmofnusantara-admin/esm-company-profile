@@ -91,8 +91,8 @@ const config: Config = {
         card: "1rem",
       },
       fontFamily: {
-        sans: ["var(--font-jakarta)", "system-ui", "sans-serif"],
-        serif: ["Georgia", "Cambria", "serif"],
+        sans: ["'Plus Jakarta Sans'", "system-ui", "-apple-system", "sans-serif"],
+        serif: ["'Fraunces'", "Georgia", "serif"],
       },
       boxShadow: {
         "warm-sm": "0 1px 3px 0 rgba(36, 20, 22, 0.05), 0 1px 2px -1px rgba(36, 20, 22, 0.05)",

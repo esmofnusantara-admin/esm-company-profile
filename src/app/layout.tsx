@@ -1,14 +1,7 @@
 import type { Metadata } from "next";
-import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/context/LanguageContext";
 import { ThemeProvider } from "@/components/theme-provider";
-
-const jakarta = Plus_Jakarta_Sans({
-  subsets: ["latin"],
-  variable: "--font-jakarta",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "ESM — Evangelical Student Movement Indonesia",
@@ -37,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" suppressHydrationWarning className={jakarta.variable}>
+    <html lang="id" suppressHydrationWarning>
       <body className="font-sans min-h-screen flex flex-col bg-background text-foreground transition-colors duration-200">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="esm-theme">
           <LanguageProvider>{children}</LanguageProvider>
