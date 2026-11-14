@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { saveMemoryDonation, updateMemoryDonationStatus } from "@/lib/donationsFallback";
 
 export interface DonationInput {
   donorName: string;
@@ -19,8 +20,26 @@ export async function submitDonation(input: DonationInput) {
       return { success: false, error: "Nama dan nominal donasi minimal Rp 10.000 wajib diisi." };
     }
 
-    const donation = await prisma.donationRecord.create({
-      data: {
+    try {
+      const donation = await prisma.donationRecord.create({
+        data: {
+          donorName: input.donorName,
+          donorEmail: input.donorEmail || null,
+          donorPhone: input.donorPhone || null,
+          amount: input.amount,
+          type: input.type,
+          message: input.message || null,
+          status: "PENDING",
+        },
+      });
+
+      revalidatePath("/admin/mitra");
+      revalidatePath("/admin");
+
+      return { success: true, id: donation.id };
+    } catch (dbErr) {
+      console.warn("DB offline, saving donation to memory fallback:", dbErr);
+      const memDonation = saveMemoryDonation({
         donorName: input.donorName,
         donorEmail: input.donorEmail || null,
         donorPhone: input.donorPhone || null,
@@ -28,13 +47,13 @@ export async function submitDonation(input: DonationInput) {
         type: input.type,
         message: input.message || null,
         status: "PENDING",
-      },
-    });
+      });
 
-    revalidatePath("/admin/mitra");
-    revalidatePath("/admin");
+      revalidatePath("/admin/mitra");
+      revalidatePath("/admin");
 
-    return { success: true, id: donation.id };
+      return { success: true, id: memDonation.id, isMemory: true };
+    }
   } catch (error) {
     console.error("Gagal submit donasi:", error);
     return { success: false, error: "Terjadi kesalahan sistem saat memproses donasi." };
@@ -44,26 +63,31 @@ export async function submitDonation(input: DonationInput) {
 // 2. Konfirmasi Donasi dari Admin Panel (/admin/mitra)
 export async function confirmDonation(id: string) {
   try {
-    const donation = await prisma.donationRecord.update({
-      where: { id },
-      data: {
-        status: "CONFIRMED",
-        confirmedAt: new Date(),
-      },
-    });
+    try {
+      const donation = await prisma.donationRecord.update({
+        where: { id },
+        data: {
+          status: "CONFIRMED",
+          confirmedAt: new Date(),
+        },
+      });
 
-    // Otomatis catat sebagai Kas Pemasukan
-    await prisma.financialTransaction.create({
-      data: {
-        type: "PEMASUKAN",
-        amount: donation.amount,
-        description: `Donasi Mitra: ${donation.donorName || "Hamba Allah"} (${
-          donation.type === "MITRA_BULANAN" ? "Bulanan" : "Sekali Beri"
-        })`,
-        category: "Donasi Mitra",
-        recordedBy: "admin",
-      },
-    });
+      // Otomatis catat sebagai Kas Pemasukan
+      await prisma.financialTransaction.create({
+        data: {
+          type: "PEMASUKAN",
+          amount: donation.amount,
+          description: `Donasi Mitra: ${donation.donorName || "Hamba Allah"} (${
+            donation.type === "MITRA_BULANAN" ? "Bulanan" : "Sekali Beri"
+          })`,
+          category: "Donasi Mitra",
+          recordedBy: "admin",
+        },
+      });
+    } catch (dbErr) {
+      console.warn("DB offline, confirming in memory fallback:", dbErr);
+      updateMemoryDonationStatus(id, "CONFIRMED");
+    }
 
     revalidatePath("/admin/mitra");
     revalidatePath("/admin/keuangan");
@@ -79,12 +103,17 @@ export async function confirmDonation(id: string) {
 // 3. Batalkan Donasi dari Admin Panel
 export async function cancelDonation(id: string) {
   try {
-    await prisma.donationRecord.update({
-      where: { id },
-      data: {
-        status: "CANCELLED",
-      },
-    });
+    try {
+      await prisma.donationRecord.update({
+        where: { id },
+        data: {
+          status: "CANCELLED",
+        },
+      });
+    } catch (dbErr) {
+      console.warn("DB offline, cancelling in memory fallback:", dbErr);
+      updateMemoryDonationStatus(id, "CANCELLED");
+    }
 
     revalidatePath("/admin/mitra");
     revalidatePath("/admin");

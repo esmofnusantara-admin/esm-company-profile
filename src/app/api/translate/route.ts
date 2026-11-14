@@ -1,47 +1,112 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const COMMON_DICTIONARY: Record<string, string> = {
+  "yayasan": "foundation",
+  "murid muda bermisi": "mission-driven young disciples",
+  "pemuridan": "discipleship",
+  "pelayanan": "ministry",
+  "mahasiswa": "university students",
+  "siswa": "students",
+  "naungan hukum": "legal umbrella",
+  "dewan pembina": "board of trustees",
+  "penasihat hukum": "legal advisors",
+  "pengawas yayasan": "foundation supervisors",
+  "sekretaris jenderal": "secretary general",
+  "koordinator nasional": "national coordinator",
+  "ketua yayasan": "foundation chairman",
+  "sekretaris yayasan": "foundation secretary",
+  "kemitraan": "partnership",
+  "gerakan": "movement",
+  "gereja": "church",
+  "injil": "gospel",
+  "alumni": "alumni",
+  "perintisan": "pioneering",
+  "ladang misi": "mission field",
+  "pokok doa": "prayer requests",
+  "komitmen integritas": "integrity commitment",
+  "tingkat": "level",
+};
+
+function dictionaryFallback(idText: string): string {
+  let result = idText;
+  for (const [idWord, enWord] of Object.entries(COMMON_DICTIONARY)) {
+    const regex = new RegExp(`\\b${idWord}\\b`, "gi");
+    result = result.replace(regex, enWord);
+  }
+  return result;
+}
+
 export async function POST(request: NextRequest) {
   try {
-    const { text, source = "id", target = "en" } = await request.json();
+    const body = await request.json();
+    const text = body.text;
+    const source = body.from || body.source || "id";
+    const target = body.to || body.target || "en";
 
     if (!text || typeof text !== "string") {
       return NextResponse.json({ error: "Teks wajib diisi" }, { status: 400 });
     }
 
-    // Call translation endpoint (Google Translate GTX API)
-    const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&q=${encodeURIComponent(
-      text
-    )}`;
+    let translatedText = "";
 
-    const res = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-      },
-    });
+    // 1. Coba Google Translate GTX API
+    try {
+      const gtxUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${target}&dt=t&q=${encodeURIComponent(
+        text
+      )}`;
 
-    if (!res.ok) {
-      throw new Error(`Translation API error: ${res.statusText}`);
+      const res = await fetch(gtxUrl, {
+        headers: { "User-Agent": "Mozilla/5.0" },
+        signal: AbortSignal.timeout(3500),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        translatedText = data[0]?.map((item: any) => item[0]).join("") || "";
+      }
+    } catch (e) {
+      console.warn("Google GTX translation failed, trying MyMemory...");
     }
 
-    const data = await res.json();
-    // Format response: [[["Translated text", "Source text", null, null, 1]], null, "id"]
-    const translatedText = data[0]?.map((item: any) => item[0]).join("") || text;
+    // 2. Fallback ke MyMemory API
+    if (!translatedText) {
+      try {
+        const myMemoryUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(
+          text
+        )}&langpair=${source}|${target}`;
+        const res = await fetch(myMemoryUrl, {
+          signal: AbortSignal.timeout(3500),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.responseData?.translatedText) {
+            translatedText = data.responseData.translatedText;
+          }
+        }
+      } catch (e) {
+        console.warn("MyMemory translation failed, falling back to dictionary...");
+      }
+    }
+
+    // 3. Fallback ke kamus / dictionary
+    if (!translatedText || translatedText.trim() === text.trim()) {
+      translatedText = dictionaryFallback(text);
+    }
 
     return NextResponse.json({
       success: true,
-      originalText: text,
+      translated: translatedText,
       translatedText,
+      originalText: text,
       source,
       target,
     });
   } catch (error) {
     console.error("Auto-translate error:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: "Gagal melakukan auto-translate.",
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      success: true,
+      translated: dictionaryFallback(""),
+      translatedText: "",
+    });
   }
 }

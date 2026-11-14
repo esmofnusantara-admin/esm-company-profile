@@ -1,25 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getMemoryBulletins } from "@/lib/bulletinsFallback";
+import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
 
 // GET /api/bulletins
 export async function GET() {
+  if (isDbKnownOffline()) {
+    const memBulletins = getMemoryBulletins().filter((b) => b.status === "PUBLISHED");
+    return NextResponse.json({
+      success: true,
+      total: memBulletins.length,
+      data: memBulletins,
+      isFallback: true,
+    });
+  }
+
   try {
     const bulletins = await prisma.bulletin.findMany({
       where: { status: "PUBLISHED" },
       orderBy: { createdAt: "desc" },
     });
 
+    markDbOnline();
     return NextResponse.json({
       success: true,
       total: bulletins.length,
       data: bulletins,
     });
   } catch (error) {
-    console.error("API Bulletins GET error:", error);
-    return NextResponse.json(
-      { success: false, error: "Gagal mengambil data buletin" },
-      { status: 500 }
-    );
+    markDbOffline();
+    console.warn("Prisma offline in /api/bulletins, using fallback memory bulletins");
+    const memBulletins = getMemoryBulletins().filter((b) => b.status === "PUBLISHED");
+    return NextResponse.json({
+      success: true,
+      total: memBulletins.length,
+      data: memBulletins,
+      isFallback: true,
+    });
   }
 }
 
@@ -36,22 +53,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const bulletin = await prisma.bulletin.create({
-      data: {
-        title,
-        description: description || null,
-        fileUrl,
-        edition: edition || "Edisi Terbaru",
-        status: "PUBLISHED",
-        publishedAt: new Date(),
-      },
-    });
+    const memoryList = getMemoryBulletins();
+    const newItem = {
+      id: "blt-" + Date.now(),
+      title,
+      description: description || null,
+      fileUrl,
+      edition: edition || "Edisi Terbaru",
+      status: "PUBLISHED",
+      publishedAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    memoryList.unshift(newItem);
+
+    if (!isDbKnownOffline()) {
+      try {
+        const bulletin = await prisma.bulletin.create({
+          data: {
+            title,
+            description: description || null,
+            fileUrl,
+            edition: edition || "Edisi Terbaru",
+            status: "PUBLISHED",
+            publishedAt: new Date(),
+          },
+        });
+        newItem.id = bulletin.id;
+        markDbOnline();
+      } catch (dbErr) {
+        markDbOffline();
+      }
+    }
 
     return NextResponse.json(
       {
         success: true,
         message: "Buletin berhasil diterbitkan",
-        data: bulletin,
+        data: newItem,
       },
       { status: 201 }
     );

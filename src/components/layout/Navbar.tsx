@@ -22,6 +22,10 @@ export function Navbar() {
 
   const navigationItems = [
     {
+      title: locale === "en" ? "Home" : "Beranda",
+      href: "/",
+    },
+    {
       title: locale === "en" ? "About" : "Tentang",
       href: "/tentang-kami",
       children: [
@@ -31,14 +35,19 @@ export function Navbar() {
           href: "/tentang-kami#sejarah",
         },
         {
-          title: locale === "en" ? "3C Foundation" : "Dasar Iman & Nilai 3C",
-          description: locale === "en" ? "Communion, Community, Commission" : "Communion, Community, Commission",
+          title: locale === "en" ? "Mission of Faith" : "Dasar Iman (Mission of Faith)",
+          description: locale === "en" ? "Communion, Community, Commission" : "Pernyataan iman & 4 pilar credo teologis",
           href: "/tentang-kami#dasar-iman",
         },
         {
           title: locale === "en" ? "Banten & Ternate" : "Ladang: Banten & Ternate",
           description: locale === "en" ? "Regional mission profiles" : "Profil perintisan di Tanah Jawara & Kota Rempah",
           href: "/tentang-kami#wilayah",
+        },
+        {
+          title: locale === "en" ? "Partners & Legal Identity" : "Mitra Gerakan & Legalitas",
+          description: locale === "en" ? "Affiliation with MMB Foundation & Governance" : "Naungan Yayasan MMB & struktur organisasi",
+          href: "/tentang-kami#mitra-legalitas",
         },
       ],
     },
@@ -64,39 +73,40 @@ export function Navbar() {
       ],
     },
     {
-      title: locale === "en" ? "News & Prayer" : "Kabar & Doa",
-      href: "/artikel",
+      title: locale === "en" ? "News & Prayer" : "Kabar dan Doa",
+      href: "/kabar-doa",
       children: [
         {
-          title: locale === "en" ? "Reflections" : "Renungan & Refleksi Firman",
-          description: locale === "en" ? "Spiritual nourishment" : "Santapan rohani & catatan pembinaan",
-          href: "/artikel",
+          title: locale === "en" ? "Daily Devotional" : "Renungan",
+          description:
+            locale === "en"
+              ? "Daily quiet time & golden verse of the day"
+              : "Renungan, saat teduh harian & ayat emas hari ini",
+          href: "/renungan",
         },
         {
           title: locale === "en" ? "Prayer Wall" : "Pokok Doa Bersama",
-          description: locale === "en" ? "Monthly prayer bulletin" : "Mezbah doa bulanan untuk sekolah & kampus",
+          description:
+            locale === "en"
+              ? "Community prayer wall & monthly requests"
+              : "Mezbah doa bulanan & pokok doa bersama ladang misi",
           href: "/doa",
         },
         {
-          title: locale === "en" ? "Field Stories" : "Warta Misi Lapangan",
-          description: locale === "en" ? "Snapshots from the field" : "Dinamika pelayanan di Banten & Ternate",
+          title: locale === "en" ? "Mission Ministry News" : "Warta Misi Pelayanan",
+          description:
+            locale === "en"
+              ? "Field updates from Banten & Ternate, and bulletins"
+              : "Kabar ladang pelayanan Banten, Ternate & buletin warta misi",
           href: "/artikel",
         },
-      ],
-    },
-    {
-      title: locale === "en" ? "Resources" : "Sumber Daya",
-      href: "/sumber-daya",
-      children: [
         {
-          title: locale === "en" ? "Bible Study Guides" : "Bahan PA & Saat Teduh",
-          description: locale === "en" ? "Free downloadable materials" : "Modul Alkitab gratis untuk siswa & mahasiswa",
+          title: locale === "en" ? "Teaching Materials" : "Bahan Ajar",
+          description:
+            locale === "en"
+              ? "Bible study guides & disciple maker handbooks"
+              : "Bahan PA & panduan pembuat murid bagi pembina KTB",
           href: "/sumber-daya",
-        },
-        {
-          title: locale === "en" ? "Leader Handbook" : "Panduan Pembuat Murid",
-          description: locale === "en" ? "Practical mentor guides" : "Buku saku praktis bagi pembina & mentor",
-          href: "/sumber-daya#mentor",
         },
       ],
     },
@@ -296,7 +306,7 @@ export function Navbar() {
                 variant="outline"
                 className="w-full justify-center rounded-xl text-xs"
               >
-                <Link href="/kemitraan#doa" onClick={() => setMobileMenuOpen(false)}>
+                <Link href="/doa" onClick={() => setMobileMenuOpen(false)}>
                   <Heart className="size-3.5 text-primary mr-1" />
                   {t.nav.prayerRequest}
                 </Link>

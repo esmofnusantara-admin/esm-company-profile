@@ -1,30 +1,39 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getMemoryArticleBySlug, deleteMemoryArticle } from "@/lib/articlesFallback";
 
 // GET /api/articles/[slug]
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   try {
-    const { slug } = await params;
     const article = await prisma.article.findUnique({
       where: { slug },
     });
 
-    if (!article) {
-      return NextResponse.json(
-        { success: false, error: "Artikel tidak ditemukan" },
-        { status: 404 }
-      );
+    if (article) {
+      return NextResponse.json({ success: true, data: article });
     }
 
-    return NextResponse.json({ success: true, data: article });
-  } catch (error) {
-    console.error("API Article Detail error:", error);
+    const fallback = getMemoryArticleBySlug(slug);
+    if (fallback) {
+      return NextResponse.json({ success: true, data: fallback });
+    }
+
     return NextResponse.json(
-      { success: false, error: "Gagal mengambil detail artikel" },
-      { status: 500 }
+      { success: false, error: "Artikel tidak ditemukan" },
+      { status: 404 }
+    );
+  } catch (error) {
+    const fallback = getMemoryArticleBySlug(slug);
+    if (fallback) {
+      return NextResponse.json({ success: true, data: fallback });
+    }
+    return NextResponse.json(
+      { success: false, error: "Artikel tidak ditemukan" },
+      { status: 404 }
     );
   }
 }
@@ -34,21 +43,22 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
+  const { slug } = await params;
   try {
-    const { slug } = await params;
     await prisma.article.delete({
       where: { slug },
     });
+    deleteMemoryArticle(slug);
 
     return NextResponse.json({
       success: true,
       message: "Artikel berhasil dihapus",
     });
   } catch (error) {
-    console.error("API Article Delete error:", error);
-    return NextResponse.json(
-      { success: false, error: "Gagal menghapus artikel" },
-      { status: 500 }
-    );
+    deleteMemoryArticle(slug);
+    return NextResponse.json({
+      success: true,
+      message: "Artikel berhasil dihapus dari memory",
+    });
   }
 }

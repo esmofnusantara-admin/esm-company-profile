@@ -16,6 +16,7 @@ import {
   Users,
   Sparkles,
   Heart,
+  ChevronLeft,
   ChevronRight,
   ChevronDown,
   MapPin,
@@ -23,6 +24,8 @@ import {
   Calendar,
   HelpCircle,
   CheckCircle2,
+  Play,
+  X,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -38,6 +41,9 @@ export default function HomePage() {
 
   // FAQ Accordion State (0 is open by default)
   const [openFaq, setOpenFaq] = React.useState<number | null>(0);
+
+  // Video Company Profile Modal State
+  const [videoModalOpen, setVideoModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     fetch("/api/articles?limit=2&status=PUBLISHED")
@@ -86,7 +92,7 @@ export default function HomePage() {
       : hero.primaryCtaTextId
     : t.hero.ctaPrimary;
 
-  const primaryCtaUrl = hero?.primaryCtaUrl || "/pelayanan";
+  const primaryCtaUrl = hero?.primaryCtaUrl || "/gabung";
 
   const secondaryCtaText = hero
     ? locale === "en"
@@ -96,7 +102,7 @@ export default function HomePage() {
 
   const secondaryCtaUrl = hero?.secondaryCtaUrl || "/tentang-kami";
 
-  const faqItems = [
+  const defaultFaqItems = [
     {
       q: locale === "en" ? "Is ESM a church denomination or an independent mission?" : "Apakah ESM adalah gereja lokal atau yayasan misi?",
       a: locale === "en"
@@ -122,6 +128,42 @@ export default function HomePage() {
         : "Tentu! Selain persekutuan tatap muka di Banten dan Ternate, kami memfasilitasi kelompok mentoring online bagi alumni serta materi pembinaan digital yang dapat diunduh bebas.",
     },
   ];
+
+  const activeFaqs: { q: string; a: string }[] = (homeContent?.faqs && Array.isArray(homeContent.faqs) && homeContent.faqs.length > 0)
+    ? homeContent.faqs.map((f: any) => ({
+        q: locale === "en" && f.questionEn ? f.questionEn : f.question,
+        a: locale === "en" && f.answerEn ? f.answerEn : f.answer,
+      }))
+    : defaultFaqItems;
+
+  const defaultTestimonies = [
+    {
+      name: "Andreas Pratama",
+      role: "Siswa SMA • Komunitas Explore Banten",
+      theme: "Tema Bulan Ini: “Berakar & Berbuah di Tengah Disrupsi Zaman”",
+      quote:
+        "Melalui kelompok pemuridan di ESM, aku belajar bahwa mengikut Yesus bukan cuma soal apa yang kita bicarakan di ruang tertutup, melainkan bagaimana kita hadir di sekolah dan kampus, berani hidup berintegritas, dan mengasihi sesama.",
+    },
+  ];
+
+  interface TestimonyItem {
+    name: string;
+    role: string;
+    theme: string;
+    quote: string;
+  }
+
+  const activeTestimonies: TestimonyItem[] = (homeContent?.testimonies && Array.isArray(homeContent.testimonies) && homeContent.testimonies.length > 0)
+    ? homeContent.testimonies.map((tm: any) => ({
+        name: tm.authorName,
+        role: tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
+        theme: tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
+        quote: locale === "en" && tm.contentEn ? tm.contentEn : tm.content,
+      }))
+    : defaultTestimonies;
+
+  const [activeTestimonyIndex, setActiveTestimonyIndex] = React.useState(0);
+  const currentTestimony = activeTestimonies[activeTestimonyIndex % activeTestimonies.length];
 
   return (
     <>
@@ -314,54 +356,63 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* Right Column: 3 Structured Cards */}
+              {/* Right Column: Video Company Profile Player */}
               <div className="lg:col-span-7 space-y-4">
-                {/* Value 1: Communion */}
-                <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-warm-xs border border-stone-200/90 space-y-2 hover:border-primary/40 hover:shadow-warm-sm transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="size-11 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold shrink-0">
-                      <Compass className="size-5" />
+                <div className="relative rounded-3xl overflow-hidden border border-stone-200/90 shadow-warm-md bg-stone-900 group">
+                  <div className="relative aspect-video w-full">
+                    <Image
+                      src="/uploads/hero/kemitraan_hero.jpg"
+                      alt="Video Profil Gerakan ESM"
+                      fill
+                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center space-y-3">
+                      <button
+                        type="button"
+                        onClick={() => setVideoModalOpen(true)}
+                        aria-label="Putar Video Company Profile ESM"
+                        className="relative size-16 sm:size-20 rounded-full bg-primary/95 text-white flex items-center justify-center shadow-warm-lg hover:scale-110 active:scale-95 transition-all group/btn cursor-pointer"
+                      >
+                        <span className="absolute -inset-2 rounded-full bg-primary/40 animate-ping pointer-events-none" />
+                        <Play className="size-7 sm:size-9 fill-white translate-x-0.5 text-white" />
+                      </button>
+
+                      <div className="space-y-1 pt-1">
+                        <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-400 text-stone-950 shadow-xs">
+                          Video Company Profile ESM
+                        </span>
+                        <h3 className="font-sans text-base sm:text-xl font-black text-white drop-shadow-md">
+                          Mengenal Hati & Api Gerakan Pemuridan
+                        </h3>
+                        <p className="text-xs text-stone-300 max-w-md hidden sm:block">
+                          Dinamika pembinaan siswa sekolah, mahasiswa kampus, dan perintisan misi di Banten serta Maluku Utara.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Nilai 01 • Communion</span>
-                      <h3 className="text-lg font-bold text-foreground">{t.whyEsm.card1Title}</h3>
+
+                    {/* Video Duration Badge */}
+                    <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[11px] font-mono font-bold text-white flex items-center gap-1.5 border border-white/10">
+                      <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
+                      <span>03:45 • Profil ESM</span>
                     </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed pl-14">
-                    {t.whyEsm.card1Desc}
-                  </p>
                 </div>
 
-                {/* Value 2: Community */}
-                <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-warm-xs border border-stone-200/90 space-y-2 hover:border-amber-400/60 hover:shadow-warm-sm transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="size-11 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold shrink-0">
-                      <Flame className="size-5" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700">Nilai 02 • Community</span>
-                      <h3 className="text-lg font-bold text-foreground">{t.whyEsm.card2Title}</h3>
-                    </div>
+                <div className="rounded-2xl bg-white p-4 border border-stone-200/90 shadow-warm-xs flex items-center justify-between text-xs">
+                  <div className="flex items-center gap-2 text-stone-600 font-medium">
+                    <Sparkles className="size-4 text-amber-500 shrink-0" />
+                    <span>Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara</span>
                   </div>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed pl-14">
-                    {t.whyEsm.card2Desc}
-                  </p>
-                </div>
-
-                {/* Value 3: Commission */}
-                <div className="rounded-2xl bg-white p-6 sm:p-7 shadow-warm-xs border border-stone-200/90 space-y-2 hover:border-primary/40 hover:shadow-warm-sm transition-all">
-                  <div className="flex items-center gap-3">
-                    <div className="size-11 rounded-xl bg-primary-50 text-primary flex items-center justify-center font-bold shrink-0">
-                      <Users className="size-5" />
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">Nilai 03 • Commission</span>
-                      <h3 className="text-lg font-bold text-foreground">{t.whyEsm.card3Title}</h3>
-                    </div>
-                  </div>
-                  <p className="text-xs sm:text-sm text-stone-600 leading-relaxed pl-14">
-                    {t.whyEsm.card3Desc}
-                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setVideoModalOpen(true)}
+                    className="text-xs font-bold text-primary hover:underline shrink-0"
+                  >
+                    Tonton Video
+                  </button>
                 </div>
               </div>
             </div>
@@ -715,7 +766,7 @@ export default function HomePage() {
 
               {/* Right Column: Interactive FAQ Accordion */}
               <div className="lg:col-span-7 space-y-3.5">
-                {faqItems.map((faq, idx) => {
+                {activeFaqs.map((faq: { q: string; a: string }, idx: number) => {
                   const isOpen = openFaq === idx;
                   return (
                     <div
@@ -906,23 +957,117 @@ export default function HomePage() {
         </section>
 
         {/* ============================================================
-            7. TESTIMONI (Distinct Sand/Stone Editorial Section - Tegas & Elegan)
-            Warm, human story closing the page before footer
+            7. TESTIMONI (Integrasi Data Master CMS & Update Berkala)
             ============================================================ */}
         <section className="py-16 sm:py-20 bg-[#F3ECE4] border-t border-stone-300/80 relative">
           <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-            <div className="rounded-3xl bg-white p-8 sm:p-12 shadow-warm-xs border border-stone-200/90 text-center space-y-5">
-              <span className="font-serif text-3xl font-bold text-accent">&ldquo;</span>
+            <div className="rounded-3xl bg-white p-8 sm:p-12 shadow-warm-xs border border-stone-200/90 text-center space-y-5 relative">
+              <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-50 px-3.5 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-900 shadow-2xs">
+                <Sparkles className="size-3 text-amber-600" />
+                <span>
+                  {locale === "en" ? "Student Reflection • ESM Movement" : "Testimoni Murid • Denyut Gerakan ESM"}
+                </span>
+              </div>
+
+              {currentTestimony.theme && (
+                <h3 className="text-sm sm:text-base font-bold text-stone-800 tracking-tight">
+                  <em>&ldquo;{currentTestimony.theme}&rdquo;</em>
+                </h3>
+              )}
+
+              <span className="font-serif text-3xl font-bold text-accent block -mb-2">&ldquo;</span>
               <p className="font-serif italic text-lg sm:text-xl text-foreground/90 leading-relaxed font-normal max-w-2xl mx-auto -mt-3">
-                Melalui kelompok pemuridan di ESM, aku belajar bahwa mengikut Yesus bukan cuma soal apa yang kita bicarakan di ruang tertutup, melainkan bagaimana kita hadir di sekolah dan kampus, berani hidup berintegritas, dan mengasihi sesama.
+                {currentTestimony.quote}
               </p>
               <div className="space-y-0.5 pt-2">
-                <p className="font-sans font-bold text-sm text-foreground">Andreas Pratama</p>
-                <p className="text-xs text-stone-500">Siswa SMA • Komunitas Explore Banten</p>
+                <p className="font-sans font-bold text-sm text-foreground">{currentTestimony.name}</p>
+                <p className="text-xs text-stone-500">{currentTestimony.role}</p>
               </div>
+
+              {/* Prev / Next Pagination Controls if Multiple Testimonies from Master */}
+              {activeTestimonies.length > 1 && (
+                <div className="pt-4 flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveTestimonyIndex((prev) =>
+                        (prev - 1 + activeTestimonies.length) % activeTestimonies.length
+                      )
+                    }
+                    className="size-8 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 flex items-center justify-center shadow-2xs transition-colors"
+                    aria-label="Previous testimony"
+                  >
+                    <ChevronLeft className="size-4" />
+                  </button>
+                  <div className="flex items-center gap-1.5">
+                    {activeTestimonies.map((_: TestimonyItem, i: number) => (
+                      <button
+                        key={i}
+                        type="button"
+                        onClick={() => setActiveTestimonyIndex(i)}
+                        className={`size-2 rounded-full transition-all ${
+                          i === (activeTestimonyIndex % activeTestimonies.length)
+                            ? "bg-primary w-5"
+                            : "bg-stone-300 hover:bg-stone-400"
+                        }`}
+                        aria-label={`Go to slide ${i + 1}`}
+                      />
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setActiveTestimonyIndex((prev) => (prev + 1) % activeTestimonies.length)
+                    }
+                    className="size-8 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-600 flex items-center justify-center shadow-2xs transition-colors"
+                    aria-label="Next testimony"
+                  >
+                    <ChevronRight className="size-4" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </section>
+
+        {/* Video Company Profile Modal Dialog */}
+        {videoModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-sm animate-in fade-in duration-200">
+            <div className="relative w-full max-w-4xl bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+              <button
+                type="button"
+                onClick={() => setVideoModalOpen(false)}
+                className="absolute top-4 right-4 z-10 size-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all cursor-pointer"
+                aria-label="Tutup video"
+              >
+                <X className="size-5" />
+              </button>
+              <div className="aspect-video w-full bg-black flex items-center justify-center">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1"
+                  title="Video Company Profile ESM Indonesia"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+              <div className="p-4 sm:p-6 bg-stone-950 text-white flex items-center justify-between">
+                <div>
+                  <h4 className="font-bold text-base">Profil Gerakan Evangelical Student Movement (ESM)</h4>
+                  <p className="text-xs text-stone-400">Panggilan Misi dan Pemuridan bagi Generasi Muda di Banten & Ternate</p>
+                </div>
+                <Button
+                  onClick={() => setVideoModalOpen(false)}
+                  variant="outline"
+                  size="sm"
+                  className="border-white/20 text-white hover:bg-white/10 rounded-full text-xs"
+                >
+                  Tutup
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <Footer />

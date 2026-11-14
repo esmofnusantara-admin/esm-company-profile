@@ -34,9 +34,13 @@ import {
   Flame,
   Maximize2,
   Quote,
+  Loader2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { submitEventRegistration } from "@/actions/eventRegistration";
+import { useToast } from "@/context/ToastContext";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 interface AgendaEvent {
   id: string;
@@ -309,7 +313,9 @@ export function AgendaView() {
   const [searchQuery, setSearchQuery] = React.useState<string>("");
 
   // Modal RSVP state
+  const { toast } = useToast();
   const [selectedEventForRsvp, setSelectedEventForRsvp] = React.useState<AgendaEvent | null>(null);
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = React.useState(false);
   const [rsvpForm, setRsvpForm] = React.useState({
     fullName: "",
     phoneWhatsApp: "",
@@ -386,17 +392,56 @@ export function AgendaView() {
     setRsvpSuccess(false);
   };
 
-  const handleRsvpSubmit = (e: React.FormEvent) => {
+  const handleRsvpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!rsvpForm.fullName || !rsvpForm.phoneWhatsApp) {
-      alert("Mohon lengkapi nama lengkap dan nomor WhatsApp Anda.");
+      toast({
+        title: "Data Belum Lengkap",
+        description: "Mohon lengkapi nama lengkap dan nomor WhatsApp Anda.",
+        type: "error",
+      });
       return;
     }
-    setRsvpSuccess(true);
+
+    setIsSubmittingRsvp(true);
+    try {
+      const res = await submitEventRegistration({
+        eventId: selectedEventForRsvp?.id,
+        eventTitle: selectedEventForRsvp?.title || "Kegiatan ESM",
+        fullName: rsvpForm.fullName,
+        phone: rsvpForm.phoneWhatsApp,
+        communityRole: rsvpForm.communityRole,
+        city: rsvpForm.city,
+        notes: rsvpForm.notes,
+      });
+
+      if (res.success) {
+        setRsvpSuccess(true);
+        toast({
+          title: "Pendaftaran Berhasil!",
+          description: "Data registrasi Anda telah tersimpan. Panitia akan segera menghubungi Anda.",
+          type: "success",
+        });
+      } else {
+        toast({
+          title: "Gagal Mendaftar",
+          description: res.error || "Terjadi kendala saat menyimpan pendaftaran.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Terjadi Kesalahan",
+        description: "Tidak dapat menghubungi server. Silakan hubungi via WhatsApp panitia.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmittingRsvp(false);
+    }
   };
 
   const handleWhatsAppDirect = (event: AgendaEvent) => {
-    const phone = "6281234567890";
+    const phone = "6281296106611";
     const text = encodeURIComponent(
       `Shalom Panitia ESM Indonesia! Saya ingin mendaftar untuk kegiatan: "${event.title}" (${event.displayDate}). Mohon informasi pendaftaran lebih lanjut. Terima kasih!`
     );
@@ -880,11 +925,6 @@ export function AgendaView() {
                       </div>
                     </div>
                   </div>
-
-                  <div className="p-5 sm:p-6 pt-0 mt-auto flex items-center justify-between text-xs font-bold text-primary border-t border-stone-100">
-                    <span>Perbesar Foto Dokumentasi</span>
-                    <Maximize2 className="size-3.5 group-hover:translate-x-0.5 transition-transform" />
-                  </div>
                 </Card>
               ))}
             </div>
@@ -1051,21 +1091,13 @@ export function AgendaView() {
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button
-                  onClick={() => {
-                    const phone = "6281234567890";
-                    const text = encodeURIComponent(
-                      "Shalom ESM Indonesia, kami dari persekutuan sekolah/kampus/gereja ingin berkonsultasi mengenai kerja sama penyelenggaraan kegiatan pembinaan."
-                    );
-                    window.open(`https://wa.me/${phone}?text=${text}`, "_blank");
-                  }}
-                  variant="outline"
-                  size="lg"
-                  className="rounded-full px-7 font-bold border-stone-300 text-stone-700 hover:bg-stone-100"
-                >
-                  <MessageCircle className="size-4 mr-2 text-emerald-600" />
-                  <span>Konsultasi Cepat via WhatsApp</span>
-                </Button>
+                <MaskedWhatsAppLink
+                  phone="6281296106611"
+                  text="Shalom ESM Indonesia, kami dari persekutuan sekolah/kampus/gereja ingin berkonsultasi mengenai kerja sama penyelenggaraan kegiatan pembinaan."
+                  variant="button"
+                  className="rounded-full px-7 py-3 font-bold border border-stone-300 text-stone-700 bg-white hover:bg-stone-50 shadow-xs text-sm"
+                  label="Konsultasi Cepat WA"
+                />
               </div>
             </div>
           </div>
@@ -1199,10 +1231,20 @@ export function AgendaView() {
                   <div className="pt-2 space-y-2">
                     <Button
                       type="submit"
-                      className="w-full rounded-full py-2.5 text-xs font-bold bg-[#2D060B] hover:bg-[#450A12] text-white shadow-warm-xs"
+                      disabled={isSubmittingRsvp}
+                      className="w-full rounded-full py-2.5 text-xs font-bold bg-[#2D060B] hover:bg-[#450A12] text-white shadow-warm-xs cursor-pointer"
                     >
-                      <Send className="size-3.5 mr-2" />
-                      <span>Kirim Formulir Pendaftaran</span>
+                      {isSubmittingRsvp ? (
+                        <>
+                          <Loader2 className="size-3.5 mr-2 animate-spin" />
+                          <span>Menyimpan Pendaftaran...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="size-3.5 mr-2" />
+                          <span>Kirim Formulir Pendaftaran</span>
+                        </>
+                      )}
                     </Button>
 
                     <Button

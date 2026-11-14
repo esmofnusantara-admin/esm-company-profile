@@ -21,9 +21,13 @@ import {
   BookOpen,
   Send,
   CheckCircle2,
+  Search,
+  X,
+  MessageCircle,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 interface ArticleItem {
   id: string;
@@ -48,6 +52,7 @@ export default function ArtikelPage() {
   const [galleryItems, setGalleryItems] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [activeCategory, setActiveCategory] = React.useState<string>("all");
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
 
   React.useEffect(() => {
     async function loadData() {
@@ -132,7 +137,7 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: Unlocking the Gates of North Maluku"
           : "Warta Pelayanan: Membuka Gerbang Misi Maluku Utara",
-      fileUrl: "#",
+      fileUrl: "/documents/warta-misi-q3-2026.pdf",
       pages: locale === "en" ? "16 Pages PDF" : "16 Halaman PDF",
       fileSize: "3.2 MB",
     },
@@ -143,7 +148,7 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: Student Faith Resilience in Banten"
           : "Warta Pelayanan: Ketahanan Iman Siswa Banten di Era Digital",
-      fileUrl: "#",
+      fileUrl: "/documents/warta-misi-q2-2026.pdf",
       pages: locale === "en" ? "14 Pages PDF" : "14 Halaman PDF",
       fileSize: "2.8 MB",
     },
@@ -154,17 +159,26 @@ export default function ArtikelPage() {
         locale === "en"
           ? "Ministry Periodical: The Call of the 3C Strategy"
           : "Warta Pelayanan: Panggilan Kerangka Strategi 3C",
-      fileUrl: "#",
+      fileUrl: "/documents/warta-misi-q1-2026.pdf",
       pages: locale === "en" ? "12 Pages PDF" : "12 Halaman PDF",
       fileSize: "2.4 MB",
     },
   ];
 
-  const displayBulletins = dbBulletins.length > 0 ? dbBulletins : fallbackBulletins;
+  // Restrict to max 3 latest editions (latest quarter)
+  const displayBulletins = (dbBulletins.length > 0 ? dbBulletins : fallbackBulletins).slice(0, 3);
 
   const filteredArticles = articles.filter((art) => {
-    if (activeCategory === "all") return true;
-    return art.category === activeCategory;
+    const matchesCategory = activeCategory === "all" || art.category === activeCategory;
+    if (!matchesCategory) return false;
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      art.title.toLowerCase().includes(q) ||
+      art.excerpt.toLowerCase().includes(q) ||
+      (art.titleEn && art.titleEn.toLowerCase().includes(q)) ||
+      (art.author && art.author.toLowerCase().includes(q))
+    );
   });
 
   const featuredArticle = articles.find((a) => a.featured) || articles[0];
@@ -202,7 +216,7 @@ export default function ArtikelPage() {
           <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-amber-200 shadow-sm">
               <Sparkles className="size-3.5 text-amber-300" />
-              <span>Jurnal, Warta, & Kabar Lapangan Misi</span>
+              <span>Warta Misi Pelayanan • Kabar Lapangan & Buletin</span>
             </div>
 
             <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white max-w-4xl mx-auto">
@@ -281,48 +295,90 @@ export default function ArtikelPage() {
         )}
 
         {/* ============================================================
-            3. CATEGORY TABS (NO UGLY SCROLLBAR)
+            3. CATEGORY TABS & SEARCH BAR
             ============================================================ */}
-        <section className="py-12 border-b border-stone-200/80">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h3 className="text-base font-bold text-foreground">
-                Kategori Berita & Tulisan
-              </h3>
-              <span className="text-xs text-stone-500">
-                Menampilkan {filteredArticles.length} artikel
-              </span>
+        <section className="py-10 border-b border-stone-200/80 bg-white/60 backdrop-blur-xs">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h3 className="text-base sm:text-lg font-bold text-foreground">
+                  Jelajahi Berita & Tulisan Misi
+                </h3>
+                <p className="text-xs text-stone-500">
+                  Temukan laporan lapangan, refleksi pemuridan, dan kesaksian anak muda.
+                </p>
+              </div>
+
+              {/* Search Bar Input */}
+              <div className="relative w-full md:w-80">
+                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 size-4 text-stone-400" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari artikel, topik, penulis..."
+                  className="w-full pl-9 pr-9 py-2.5 rounded-full border border-stone-200 bg-white text-xs text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-primary shadow-2xs transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-700"
+                    title="Hapus pencarian"
+                  >
+                    <X className="size-4" />
+                  </button>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5">
-              {categories.map((cat) => {
-                const isActive = activeCategory === cat.id;
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => setActiveCategory(cat.id)}
-                    className={cn(
-                      "group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer",
-                      isActive
-                        ? "bg-[#2D060B] text-white shadow-warm-xs ring-1 ring-primary/40 border border-transparent"
-                        : "bg-white text-stone-700 hover:text-stone-950 border border-stone-200/90 hover:border-stone-300 hover:bg-stone-50 shadow-2xs"
-                    )}
-                  >
-                    <span>{cat.label}</span>
-                    <span
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {categories.map((cat) => {
+                  const isActive = activeCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setActiveCategory(cat.id)}
                       className={cn(
-                        "ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                        "group inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs sm:text-sm font-bold transition-all duration-200 cursor-pointer",
                         isActive
-                          ? "bg-white/20 text-white"
-                          : "bg-stone-100 text-stone-600 group-hover:bg-stone-200"
+                          ? "bg-[#2D060B] text-white shadow-warm-xs ring-1 ring-primary/40 border border-transparent"
+                          : "bg-white text-stone-700 hover:text-stone-950 border border-stone-200/90 hover:border-stone-300 hover:bg-stone-50 shadow-2xs"
                       )}
                     >
-                      {cat.count}
-                    </span>
-                  </button>
-                );
-              })}
+                      <span>{cat.label}</span>
+                      <span
+                        className={cn(
+                          "ml-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold",
+                          isActive
+                            ? "bg-white/20 text-white"
+                            : "bg-stone-100 text-stone-600 group-hover:bg-stone-200"
+                        )}
+                      >
+                        {cat.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {(activeCategory !== "all" || searchQuery.trim() !== "") && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setActiveCategory("all");
+                    setSearchQuery("");
+                  }}
+                  className="rounded-full text-xs font-semibold text-primary hover:bg-red-50 hover:text-primary cursor-pointer"
+                >
+                  <RefreshCw className="size-3 mr-1.5" />
+                  <span>Lihat Semua ({articles.length})</span>
+                </Button>
+              )}
             </div>
           </div>
         </section>
@@ -449,6 +505,25 @@ export default function ArtikelPage() {
                   </div>
                 </Card>
               ))}
+            </div>
+
+            {/* Note & WhatsApp CTA for Older Editions / Physical Copies */}
+            <div className="rounded-2xl border border-dashed border-stone-300 bg-[#FAF7F2] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="space-y-1">
+                <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                  <span>Memerlukan Edisi Terdahulu atau Versi Cetak?</span>
+                </h4>
+                <p className="text-xs text-stone-500 leading-relaxed max-w-xl">
+                  Untuk distribusi buletin cetak bagi gereja lokal, persekutuan doa, atau arsip lengkap kuartal sebelumnya, silakan hubungi tim sekretariat ESM melalui WhatsApp resmi kami.
+                </p>
+              </div>
+              <MaskedWhatsAppLink
+                phone="6281296106611"
+                text="Halo Sekretariat ESM, saya ingin meminta arsip warta misi atau edisi cetak"
+                variant="button"
+                className="rounded-full border border-primary/30 text-primary hover:bg-primary-50 font-bold shrink-0 text-xs px-5 py-2.5 bg-white shadow-xs"
+                label="Hubungi Sekretariat"
+              />
             </div>
           </div>
         </section>

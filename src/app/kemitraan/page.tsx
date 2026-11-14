@@ -31,6 +31,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { submitDonation } from "@/actions/donation";
 import { cn } from "@/lib/utils";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 export default function KemitraanPage() {
   const { t, locale } = useLanguage();
@@ -267,18 +268,13 @@ export default function KemitraanPage() {
                       >
                         Kirim Komitmen Lain
                       </Button>
-                      <Button asChild size="sm" className="rounded-full text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold">
-                        <a
-                          href={`https://wa.me/${waContact}?text=${encodeURIComponent(
-                            `Halo Admin ESM, saya ingin konfirmasi komitmen donasi kemitraan misi.`
-                          )}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Phone className="size-3.5 mr-1.5" />
-                          <span>Konfirmasi via WhatsApp</span>
-                        </a>
-                      </Button>
+                      <MaskedWhatsAppLink
+                        phone={waContact}
+                        text="Halo Admin ESM, saya ingin konfirmasi komitmen donasi kemitraan misi."
+                        variant="button"
+                        className="rounded-full text-xs bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-4 py-2"
+                        label="Konfirmasi WA"
+                      />
                     </div>
                   </div>
                 ) : (
@@ -503,99 +499,34 @@ export default function KemitraanPage() {
         </section>
 
         {/* ============================================================
-            4. POKOK DOA MITRA (Dynamic from Database)
+            4. KONTAK KONSULTASI KEMITRAAN & KONFIRMASI TRANSFER
+            (Elevated and prominent before or alongside donation)
             ============================================================ */}
-        <section id="doa" className="py-16 sm:py-20 bg-[#FAF7F2]">
-          <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="text-center space-y-2">
+        <section id="kontak" className="py-16 sm:py-20 bg-[#FAF7F2] border-t border-stone-200/90">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
+            <div className="size-12 rounded-2xl bg-[#2D060B] text-amber-300 mx-auto flex items-center justify-center shadow-warm-xs">
+              <Phone className="size-5" />
+            </div>
+            <div className="space-y-2">
               <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                Syafaat Mitra & Penopang
+                Layanan Mitra & Donatur
               </span>
-              <h2 className="font-sans text-2xl sm:text-3xl font-black text-foreground">
-                Pokok Doa Khusus Kemitraan Misi
-              </h2>
-              <p className="text-xs sm:text-sm text-stone-600 max-w-lg mx-auto">
-                Selain dukungan materi, topangan doa Anda adalah fondasi utama yang memungkinkan tim staf tetap bertahan melayani di lapangan.
+              <h3 className="font-sans text-2xl sm:text-3xl font-black text-foreground">
+                Butuh Konsultasi atau Konfirmasi Transfer Kemitraan?
+              </h3>
+              <p className="text-xs sm:text-sm text-stone-600 max-w-lg mx-auto leading-relaxed">
+                Sebelum mentransfer atau jika Anda membutuhkan proposal kemitraan institusi/gereja, tim bendahara dan sekretariat ESM siap melayani dan memberikan bukti tanda terima donasi Anda.
               </p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              {prayers && Array.isArray(prayers) && prayers.length > 0 ? (
-                prayers.map((pr: any) => {
-                  const title = locale === "en" ? pr.titleEn || pr.title : pr.title;
-                  const desc = locale === "en" ? pr.descriptionEn || pr.description : pr.description;
-                  return (
-                    <Card key={pr.id} className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-3 flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[10px] font-bold uppercase text-primary tracking-wider">{pr.category}</span>
-                          {pr.isAnswered && (
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
-                              <CheckCircle className="size-3" /> Terjawab
-                            </span>
-                          )}
-                        </div>
-                        <h4 className="font-bold text-sm text-foreground">{title}</h4>
-                        <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                          {desc}
-                        </p>
-                      </div>
-                      <span className="text-[10px] text-stone-400 pt-3 block border-t border-stone-100">
-                        Periode: {pr.month}
-                      </span>
-                    </Card>
-                  );
-                })
-              ) : (
-                <>
-                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">Perintisan Banten</span>
-                    <h4 className="font-bold text-sm text-foreground">Penyediaan Asrama Siswa di Serang</h4>
-                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                      Doakan kecukupan biaya sewa rumah binaan untuk menampung adik-adik siswa yang rindu dididik dalam kelompok KTB.
-                    </p>
-                  </Card>
-
-                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-amber-800 tracking-wider">Misi Ternate</span>
-                    <h4 className="font-bold text-sm text-foreground">Kesehatan & Perlindungan Staf Lapangan</h4>
-                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                      Doakan stamina fisik dan perlindungan rohani bagi keluarga staf perintis yang melintasi pulau-pulau di Maluku Utara.
-                    </p>
-                  </Card>
-
-                  <Card className="p-6 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-2">
-                    <span className="text-[10px] font-bold uppercase text-primary tracking-wider">Kurikulum Firman</span>
-                    <h4 className="font-bold text-sm text-foreground">Pencetakan 1.000 Modul KTB Gratis</h4>
-                    <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                      Doakan dana pengadaan pencetakan buku modul bimbingan firman agar dapat dibagikan cuma-cuma ke sekolah dan kampus mitra.
-                    </p>
-                  </Card>
-                </>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* ============================================================
-            5. KONTAK HUB TIM KEMITRAAN
-            ============================================================ */}
-        <section id="kontak" className="py-16 bg-white border-t border-stone-200/90">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <h3 className="font-sans text-2xl font-bold text-foreground">
-              Butuh Konsultasi atau Konfirmasi Transfer Kemitraan?
-            </h3>
-            <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto leading-relaxed">
-              Tim sekretariat dan penatalayanan donasi kami siap membantu verifikasi atau mengirimkan bukti tanda terima donasi Anda.
-            </p>
             <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
-              <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white">
-                <a href={`https://wa.me/${waContact}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                  <Phone className="size-4" />
-                  <span>WhatsApp Bendahara (+{waContact})</span>
-                </a>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-stone-300">
+              <MaskedWhatsAppLink
+                phone={waContact}
+                text="Halo Bendahara ESM, saya ingin berkonsultasi mengenai kemitraan misi."
+                variant="button"
+                className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white text-sm"
+                label="WhatsApp Bendahara"
+              />
+              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-stone-300 bg-white">
                 <a href={`mailto:${settings?.email || "halo@esm.or.id"}`} className="flex items-center gap-2">
                   <Mail className="size-4" />
                   <span>{settings?.email || "halo@esm.or.id"}</span>

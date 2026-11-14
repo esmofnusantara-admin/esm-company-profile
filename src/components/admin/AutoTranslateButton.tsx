@@ -35,8 +35,9 @@ export function AutoTranslateButton({
       });
 
       const data = await res.json();
-      if (data.translated) {
-        onTranslated(data.translated);
+      const translatedResult = data.translated || data.translatedText;
+      if (translatedResult) {
+        onTranslated(translatedResult);
       } else {
         alert("Gagal menerjemahkan teks.");
       }

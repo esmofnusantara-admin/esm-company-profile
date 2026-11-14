@@ -22,6 +22,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 const encounterSlides: CarouselSlide[] = [
   {
@@ -92,10 +93,10 @@ export default function EncounterPage() {
 
                 <div className="pt-3 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                   <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306]">
-                    <a href="https://wa.me/6281296106611?text=Halo%20Kak%2C%20aku%20mahasiswa%20mau%20gabung%20Encounter%20ESM" target="_blank" rel="noopener noreferrer">
+                    <Link href="/gabung">
                       <span>Gabung KTB Mahasiswa</span>
                       <ArrowRight className="size-4 ml-1.5" />
-                    </a>
+                    </Link>
                   </Button>
                   <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                     <Link href="/sumber-daya">Modul Worldview KTB</Link>
@@ -301,12 +302,13 @@ export default function EncounterPage() {
                 Staf pembina kampus dan kakak-kakak mentor alumni siap mendampingimu bertumbuh, menyediakan modul pembinaan gratis, atau menghubungkanmu dengan kelompok pemuridan terdekat.
               </p>
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306]">
-                  <a href="https://wa.me/6281296106611?text=Halo%20Kak%2C%20aku%20mahasiswa%20mau%20gabung%20Encounter%20ESM" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <Phone className="size-4" />
-                    <span>Hubungi Pembina Kampus di WhatsApp</span>
-                  </a>
-                </Button>
+                <MaskedWhatsAppLink
+                  phone="6281296106611"
+                  text="Halo Kak, aku mahasiswa mau gabung Encounter ESM"
+                  variant="button"
+                  className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306] text-sm"
+                  label="Chat Pembina Kampus WA"
+                />
                 <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                   <Link href="/gabung">Formulir Gabung Komunitas</Link>
                 </Button>

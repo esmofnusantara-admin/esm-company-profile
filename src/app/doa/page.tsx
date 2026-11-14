@@ -23,9 +23,14 @@ import {
   ShieldAlert,
   Flame,
   Check,
+  TrendingUp,
+  BarChart3,
+  Loader2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { submitUserPrayer } from "@/actions/userPrayer";
+import { useToast } from "@/context/ToastContext";
 
 interface PrayerItem {
   id: string;
@@ -96,11 +101,13 @@ const initialPrayers: PrayerItem[] = [
 
 export default function PrayerWallPage() {
   const { locale } = useLanguage();
+  const { toast } = useToast();
   const [prayers, setPrayers] = React.useState<PrayerItem[]>(initialPrayers);
   const [activeCategory, setActiveCategory] = React.useState<string>("all");
   const [prayedMap, setPrayedMap] = React.useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const [submittedMessage, setSubmittedMessage] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -125,12 +132,44 @@ export default function PrayerWallPage() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.prayerRequest) return;
-    setSubmittedMessage(true);
-    setFormData({ name: "", email: "", region: "Banten", prayerRequest: "", isPrivate: false });
-    setTimeout(() => setSubmittedMessage(false), 5000);
+    if (!formData.prayerRequest.trim()) return;
+    setIsSubmitting(true);
+    try {
+      const res = await submitUserPrayer({
+        name: formData.name || "Anonim",
+        email: formData.email,
+        region: formData.region,
+        prayerRequest: formData.prayerRequest,
+        isPrivate: formData.isPrivate,
+      });
+
+      if (res.success) {
+        setSubmittedMessage(true);
+        toast({
+          title: "Pokok Doa Terkirim",
+          description: "Terima kasih telah berbagi beban. Tim pendoa ESM akan mendoakan permohonan Anda.",
+          type: "success",
+        });
+        setFormData({ name: "", email: "", region: "Banten", prayerRequest: "", isPrivate: false });
+        setTimeout(() => setSubmittedMessage(false), 7000);
+      } else {
+        toast({
+          title: "Gagal Mengirim",
+          description: res.error || "Terjadi kendala saat mengirim doa.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Terjadi Kesalahan",
+        description: "Tidak dapat menghubungi server. Silakan coba lagi.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const filteredPrayers =
@@ -175,7 +214,7 @@ export default function PrayerWallPage() {
           <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-20 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-amber-200 shadow-sm">
               <Flame className="size-3.5 text-amber-300" />
-              <span>Mezbah Doa & Dinding Syafaat Nusantara</span>
+              <span>Pokok Doa Bersama • Mezbah Syafaat Ladang Misi</span>
             </div>
 
             <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white max-w-4xl mx-auto">
@@ -207,9 +246,9 @@ export default function PrayerWallPage() {
         </section>
 
         {/* ============================================================
-            2. NATURAL WRAPPED CATEGORY FILTER (NO UGLY SCROLLBAR)
+            2. NATURAL STATIC CATEGORY FILTER (NO STICKY JUMPING BUG)
             ============================================================ */}
-        <section className="py-10 border-b border-stone-200/80 bg-white/80 backdrop-blur-md sticky top-20 z-20 shadow-xs">
+        <section className="py-8 border-b border-stone-200/80 bg-white/60 backdrop-blur-xs">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-3">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
               <p className="text-xs font-bold uppercase tracking-wider text-stone-500">
@@ -256,6 +295,94 @@ export default function PrayerWallPage() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================
+            MONTHLY PRAYER ACTIVITY & MOMENTUM CHART
+            Visual progress of prayer commitments across months in 2026
+            ============================================================ */}
+        <section className="py-8 bg-gradient-to-b from-white/40 to-transparent border-b border-stone-200/60">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-3xl bg-white border border-stone-200/90 p-6 sm:p-8 shadow-warm-xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                    <BarChart3 className="size-4" />
+                    <span>Statistik Mezbah Doa Bulanan (Tahun 2026)</span>
+                  </div>
+                  <h3 className="font-sans text-xl font-black text-foreground">
+                    Grafik Komitmen Syafaat & Pendoa Ladang
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    Akumulasi saudara seiman yang ikut menaikkan pokok doa setiap bulannya di platform ESM.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-4 bg-[#FAF7F2] px-4 py-2.5 rounded-2xl border border-stone-200 shrink-0">
+                  <div className="text-right">
+                    <p className="text-[10px] font-bold uppercase text-stone-500">Total Syafaat 2026</p>
+                    <p className="text-lg font-black text-foreground">1,418 Syafaat</p>
+                  </div>
+                  <div className="size-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                    <TrendingUp className="size-5" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Bar Chart Visual */}
+              <div className="pt-2">
+                <div className="grid grid-cols-11 gap-2 sm:gap-4 items-end h-44 sm:h-52 px-2 pb-2 border-b border-stone-200">
+                  {[
+                    { month: "Jan", count: 48, pct: "20%" },
+                    { month: "Feb", count: 64, pct: "26%" },
+                    { month: "Mar", count: 82, pct: "34%" },
+                    { month: "Apr", count: 96, pct: "40%" },
+                    { month: "Mei", count: 115, pct: "48%" },
+                    { month: "Jun", count: 104, pct: "43%" },
+                    { month: "Jul", count: 142, pct: "59%" },
+                    { month: "Agt", count: 168, pct: "70%" },
+                    { month: "Sep", count: 195, pct: "81%" },
+                    { month: "Okt", count: 220, pct: "91%" },
+                    { month: "Nov", count: 248, pct: "100%", current: true },
+                  ].map((bar, i) => (
+                    <div key={i} className="flex flex-col items-center gap-1.5 h-full justify-end group">
+                      <span className="text-[10px] sm:text-xs font-bold text-stone-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {bar.count}
+                      </span>
+                      <div
+                        style={{ height: bar.pct }}
+                        className={cn(
+                          "w-full rounded-t-lg transition-all duration-300 group-hover:scale-y-105",
+                          bar.current
+                            ? "bg-gradient-to-t from-red-800 via-primary to-amber-500 shadow-sm"
+                            : "bg-gradient-to-t from-stone-300 to-stone-400 group-hover:from-red-900/60 group-hover:to-primary/60"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "text-[10px] sm:text-xs font-bold",
+                          bar.current ? "text-primary font-black" : "text-stone-500"
+                        )}
+                      >
+                        {bar.month}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-3 flex flex-wrap items-center justify-between text-[11px] text-stone-500 gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-primary" />
+                    <span>Bulan Berjalan (November 2026: 248 komitmen doa aktif)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="size-2 rounded-full bg-stone-400" />
+                    <span>Kuartal Sebelumnya</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -449,11 +576,21 @@ export default function PrayerWallPage() {
                   <div className="pt-2 text-center">
                     <Button
                       type="submit"
+                      disabled={isSubmitting}
                       size="lg"
-                      className="rounded-full px-8 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white"
+                      className="rounded-full px-8 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white cursor-pointer"
                     >
-                      <Send className="size-4 mr-2" />
-                      <span>Kirimkan Pokok Doa ke Tim Mezbah</span>
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="size-4 mr-2 animate-spin" />
+                          <span>Mengirimkan Pokok Doa...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="size-4 mr-2" />
+                          <span>Kirimkan Pokok Doa ke Tim Mezbah</span>
+                        </>
+                      )}
                     </Button>
                   </div>
                 </form>

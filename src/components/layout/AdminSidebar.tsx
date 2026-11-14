@@ -96,12 +96,17 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "AGENDA & EVENT",
+    label: "KOMUNITAS & EVENT",
     items: [
       {
         title: "Event & Mobilisasi",
         href: "/admin/event",
         icon: Calendar,
+      },
+      {
+        title: "Pendaftar Komunitas",
+        href: "/admin/gabung",
+        icon: Users2,
       },
     ],
   },
@@ -134,7 +139,7 @@ const navGroups: NavGroup[] = [
     label: "PENGATURAN",
     items: [
       {
-        title: "Kontak & Footer",
+        title: "Kontak & Tema Web",
         href: "/admin/pengaturan",
         icon: Settings,
       },

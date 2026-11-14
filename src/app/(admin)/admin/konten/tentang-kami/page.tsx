@@ -23,9 +23,14 @@ import {
   Compass,
   MapPin,
   ShieldAlert,
+  Building2,
+  Phone,
+  ShieldCheck,
+  Network,
 } from "lucide-react";
 import Image from "next/image";
 import { Community } from "@prisma/client";
+import { AboutLegalOrg, defaultLegalOrg } from "@/lib/legalOrgConfig";
 
 interface AboutHistory {
   titleId: string;
@@ -103,6 +108,7 @@ export default function AdminTentangKamiCMS() {
   const [history, setHistory] = useState<AboutHistory>(defaultHistory);
   const [visionMission, setVisionMission] = useState<AboutVisionMission>(defaultVisionMission);
   const [regions, setRegions] = useState<AboutRegions>(defaultRegions);
+  const [legalOrg, setLegalOrg] = useState<AboutLegalOrg>(defaultLegalOrg);
   const [teamMembers, setTeamMembers] = useState<any[]>([]);
 
   // Team Form Modal State
@@ -128,15 +134,17 @@ export default function AdminTentangKamiCMS() {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [savedHist, savedVM, savedReg, members] = await Promise.all([
+        const [savedHist, savedVM, savedReg, savedLegal, members] = await Promise.all([
           getSiteConfig<AboutHistory>("about_history", defaultHistory),
           getSiteConfig<AboutVisionMission>("about_vision_mission", defaultVisionMission),
           getSiteConfig<AboutRegions>("about_regions", defaultRegions),
+          getSiteConfig<AboutLegalOrg>("about_legal_org", defaultLegalOrg),
           getTeamMembers(),
         ]);
         if (savedHist) setHistory(savedHist);
         if (savedVM) setVisionMission(savedVM);
         if (savedReg) setRegions(savedReg);
+        if (savedLegal) setLegalOrg(savedLegal);
         if (members) setTeamMembers(members);
       } catch (err) {
         console.error("Gagal memuat data:", err);
@@ -155,6 +163,7 @@ export default function AdminTentangKamiCMS() {
         saveSiteConfig("about_history", history),
         saveSiteConfig("about_vision_mission", visionMission),
         saveSiteConfig("about_regions", regions),
+        saveSiteConfig("about_legal_org", legalOrg),
       ]);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 4000);
@@ -587,7 +596,435 @@ export default function AdminTentangKamiCMS() {
         </div>
       </div>
 
-      {/* 4. DEWAN PENGURUS & TIM PELAYANAN */}
+      {/* 4. BADAN HUKUM YAYASAN MMB & BAGAN ORGANISASI */}
+      <div id="legal-org" className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
+        <div className="border-b border-border pb-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-amber-800 uppercase tracking-wider mb-1">
+            <Building2 className="size-3.5" />
+            <span>LEGALITAS & BAGAN ORGANISASI</span>
+          </div>
+          <h2 className="text-base font-bold text-foreground">
+            4. Badan Hukum Yayasan MMB (Murid Muda Bermisi) & Bagan Organisasi
+          </h2>
+          <p className="text-xs text-muted-foreground">
+            Atur SK AHU Kemenkumham, kontak Sekretaris Yayasan, Ketua Yayasan, serta struktur hierarki Tingkat 1 (Naungan Hukum), Tingkat 2 (Sekjen / Koordinator Nasional Gerakan ESM), dan Tingkat 3 (Banten - Ternate).
+          </p>
+        </div>
+
+        {/* 4.1 Identitas Legalitas Yayasan MMB */}
+        <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
+            <ShieldCheck className="size-4 text-emerald-600" />
+            <span>A. Identitas & Legalitas Yayasan</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Nama Resmi Yayasan</label>
+              <input
+                type="text"
+                value={legalOrg.foundationName}
+                onChange={(e) => setLegalOrg({ ...legalOrg, foundationName: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder="Yayasan Murid Muda Bermisi"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Singkatan Yayasan</label>
+              <input
+                type="text"
+                value={legalOrg.foundationAbbr}
+                onChange={(e) => setLegalOrg({ ...legalOrg, foundationAbbr: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder="Yayasan MMB"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Nomor SK AHU Kemenkumham</label>
+              <input
+                type="text"
+                value={legalOrg.skAhu}
+                onChange={(e) => setLegalOrg({ ...legalOrg, skAhu: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-mono font-bold"
+                placeholder="AHU-0013520.AH.01.04.Tahun 2024"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Nama Ketua Yayasan</label>
+              <input
+                type="text"
+                value={legalOrg.foundationHead}
+                onChange={(e) => setLegalOrg({ ...legalOrg, foundationHead: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder="Markus P., M.Div."
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Nama Sekretaris Yayasan</label>
+              <input
+                type="text"
+                value={legalOrg.secretaryName}
+                onChange={(e) => setLegalOrg({ ...legalOrg, secretaryName: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder="Hana Kristianti, S.E."
+              />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Nomor Kontak Sekretaris Yayasan</label>
+              <input
+                type="text"
+                value={legalOrg.secretaryPhone}
+                onChange={(e) => setLegalOrg({ ...legalOrg, secretaryPhone: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                placeholder="+62 812-9610-6611"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* 4.2 Bagan Organisasi Gerakan (Tingkat 1, 2, 3) */}
+        <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
+            <Network className="size-4 text-primary" />
+            <span>B. Bagan Organisasi Gerakan (Tingkat 1, 2 & 3)</span>
+          </div>
+
+          {/* Tingkat 1 */}
+          <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-amber-900 uppercase tracking-wide">
+                Tingkat 1 — Naungan Hukum
+              </span>
+              <span className="text-[10px] text-stone-500">
+                (Nama Yayasan, Ketua Yayasan, SK AHU, dan Kontak Sekretaris diambil otomatis)
+              </span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Label Tingkat 1 (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier1BadgeId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier1BadgeId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Tingkat 1 • Naungan Hukum"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Label Tingkat 1 (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier1BadgeId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier1BadgeEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier1BadgeEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier1BadgeEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Level 1 • Legal Umbrella"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Subteks Pengawas / Pembina (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier1SubId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier1SubId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Dewan Pembina, Penasihat Hukum & Pengawas Yayasan"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Subteks Pengawas / Pembina (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier1SubId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier1SubEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier1SubEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier1SubEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Board of Trustees, Legal Advisors & Foundation Supervisors"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Tingkat 2 */}
+          <div className="p-3.5 rounded-xl bg-stone-900 text-white space-y-3">
+            <span className="text-xs font-bold text-amber-300 uppercase tracking-wide block">
+              Tingkat 2 — Sekretaris Jenderal (Koordinator Nasional Gerakan ESM)
+            </span>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-white block mb-1">Label Tingkat 2 (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier2BadgeId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier2BadgeId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-700 bg-stone-800 text-white"
+                  placeholder="Tingkat 2 • Sekretaris Jendral (Koordinator Nasional Gerakan ESM)"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-stone-200">Label Tingkat 2 (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier2BadgeId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier2BadgeEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier2BadgeEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier2BadgeEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-700 bg-stone-800 text-white"
+                  placeholder="Level 2 • Secretary General (National Coordinator of ESM Movement)"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="text-xs font-bold text-white block mb-1">Nama Pimpinan / Sekjen</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier2LeaderName}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier2LeaderName: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-700 bg-stone-800 text-white font-bold"
+                  placeholder="Pdt. Daniel S. Th., M.Min."
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-stone-200 block mb-1">Jabatan Subteks (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier2RoleSubId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier2RoleSubId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-700 bg-stone-800 text-white"
+                  placeholder="Sekretaris Jenderal / Koordinator Nasional Gerakan ESM & Dewan Pembina Rohani"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-stone-200">Jabatan Subteks (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier2RoleSubId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier2RoleSubEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier2RoleSubEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier2RoleSubEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-700 bg-stone-800 text-white"
+                  placeholder="Secretary General / National Coordinator of ESM Movement & Spiritual Oversight"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Tingkat 3 - Ladang Pelayanan Lapangan: Banten - Ternate */}
+          <div className="p-3.5 rounded-xl bg-muted/40 border border-border space-y-3">
+            <span className="text-xs font-bold text-foreground uppercase tracking-wide block">
+              Tingkat 3 — Ladang Pelayanan Lapangan: Banten - Ternate
+            </span>
+
+            {/* Banten */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Deskripsi Wilayah Banten (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier3BantenDescId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier3BantenDescId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Pelayanan Siswa & Kampus Mahasiswa (Explore & Encounter Serang, Cilegon, Tangerang)"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Deskripsi Wilayah Banten (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier3BantenDescId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier3BantenDescEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier3BantenDescEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier3BantenDescEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="High School & Campus Ministry (Explore & Encounter Serang, Cilegon, Tangerang)"
+                />
+              </div>
+            </div>
+
+            {/* Ternate */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Deskripsi Wilayah Ternate (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.tier3TernateDescId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier3TernateDescId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Perintisan Pelayanan Siswa & Kampus Mahasiswa Maluku Utara (Kota Rempah)"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Deskripsi Wilayah Ternate (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.tier3TernateDescId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, tier3TernateDescEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.tier3TernateDescEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, tier3TernateDescEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Pioneering Student & Campus Ministry across North Maluku (Spice Islands)"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 4.3 Teks Pernyataan Hukum & 3 Butir Akuntabilitas */}
+        <div className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
+          <div className="flex items-center gap-2 text-xs font-bold text-foreground uppercase tracking-wider">
+            <BookOpen className="size-4 text-amber-700" />
+            <span>C. Narasi Pernyataan Hukum & 3 Butir Akuntabilitas</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Deskripsi Pernyataan Hukum (ID)</label>
+              <textarea
+                rows={3}
+                value={legalOrg.legalStatementDescId}
+                onChange={(e) => setLegalOrg({ ...legalOrg, legalStatementDescId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-foreground">Deskripsi Pernyataan Hukum (EN)</label>
+                <AutoTranslateButton
+                  sourceText={legalOrg.legalStatementDescId}
+                  onTranslated={(txt) => setLegalOrg({ ...legalOrg, legalStatementDescEn: txt })}
+                />
+              </div>
+              <textarea
+                rows={3}
+                value={legalOrg.legalStatementDescEn}
+                onChange={(e) => setLegalOrg({ ...legalOrg, legalStatementDescEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+          </div>
+
+          {/* 3 Butir */}
+          <div className="space-y-3 pt-1">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Butir 1: Independensi Parachurch (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.point1DescId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point1DescId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Butir 1 (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.point1DescId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, point1DescEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.point1DescEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point1DescEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Butir 2: Payung Legalitas & SK AHU (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.point2DescId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point2DescId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Butir 2 (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.point2DescId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, point2DescEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.point2DescEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point2DescEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Butir 3: Akuntabilitas Tata Kelola (ID)</label>
+                <input
+                  type="text"
+                  value={legalOrg.point3DescId}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point3DescId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Butir 3 (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={legalOrg.point3DescId}
+                    onTranslated={(txt) => setLegalOrg({ ...legalOrg, point3DescEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={legalOrg.point3DescEn}
+                  onChange={(e) => setLegalOrg({ ...legalOrg, point3DescEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 5. DEWAN PENGURUS & TIM PELAYANAN */}
       <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
         <div className="border-b border-border pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -595,7 +1032,7 @@ export default function AdminTentangKamiCMS() {
               <UserCheck className="size-3.5" />
               <span>TIM & PENGURUS</span>
             </div>
-            <h2 className="text-base font-bold text-foreground">4. Struktur Dewan Pengurus & Staf Pelayanan</h2>
+            <h2 className="text-base font-bold text-foreground">5. Struktur Dewan Pengurus & Staf Pelayanan</h2>
             <p className="text-xs text-muted-foreground">Kelola profil, foto pengurus, jabatan, dan bio anggota tim.</p>
           </div>
 

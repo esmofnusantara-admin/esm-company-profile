@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Mail, Phone, MapPin, Instagram, Youtube, Facebook } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 export function Footer() {
   const { t, locale } = useLanguage();
@@ -118,11 +119,6 @@ export function Footer() {
                   Connect <span className="text-[11px] text-muted-foreground/70">{t.footer.connectSub}</span>
                 </Link>
               </li>
-              <li>
-                <Link href="/pelayanan" className="hover:text-primary transition-colors">
-                  {t.footer.framework3C}
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -134,7 +130,7 @@ export function Footer() {
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
                 <Link href="/tentang-kami#dasar-iman" className="hover:text-primary transition-colors">
-                  {t.footer.statementOfFaith}
+                  {locale === "en" ? "Mission of Faith" : "Misi Iman (Mission of Faith)"}
                 </Link>
               </li>
               <li>
@@ -143,14 +139,24 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/doa" className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <span>Pokok Doa Bersama</span>
+                <Link href="/renungan" className="hover:text-primary transition-colors flex items-center gap-1.5">
+                  <span>Renungan & Saat Teduh</span>
                   <span className="size-1.5 rounded-full bg-primary" />
                 </Link>
               </li>
               <li>
+                <Link href="/doa" className="hover:text-primary transition-colors">
+                  Pokok Doa Bersama
+                </Link>
+              </li>
+              <li>
+                <Link href="/artikel" className="hover:text-primary transition-colors">
+                  Warta Misi Pelayanan
+                </Link>
+              </li>
+              <li>
                 <Link href="/sumber-daya" className="hover:text-primary transition-colors">
-                  Bahan PA & Modul Pemuridan
+                  Bahan Ajar & Panduan KTB
                 </Link>
               </li>
               <li>
@@ -190,8 +196,12 @@ export function Footer() {
                 </span>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="size-3.5 shrink-0 text-primary" />
-                <span>{phone}</span>
+                <MaskedWhatsAppLink
+                  phone={phone}
+                  text="Halo ESM Indonesia, saya ingin bertanya seputar pelayanan..."
+                  variant="pill"
+                  className="text-xs hover:text-primary"
+                />
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="size-3.5 shrink-0 text-primary" />
@@ -206,7 +216,7 @@ export function Footer() {
           <p>© {new Date().getFullYear()} Evangelical Student Movement (ESM). All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link href="/tentang-kami#dasar-iman" className="hover:text-foreground transition-colors">
-              {locale === "en" ? "Statement of Faith" : "Dasar Iman"}
+              {locale === "en" ? "Mission of Faith" : "Mission of Faith (Misi Iman)"}
             </Link>
             <Link href="/kemitraan" className="hover:text-foreground transition-colors">
               {locale === "en" ? "Mission Partnership" : "Kemitraan Misi"}

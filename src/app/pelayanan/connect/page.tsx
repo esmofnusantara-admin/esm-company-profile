@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 const connectSlides: CarouselSlide[] = [
   {
@@ -76,10 +77,10 @@ export default function ConnectPage() {
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
               <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#1A0E06]">
-                <a href="https://wa.me/6281296106611?text=Halo%20Tim%20Connect%2C%20saya%20alumni%20ingin%20terhubung%20dengan%20komunitas%20profesional%20ESM" target="_blank" rel="noopener noreferrer">
+                <Link href="/gabung">
                   <span>Gabung Komunitas Profesional</span>
                   <ArrowRight className="size-4 ml-1.5" />
-                </a>
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                 <Link href="/sumber-daya">Buku: Iman di Ruang Rapat</Link>
@@ -220,32 +221,32 @@ export default function ConnectPage() {
                 </h2>
               </div>
               <Badge variant="outline" className="border-stone-300 text-stone-700 w-fit">
-                Jabodetabek • Banten • Ternate
+                Banten & Tangerang (Aktif) • Ternate (Segera Hadir)
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="p-6 rounded-3xl bg-[#FAF7F2] border border-stone-200/90 shadow-warm-xs space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-primary">Jabodetabek</span>
-                <h4 className="font-bold text-base text-foreground">Komunitas Profesional Ibu Kota</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Card Banten & Tangerang */}
+              <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-primary">Banten & Tangerang</span>
+                  <Badge className="bg-red-50 text-primary border border-primary/20 text-[10px]">Aktif</Badge>
+                </div>
+                <h4 className="font-bold text-lg text-foreground">Alumni Industri, Korporasi & Pelayanan</h4>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Pertemuan sarapan pagi / makan malam bulanan dan kelompok doa profesional di sekitar Jakarta, Tangerang, dan sekitarnya.
+                  Kaum profesional yang berkarya di kawasan industri Cilegon, Serang, dan perkantoran Tangerang. Aktif mendampingi adik-adik siswa SMA, memuridkan mahasiswa, serta saling meneguhkan integritas kerja.
                 </p>
               </Card>
 
-              <Card className="p-6 rounded-3xl bg-[#FAF7F2] border border-stone-200/90 shadow-warm-xs space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-amber-800">Banten (Serang-Cilegon)</span>
-                <h4 className="font-bold text-base text-foreground">Alumni Industri & Pelayanan</h4>
+              {/* Card Ternate (Coming Soon) */}
+              <Card className="p-7 rounded-3xl bg-[#FAF7F2] border border-amber-300/80 shadow-warm-xs space-y-4 relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-amber-800">Maluku Utara (Ternate)</span>
+                  <Badge className="bg-amber-100 text-amber-900 border border-amber-300 text-[10px] font-bold">Segera Hadir (Soon)</Badge>
+                </div>
+                <h4 className="font-bold text-lg text-foreground">Alumni Pendidik & Medis Kota Rempah</h4>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Kaum profesional yang bekerja di kawasan industri Cilegon dan instansi di Serang, mendampingi perintisan siswa SMA dan mahasiswa Untirta.
-                </p>
-              </Card>
-
-              <Card className="p-6 rounded-3xl bg-[#FAF7F2] border border-stone-200/90 shadow-warm-xs space-y-3">
-                <span className="text-xs font-bold uppercase tracking-wider text-emerald-800">Maluku Utara (Ternate)</span>
-                <h4 className="font-bold text-base text-foreground">Alumni Pendidik & Medis Kota Rempah</h4>
-                <p className="text-xs text-stone-600 leading-relaxed">
-                  Dokter, perawat, guru, dan pegawai di Ternate yang setia menopang asrama mahasiswa perantau dan gerakan doa kepulauan.
+                  Tahap persiapan jejaring alumni medis, guru, dan pegawai di Ternate untuk menopang asrama mahasiswa perantau serta perintisan persekutuan profesional pulau-pulau.
                 </p>
               </Card>
             </div>
@@ -268,12 +269,13 @@ export default function ConnectPage() {
                 Bergabunglah dengan jejaring alumni Connect, temukan teman seiman di industri yang sama, atau daftarkan diri Anda menjadi kakak mentor bagi generasi penerus.
               </p>
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180A04]">
-                  <a href="https://wa.me/6281296106611?text=Halo%20Tim%20Connect%2C%20saya%20alumni%20ingin%20bergabung%20atau%20menjadi%20mentor%20ESM" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <Phone className="size-4" />
-                    <span>Hubungi Koordinator Alumni (WhatsApp)</span>
-                  </a>
-                </Button>
+                <MaskedWhatsAppLink
+                  phone="6281296106611"
+                  text="Halo Tim Connect, saya alumni ingin terhubung atau menjadi mentor ESM"
+                  variant="button"
+                  className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180A04] text-sm"
+                  label="Hubungi Koordinator Alumni WA"
+                />
                 <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                   <Link href="/kemitraan">Dukung Pelayanan Misi</Link>
                 </Button>

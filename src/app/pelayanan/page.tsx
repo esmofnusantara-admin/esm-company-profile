@@ -1,5 +1,5 @@
 "use client";
-
+import * as React from "react";
 import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -18,9 +18,45 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 
 export default function PelayananPage() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const m = t.ministryPage;
   const c = t.communities;
+  const [cmsData, setCmsData] = React.useState<any>(null);
+
+  React.useEffect(() => {
+    fetch("/api/content?section=pelayanan")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.success && res.data) {
+          setCmsData(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const f3c = cmsData?.framework3C;
+  const commList = cmsData?.communities;
+
+  const communionItem = f3c?.[0];
+  const communityItem = f3c?.[1];
+  const commissionItem = f3c?.[2];
+
+  const c1Title = communionItem ? (locale === "en" ? communionItem.titleEn || communionItem.titleId : communionItem.titleId) : m.c1Title;
+  const c1Desc = communionItem ? (locale === "en" ? communionItem.descEn || communionItem.descId : communionItem.descId) : m.c1Desc;
+
+  const c2Title = communityItem ? (locale === "en" ? communityItem.titleEn || communityItem.titleId : communityItem.titleId) : m.c2Title;
+  const c2Desc = communityItem ? (locale === "en" ? communityItem.descEn || communityItem.descId : communityItem.descId) : m.c2Desc;
+
+  const c3Title = commissionItem ? (locale === "en" ? commissionItem.titleEn || commissionItem.titleId : commissionItem.titleId) : m.c3Title;
+  const c3Desc = commissionItem ? (locale === "en" ? commissionItem.descEn || commissionItem.descId : commissionItem.descId) : m.c3Desc;
+
+  const exploreComm = Array.isArray(commList) ? commList.find((cm: any) => cm.slug === "explore") : null;
+  const encounterComm = Array.isArray(commList) ? commList.find((cm: any) => cm.slug === "encounter") : null;
+  const connectComm = Array.isArray(commList) ? commList.find((cm: any) => cm.slug === "connect") : null;
+
+  const exploreDesc = exploreComm ? (locale === "en" ? exploreComm.descEn || exploreComm.descId : exploreComm.descId) : c.exploreDesc;
+  const encounterDesc = encounterComm ? (locale === "en" ? encounterComm.descEn || encounterComm.descId : encounterComm.descId) : c.encounterDesc;
+  const connectDesc = connectComm ? (locale === "en" ? connectComm.descEn || connectComm.descId : connectComm.descId) : c.connectDesc;
 
   return (
     <>
@@ -53,9 +89,9 @@ export default function PelayananPage() {
                   <Heart className="size-6" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-primary">{m.c1Number}</span>
-                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{m.c1Title}</h3>
+                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{c1Title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  {m.c1Desc}
+                  {c1Desc}
                 </p>
               </Card>
 
@@ -64,9 +100,9 @@ export default function PelayananPage() {
                   <Users className="size-6" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-accent">{m.c2Number}</span>
-                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{m.c2Title}</h3>
+                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{c2Title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  {m.c2Desc}
+                  {c2Desc}
                 </p>
               </Card>
 
@@ -75,9 +111,9 @@ export default function PelayananPage() {
                   <Send className="size-6" />
                 </div>
                 <span className="text-xs font-bold uppercase tracking-wider text-primary">{m.c3Number}</span>
-                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{m.c3Title}</h3>
+                <h3 className="text-xl font-bold text-foreground mt-1 mb-2">{c3Title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">
-                  {m.c3Desc}
+                  {c3Desc}
                 </p>
               </Card>
             </div>
@@ -102,7 +138,7 @@ export default function PelayananPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground">Explore Community</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    {c.exploreDesc}
+                    {exploreDesc}
                   </p>
                 </div>
                 <div className="pt-4 mt-4 border-t border-border">
@@ -122,7 +158,7 @@ export default function PelayananPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground">Encounter Community</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    {c.encounterDesc}
+                    {encounterDesc}
                   </p>
                 </div>
                 <div className="pt-4 mt-4 border-t border-border">
@@ -142,7 +178,7 @@ export default function PelayananPage() {
                   </div>
                   <h3 className="text-xl font-bold text-foreground">Connect Community</h3>
                   <p className="text-xs text-muted-foreground leading-relaxed">
-                    {c.connectDesc}
+                    {connectDesc}
                   </p>
                 </div>
                 <div className="pt-4 mt-4 border-t border-border">

@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/context/ToastContext";
 
 interface ResourceItem {
   id: string;
@@ -66,7 +67,7 @@ const initialResources: ResourceItem[] = [
     sessions: "8 Sesi Diskusi",
     description:
       "Panduan kelompok kecil pemuridan kampus untuk membentengi iman mahasiswa dari relativisme moral, skeptisisme intelektual, dan filsafat sekuler di lingkungan perguruan tinggi.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/modul-murid-kritis.pdf",
     coverImage: "/uploads/books/murid_kritis.jpg",
     badge: "Bahan Wajib KTB",
     featured: true,
@@ -83,7 +84,7 @@ const initialResources: ResourceItem[] = [
     sessions: "6 Sesi Pemuridan",
     description:
       "Modul 6 minggu membimbing siswa menghadapi krisis identitas remaja, tekanan teman sebaya, media sosial, dan keberanian hidup kudus bagi Kristus di sekolah.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/modul-jati-diri.pdf",
     coverImage: "/uploads/books/jati_diri.jpg",
     badge: "Paling Populer",
   },
@@ -99,7 +100,7 @@ const initialResources: ResourceItem[] = [
     sessions: "10 Bab Praktis",
     description:
       "Kiat praktis bagaimana memimpin diskusi firman yang hidup, membangun relasi hati-ke-hati tanpa manipulasi, menangani pergumulan anggota, dan mendidik murid agar siap memuridkan kembali.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/panduan-pemimpin-ktb.pdf",
     coverImage: "/uploads/books/pemimpin_ktb.jpg",
     badge: "Pedoman Mentor",
   },
@@ -115,7 +116,7 @@ const initialResources: ResourceItem[] = [
     sessions: "5 Seri Diskusi",
     description:
       "Menjawab dilema etika bisnis, godaan kompromi integritas, kejenuhan karier, dan bagaimana menghidupi profesi harian sebagai mimbar misi Allah di tengah dunia kerja sekuler.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/modul-murid-kritis.pdf",
     coverImage: "/uploads/books/iman_rapat.jpg",
   },
   {
@@ -130,7 +131,7 @@ const initialResources: ResourceItem[] = [
     sessions: "30 Hari Refleksi",
     description:
       "Jurnal perenungan pribadi harian dari Kitab Mazmur dan Injil untuk menumbuhkan keintiman doa, kedisiplinan membaca firman, dan ketenangan jiwa di awal hari.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/mission-of-faith-esm.pdf",
     coverImage: "/uploads/books/saat_teduh.jpg",
   },
   {
@@ -145,7 +146,7 @@ const initialResources: ResourceItem[] = [
     sessions: "Studi Lapangan",
     description:
       "Kajian sosiologis, pemetaan kampus, dan gambaran nyata dinamika pelayanan perintisan generasi muda di Tanah Jawara Banten serta Kepulauan Maluku Utara.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/warta-misi-q3-2026.pdf",
     coverImage: "/uploads/books/misi_nusantara.jpg",
   },
   {
@@ -160,7 +161,7 @@ const initialResources: ResourceItem[] = [
     sessions: "7 Sesi Dasar",
     description:
       "Kurikulum esensial mencakup kepastian keselamatan, arti pengampunan dosa, kuasa doa, membaca firman, hidup berkemenangan, serta persekutuan jemaat mula-mula.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/modul-jati-diri.pdf",
     coverImage: "/uploads/books/jati_diri.jpg",
     badge: "Dasar Pertumbuhan",
   },
@@ -176,7 +177,7 @@ const initialResources: ResourceItem[] = [
     sessions: "4 Seri Tematik",
     description:
       "Studi praktis tentang menjaga kekudusan mata di media sosial, mengatasi kecemasan perbandingan digital, dan menjadikan konten online sebagai sarana kesaksian iman.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/modul-murid-kritis.pdf",
     coverImage: "/uploads/books/murid_kritis.jpg",
   },
   {
@@ -191,7 +192,7 @@ const initialResources: ResourceItem[] = [
     sessions: "6 Seri Keuangan",
     description:
       "Pedoman praktis bebas dari jeratan konsumerisme dan utang, membangun dana darurat, menata prioritas perpuluhan, serta berinvestasi dengan integritas moral kristiani.",
-    downloadUrl: "#",
+    downloadUrl: "/documents/panduan-pemimpin-ktb.pdf",
     coverImage: "/uploads/books/iman_rapat.jpg",
     badge: "Praktis & Terapan",
   },
@@ -199,6 +200,7 @@ const initialResources: ResourceItem[] = [
 
 export default function ResourcesPage() {
   const { locale } = useLanguage();
+  const { toast } = useToast();
   const [resources] = React.useState<ResourceItem[]>(initialResources);
   const [activeCategory, setActiveCategory] = React.useState<string>("all");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
@@ -217,9 +219,20 @@ export default function ResourcesPage() {
     setCurrentPage(1);
   }, [activeCategory, searchQuery, viewMode]);
 
-  const handleDownload = (id: string, title: string) => {
+  const handleDownload = (id: string, title: string, url?: string) => {
     setDownloadedIds((prev) => ({ ...prev, [id]: true }));
-    alert(`Modul "${title}" siap diunduh! Kiranya bahan ini memberkati pemuridan Anda.`);
+    const targetUrl = url && url !== "#" ? url : "/documents/panduan-pemimpin-ktb.pdf";
+    const a = document.createElement("a");
+    a.href = targetUrl;
+    a.download = "";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast({
+      title: "Mengunduh Modul",
+      description: `Modul "${title}" berhasil diunduh. Kiranya bahan ini memberkati pemuridan Anda.`,
+      type: "success",
+    });
   };
 
   const filteredResources = React.useMemo(() => {
@@ -288,18 +301,18 @@ export default function ResourcesPage() {
           <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20 text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-bold uppercase tracking-wider text-amber-200 shadow-sm">
               <BookMarked className="size-3.5 text-amber-300" />
-              <span>Pusat Sumber Daya & Modul Pemuridan</span>
+              <span>Bahan Ajar • Bahan PA & Panduan Pembuat Murid</span>
             </div>
 
             <h1 className="font-sans text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight text-white max-w-4xl mx-auto">
-              Bahan Pembinaan Firman untuk{" "}
+              Bahan Ajar Firman untuk{" "}
               <span className="font-serif italic font-normal text-amber-200">
                 Melatih & Memperlengkapi Murid
               </span>
             </h1>
 
             <p className="text-sm sm:text-base lg:text-lg text-stone-200/90 max-w-2xl mx-auto font-normal leading-relaxed">
-              Koleksi kurikulum pendalaman Alkitab, panduan pemimpin KTB, modul pembinaan siswa, dan jurnal refleksi yang dapat diunduh gratis untuk menolong generasi muda bertumbuh mandiri dalam Kristus.
+              Koleksi bahan PA siswa & mahasiswa, panduan praktis pembuat murid bagi pembina KTB, modul pembinaan karakter, dan jurnal saat teduh yang dapat diunduh gratis untuk melipatgandakan generasi murid Kristus.
             </p>
 
             {/* Trust Highlights */}
@@ -870,6 +883,124 @@ export default function ResourcesPage() {
                 )}
               </div>
             )}
+          </div>
+        </section>
+
+        {/* ============================================================
+            4.5 ZONA KHUSUS: PANDUAN PEMBINA & PEMIMPIN KTB (#mentor)
+            Distinct header separating mentor/leader guides from participant sheets
+            ============================================================ */}
+        <section id="mentor" className="py-16 sm:py-20 bg-gradient-to-b from-[#FAF7F2] via-amber-50/40 to-white border-t border-stone-200/90 scroll-mt-24">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-2 max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/70 border border-amber-300 text-amber-900 text-xs font-bold uppercase tracking-wider">
+                  <ShieldCheck className="size-3.5 text-amber-800" />
+                  <span>Zona Khusus Pembina & Pemimpin KTB</span>
+                </div>
+                <h2 className="font-sans text-2xl sm:text-3xl font-black text-foreground tracking-tight">
+                  Pedoman Khusus Pembuat Murid (Leader&apos;s Edition)
+                </h2>
+                <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-normal">
+                  Berbeda dari modul peserta biasa, panduan mentor memuat kunci penggalian induktif, lembar fasilitasi kelompok, panduan konseling teman sebaya, serta kiat mengatasi kebuntuan dalam kelompok kecil.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-amber-100/70 border border-amber-300/80 text-amber-950 text-xs max-w-sm">
+                <p className="font-bold flex items-center gap-1.5 mb-1">
+                  <span>💡 Catatan Pembina:</span>
+                </p>
+                <p className="text-[11px] leading-relaxed">
+                  Gunakan buku panduan ini sebagai pegangan pribadi saat mendampingi adik-adik PA di sekolah dan kampus.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-warm-xs hover:shadow-warm-md hover:border-amber-400 transition-all space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="size-11 rounded-2xl bg-[#2D060B] text-amber-300 flex items-center justify-center font-bold">
+                    <BookOpen className="size-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-900 bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300">
+                    Panduan Utama Mentor
+                  </span>
+                  <h3 className="font-sans text-base font-bold text-foreground">
+                    Buku Saku Pemimpin KTB: Seni Melipatgandakan Murid
+                  </h3>
+                  <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                    10 bab panduan langkah demi langkah memandu kelompok pemuridan, membangun keintiman persekutuan, dan melatih murid menjadi pembimbing generasi berikutnya.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                  <span className="text-[11px] text-stone-400">PDF • 44 Halaman</span>
+                  <Button
+                    size="sm"
+                    onClick={() => handleDownload("mentor-guide-1", "Buku Saku Pemimpin KTB", "/documents/panduan-pemimpin-ktb.pdf")}
+                    className="rounded-full px-4 text-xs font-bold bg-[#2D060B] hover:bg-[#450A12] text-white"
+                  >
+                    <Download className="size-3 mr-1.5" />
+                    <span>Unduh PDF</span>
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-warm-xs hover:shadow-warm-md hover:border-amber-400 transition-all space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="size-11 rounded-2xl bg-amber-500 text-stone-950 flex items-center justify-center font-bold">
+                    <Users className="size-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-stone-800 bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
+                    Klinik Pendampingan
+                  </span>
+                  <h3 className="font-sans text-base font-bold text-foreground">
+                    Panduan Konseling Teman Sebaya bagi Pembina
+                  </h3>
+                  <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                    Prinsip mendengarkan secara empatik, batasan etika pastoral, kerahasiaan konseling, dan cara merujuk kasus berat ke konselor profesional.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                  <span className="text-[11px] text-stone-400">PDF • 32 Halaman</span>
+                  <Button
+                    size="sm"
+                    onClick={() => handleDownload("mentor-guide-2", "Panduan Konseling Teman Sebaya", "/documents/panduan-pemimpin-ktb.pdf")}
+                    className="rounded-full px-4 text-xs font-bold bg-[#2D060B] hover:bg-[#450A12] text-white"
+                  >
+                    <Download className="size-3 mr-1.5" />
+                    <span>Unduh PDF</span>
+                  </Button>
+                </div>
+              </Card>
+
+              <Card className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-warm-xs hover:shadow-warm-md hover:border-amber-400 transition-all space-y-4 flex flex-col justify-between">
+                <div className="space-y-3">
+                  <div className="size-11 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold">
+                    <Layers className="size-5" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100 px-2 py-0.5 rounded-md border border-emerald-300">
+                    Metode Induktif
+                  </span>
+                  <h3 className="font-sans text-base font-bold text-foreground">
+                    Pedoman Observasi, Interpretasi, & Aplikasi (OIA)
+                  </h3>
+                  <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                    Lembar kerja dan pertanyaan penuntun untuk menolong mentor menyusun bahan PA sendiri dari kitab-kitab Perjanjian Lama dan Perjanjian Baru.
+                  </p>
+                </div>
+                <div className="pt-4 border-t border-stone-100 flex items-center justify-between">
+                  <span className="text-[11px] text-stone-400">PDF • 38 Halaman</span>
+                  <Button
+                    size="sm"
+                    onClick={() => handleDownload("mentor-guide-3", "Pedoman OIA Induktif", "/documents/modul-murid-kritis.pdf")}
+                    className="rounded-full px-4 text-xs font-bold bg-[#2D060B] hover:bg-[#450A12] text-white"
+                  >
+                    <Download className="size-3 mr-1.5" />
+                    <span>Unduh PDF</span>
+                  </Button>
+                </div>
+              </Card>
+            </div>
           </div>
         </section>
 

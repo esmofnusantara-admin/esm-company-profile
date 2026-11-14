@@ -21,12 +21,18 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { submitJoinForm } from "@/actions/join";
+import { useToast } from "@/context/ToastContext";
+import { Loader2 } from "lucide-react";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 export default function JoinGroupPage() {
   const { locale } = useLanguage();
+  const { toast } = useToast();
   const [selectedRole, setSelectedRole] = React.useState<"siswa" | "mahasiswa" | "alumni">("mahasiswa");
   const [selectedRegion, setSelectedRegion] = React.useState<string>("banten");
   const [submitted, setSubmitted] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [formData, setFormData] = React.useState({
     fullName: "",
     phone: "",
@@ -35,9 +41,42 @@ export default function JoinGroupPage() {
     notes: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+    try {
+      const res = await submitJoinForm({
+        fullName: formData.fullName,
+        phone: formData.phone,
+        schoolOrCampus: formData.schoolOrCampus,
+        role: selectedRole,
+        region: selectedRegion,
+        notes: formData.notes,
+      });
+
+      if (res.success) {
+        setSubmitted(true);
+        toast({
+          title: "Pendaftaran Berhasil!",
+          description: "Data Anda telah tersimpan. Tim pembina ESM akan segera menghubungi Anda.",
+          type: "success",
+        });
+      } else {
+        toast({
+          title: "Gagal Mengirim",
+          description: res.error || "Terjadi kendala saat mengirim formulir. Coba lagi atau hubungi via WhatsApp.",
+          type: "error",
+        });
+      }
+    } catch (err) {
+      toast({
+        title: "Terjadi Kesalahan",
+        description: "Tidak dapat menghubungi server. Silakan hubungi kami via WhatsApp.",
+        type: "error",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -258,25 +297,35 @@ export default function JoinGroupPage() {
                   </div>
 
                   <div className="pt-2">
-                    <Button type="submit" size="lg" className="w-full rounded-full font-bold shadow-warm-md text-sm py-6">
-                      <Send className="size-4 mr-2" />
-                      <span>Kirimkan dan Terhubung dengan Komunitas</span>
+                    <Button
+                      type="submit"
+                      disabled={isSubmitting}
+                      size="lg"
+                      className="w-full rounded-full font-bold shadow-warm-md text-sm py-6 cursor-pointer"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 className="size-4 mr-2 animate-spin" />
+                          <span>Mengirim Pendaftaran...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="size-4 mr-2" />
+                          <span>Kirimkan dan Terhubung dengan Komunitas</span>
+                        </>
+                      )}
                     </Button>
                   </div>
 
-                  <div className="pt-2 text-center">
-                    <p className="text-xs text-muted-foreground">
-                      Atau ingin bertanya langsung terlebih dahulu?{" "}
-                      <a
-                        href="https://wa.me/6281296106611?text=Halo%20ESM,%20saya%20ingin%20tahu%20lebih%20banyak%20tentang%20kelompok%20pemuridan"
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-primary font-bold hover:underline inline-flex items-center gap-1"
-                      >
-                        <MessageCircle className="size-3.5" />
-                        Chat WhatsApp ESM
-                      </a>
-                    </p>
+                  <div className="pt-2 text-center flex flex-col sm:flex-row items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <span>Atau ingin bertanya langsung terlebih dahulu?</span>
+                    <MaskedWhatsAppLink
+                      phone="6281296106611"
+                      text="Halo ESM, saya ingin tahu lebih banyak tentang kelompok pemuridan"
+                      variant="pill"
+                      className="text-primary font-bold hover:underline"
+                      label="WhatsApp ESM"
+                    />
                   </div>
                 </form>
               </Card>

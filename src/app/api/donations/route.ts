@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import { getMemoryDonations, saveMemoryDonation } from "@/lib/donationsFallback";
 
 // GET /api/donations?status=CONFIRMED
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const status = searchParams.get("status");
+  const { searchParams } = new URL(request.url);
+  const status = searchParams.get("status");
 
+  try {
     const where: any = {};
-    if (status) where.status = status;
+    if (status && status !== "ALL") where.status = status;
 
     const donations = await prisma.donationRecord.findMany({
       where,
@@ -21,11 +22,14 @@ export async function GET(request: NextRequest) {
       data: donations,
     });
   } catch (error) {
-    console.error("API Donations GET error:", error);
-    return NextResponse.json(
-      { success: false, error: "Gagal mengambil data donasi" },
-      { status: 500 }
-    );
+    console.warn("Prisma offline or timeout, returning memory donations:", error);
+    const fallbackData = getMemoryDonations(status);
+    return NextResponse.json({
+      success: true,
+      total: fallbackData.length,
+      data: fallbackData,
+      isFallback: true,
+    });
   }
 }
 
@@ -44,8 +48,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const donation = await prisma.donationRecord.create({
-      data: {
+    try {
+      const donation = await prisma.donationRecord.create({
+        data: {
+          donorName,
+          donorEmail: donorEmail || null,
+          donorPhone: donorPhone || null,
+          amount: parsedAmount,
+          type: type || "SEKALI_BERI",
+          message: message || null,
+          status: "PENDING",
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: donation,
+      });
+    } catch (dbErr) {
+      console.warn("DB offline, saving donation to memory fallback:", dbErr);
+      const memDonation = saveMemoryDonation({
         donorName,
         donorEmail: donorEmail || null,
         donorPhone: donorPhone || null,
@@ -53,21 +75,18 @@ export async function POST(request: NextRequest) {
         type: type || "SEKALI_BERI",
         message: message || null,
         status: "PENDING",
-      },
-    });
+      });
 
-    return NextResponse.json(
-      {
+      return NextResponse.json({
         success: true,
-        message: "Komitmen donasi berhasil dicatat",
-        data: donation,
-      },
-      { status: 201 }
-    );
+        data: memDonation,
+        isFallback: true,
+      });
+    }
   } catch (error) {
     console.error("API Donations POST error:", error);
     return NextResponse.json(
-      { success: false, error: "Gagal menyimpan donasi" },
+      { success: false, error: "Gagal memproses donasi." },
       { status: 500 }
     );
   }

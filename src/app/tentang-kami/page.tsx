@@ -29,9 +29,13 @@ import {
   Scroll,
   ArrowRight,
   Quote,
+  FileText,
+  Building2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { AboutLegalOrg, defaultLegalOrg } from "@/lib/legalOrgConfig";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 export default function TentangKamiPage() {
   const { t, locale } = useLanguage();
@@ -59,6 +63,7 @@ export default function TentangKamiPage() {
   const visionMission = aboutData?.visionMission;
   const regions = aboutData?.regions;
   const team = aboutData?.team;
+  const legalOrg: AboutLegalOrg = aboutData?.legalOrg || defaultLegalOrg;
 
   // History text
   const historyTitle = history
@@ -195,26 +200,7 @@ export default function TentangKamiPage() {
 
   const teamList = React.useMemo(() => {
     if (team && Array.isArray(team) && team.length > 0) {
-      const seen = new Set<string>();
-      const deduped: any[] = [];
-      team.forEach((m: any) => {
-        if (!m || !m.name) return;
-        const key = m.name.trim().toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          deduped.push(m);
-        }
-      });
-      if (deduped.length < 6) {
-        defaultTeam.forEach((dt) => {
-          const key = dt.name.trim().toLowerCase();
-          if (!seen.has(key)) {
-            seen.add(key);
-            deduped.push(dt);
-          }
-        });
-      }
-      return deduped;
+      return team;
     }
     return defaultTeam;
   }, [team]);
@@ -307,8 +293,8 @@ export default function TentangKamiPage() {
               </p>
             </div>
 
-            {/* 4 Interactive Chapter Cards (MENGGAMBARKAN ISI SELURUH HALAMAN) */}
-            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-left">
+            {/* 5 Interactive Chapter Cards (MENGGAMBARKAN ISI SELURUH HALAMAN) */}
+            <div className="pt-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 text-left">
               {[
                 {
                   id: "sejarah",
@@ -333,7 +319,7 @@ export default function TentangKamiPage() {
                 {
                   id: "dasar-iman",
                   numeral: "BAGIAN 3",
-                  title: "Pengakuan Iman",
+                  title: "Mission of Faith",
                   subtitle: "Pondasi Teologis & Credo",
                   desc: "Setia pada Alkitab, Tritunggal, Kristus, dan Mandat Agung Injil.",
                   icon: ShieldCheck,
@@ -343,12 +329,22 @@ export default function TentangKamiPage() {
                 {
                   id: "wilayah",
                   numeral: "BAGIAN 4",
-                  title: "Wilayah & Tim",
-                  subtitle: "Ladang Misi & Pengurus",
-                  desc: "Pelayanan di Tanah Jawara, Kota Rempah, serta para pembina.",
+                  title: "Ladang Wilayah",
+                  subtitle: "Banten & Ternate",
+                  desc: "Pelayanan di Tanah Jawara & Kota Rempah.",
                   icon: MapPin,
                   iconBg: "bg-emerald-500/20 text-emerald-300 border-emerald-400/30",
                   href: "#wilayah",
+                },
+                {
+                  id: "mitra-legalitas",
+                  numeral: "BAGIAN 5",
+                  title: "Mitra & Legalitas",
+                  subtitle: "Naungan Yayasan MMB",
+                  desc: "Akuntabilitas hukum, integritas tata kelola, dan struktur organisasi.",
+                  icon: Building2,
+                  iconBg: "bg-blue-500/20 text-blue-300 border-blue-400/30",
+                  href: "#mitra-legalitas",
                 },
               ].map((chapter) => {
                 const Icon = chapter.icon;
@@ -356,12 +352,12 @@ export default function TentangKamiPage() {
                   <a
                     key={chapter.id}
                     href={chapter.href}
-                    className="group rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-4 sm:p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl flex flex-col justify-between space-y-3 cursor-pointer"
+                    className="group rounded-2xl bg-white/[0.08] hover:bg-white/[0.14] backdrop-blur-md border border-white/15 hover:border-amber-400/50 p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-xl flex flex-col justify-between space-y-3 cursor-pointer"
                   >
-                    <div className="space-y-2.5">
+                    <div className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className={cn("size-9 rounded-xl flex items-center justify-center border", chapter.iconBg)}>
-                          <Icon className="size-4" />
+                        <div className={cn("size-8 rounded-xl flex items-center justify-center border", chapter.iconBg)}>
+                          <Icon className="size-3.5" />
                         </div>
                         <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-amber-300/80">
                           {chapter.numeral}
@@ -369,21 +365,21 @@ export default function TentangKamiPage() {
                       </div>
 
                       <div className="space-y-0.5">
-                        <h4 className="font-sans text-base font-bold text-white group-hover:text-amber-200 transition-colors flex items-center justify-between">
+                        <h4 className="font-sans text-sm font-bold text-white group-hover:text-amber-200 transition-colors flex items-center justify-between">
                           <span>{chapter.title}</span>
-                          <ArrowRight className="size-3.5 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-amber-300" />
+                          <ArrowRight className="size-3 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all text-amber-300" />
                         </h4>
-                        <p className="text-[11px] font-semibold text-primary/90">
+                        <p className="text-[10px] font-semibold text-amber-200/90">
                           {chapter.subtitle}
                         </p>
                       </div>
 
-                      <p className="text-xs text-stone-300 leading-relaxed font-normal line-clamp-2">
+                      <p className="text-[11px] text-stone-300 leading-relaxed font-normal line-clamp-2">
                         {chapter.desc}
                       </p>
                     </div>
 
-                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[11px] font-bold text-amber-300/90 group-hover:text-amber-200">
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between text-[10px] font-bold text-amber-300/90 group-hover:text-amber-200">
                       <span>Jelajahi Bagian Ini</span>
                       <span>↓</span>
                     </div>
@@ -392,15 +388,15 @@ export default function TentangKamiPage() {
               })}
             </div>
 
-            {/* Quick Action Navigation Buttons */}
+            {/* Quick Action Navigation Buttons (High-Contrast Guaranteed) */}
             <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-              <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-stone-950 font-sans">
+              <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-md bg-amber-400 hover:bg-amber-300 text-stone-950 font-sans border-2 border-amber-400">
                 <a href="#sejarah" className="flex items-center gap-2">
                   <span>Baca Sejarah Gerakan</span>
                   <ArrowRight className="size-4" />
                 </a>
               </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/20 text-white hover:bg-white/10 backdrop-blur-md">
+              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-2 border-white/70 bg-white/15 text-white hover:bg-white/30 backdrop-blur-md shadow-sm">
                 <a href="#tim" className="flex items-center gap-2">
                   <Users2 className="size-4 mr-1 text-amber-300" />
                   <span>Lihat Tim Pengurus & Staf</span>
@@ -441,6 +437,17 @@ export default function TentangKamiPage() {
                 )}
               </div>
             )}
+
+            {/* CTA: Baca Sejarah Lengkap di Artikel Gerakan */}
+            <div className="pt-4 flex flex-wrap items-center gap-3 border-t border-border/80">
+              <Button asChild className="rounded-full px-6 text-xs font-bold shadow-warm-xs bg-primary hover:bg-primary/90 text-white">
+                <Link href="/artikel" className="flex items-center gap-2">
+                  <FileText className="size-3.5" />
+                  <span>Baca Kisah & Sejarah Lengkap di Artikel</span>
+                  <ArrowRight className="size-3.5 ml-0.5" />
+                </Link>
+              </Button>
+            </div>
           </div>
         </section>
 
@@ -526,9 +533,9 @@ export default function TentangKamiPage() {
               </div>
 
               <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight leading-tight">
-                Pengakuan Iman{" "}
+                Pernyataan Misi Iman{" "}
                 <span className="font-serif italic font-normal text-amber-200">
-                  (Statement of Faith)
+                  (Mission of Faith)
                 </span>
               </h2>
 
@@ -709,20 +716,22 @@ export default function TentangKamiPage() {
 
               <div className="flex flex-wrap items-center gap-3 shrink-0">
                 <Button
-                  onClick={() => alert("Dokumen naskah lengkap Pengakuan Iman ESM (PDF) siap diunduh.")}
+                  asChild
                   size="sm"
-                  className="rounded-full px-5 text-xs font-bold bg-amber-400 hover:bg-amber-300 text-stone-950 shadow-md font-sans"
+                  className="rounded-full px-5 text-xs font-bold bg-amber-400 hover:bg-amber-300 text-stone-950 shadow-md font-sans border border-amber-400"
                 >
-                  <Download className="size-3.5 mr-1.5" />
-                  <span>Unduh Dokumen Resmi (PDF)</span>
+                  <a href="/documents/mission-of-faith-esm.pdf" download="mission-of-faith-esm.pdf" className="flex items-center gap-1.5">
+                    <Download className="size-3.5" />
+                    <span>Unduh Dokumen Resmi (PDF)</span>
+                  </a>
                 </Button>
                 <Button
                   asChild
                   variant="outline"
                   size="sm"
-                  className="rounded-full px-4 text-xs font-bold border-white/20 text-white hover:bg-white/10"
+                  className="rounded-full px-5 text-xs font-bold border-2 border-white/60 bg-white/15 text-white hover:bg-white/25"
                 >
-                  <Link href="/kemitraan">
+                  <Link href="/kemitraan#kontak">
                     <span>Tanya Teologis</span>
                     <ArrowRight className="size-3.5 ml-1" />
                   </Link>
@@ -784,6 +793,217 @@ export default function TentangKamiPage() {
                   {ternateDesc}
                 </p>
               </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* ============================================================
+            5. MITRA STRATEGIS, LEGALITAS & STRUKTUR ORGANISASI
+            Naungan Hukum di Bawah Yayasan MMB (Murid Muda Bermisi) & Bagan Organisasi
+            ============================================================ */}
+        <section id="mitra-legalitas" className="py-20 bg-canvas border-t border-border">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="text-center max-w-3xl mx-auto space-y-3">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-bold uppercase tracking-wider text-primary">
+                <Building2 className="size-3.5" />
+                <span>{locale === "en" ? (legalOrg.legalStatementBadgeEn || "Legal Statement & Compliance") : (legalOrg.legalStatementBadgeId || "Legalitas Gerakan & Naungan Hukum")}</span>
+              </div>
+              <h2 className="font-sans text-3xl sm:text-4xl font-black text-foreground tracking-tight">
+                {locale === "en"
+                  ? `Institutional Partnership with ${legalOrg.foundationAbbr || "Yayasan MMB"}`
+                  : `Hubungan Kemitraan dengan ${legalOrg.foundationAbbr || "Yayasan MMB"}`}
+              </h2>
+              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-normal">
+                {locale === "en"
+                  ? "Commitment to legal compliance, ecclesiastical accountability, and high integrity in next-generation mission stewardship."
+                  : "Komitmen akuntabilitas hukum, integritas tata kelola organisasi, dan transparansi pelayanan misi di hadapan Allah dan sesama."}
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+              {/* Left Column: Legal Statement Card */}
+              <div className="lg:col-span-6 rounded-3xl bg-white p-7 sm:p-9 border border-stone-200/90 shadow-warm-xs flex flex-col justify-between space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-12 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center font-bold">
+                      <ShieldCheck className="size-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
+                        {locale === "en" ? (legalOrg.legalStatementBadgeEn || "Legal Statement") : (legalOrg.legalStatementBadgeId || "Pernyataan Hukum (Legal Statement)")}
+                      </span>
+                      <h3 className="font-sans text-xl font-bold text-foreground">
+                        {locale === "en" ? (legalOrg.legalStatementTitleEn || "Legal Entity of Yayasan MMB") : (legalOrg.legalStatementTitleId || "Badan Hukum Yayasan MMB")}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-normal">
+                    {locale === "en" ? (
+                      <>
+                        The <strong>Evangelical Student Movement (ESM) Indonesia</strong> operates and partners institutionally under the official legal umbrella of <strong>{legalOrg.foundationName} ({legalOrg.foundationAbbr})</strong>.
+                      </>
+                    ) : (
+                      <>
+                        Gerakan <strong>Evangelical Student Movement (ESM) Indonesia</strong> bernaung dan bermitra secara institusional di bawah payung hukum resmi <strong>{legalOrg.foundationName} ({legalOrg.foundationAbbr})</strong>.
+                      </>
+                    )}
+                  </p>
+
+                  {/* Legal Credentials Banner (SK AHU & Kontak Sekretaris Yayasan) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-4 rounded-2xl bg-amber-50/70 border border-amber-200/90 text-xs">
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                        {locale === "en" ? "AHU Legal Decree:" : "SK AHU Kemenkumham:"}
+                      </span>
+                      <span className="font-mono font-bold text-stone-900 block text-[11px] sm:text-xs">
+                        {legalOrg.skAhu || "AHU-0013520.AH.01.04.Tahun 2024"}
+                      </span>
+                    </div>
+                    <div className="space-y-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                        {locale === "en" ? "Foundation Secretary Contact:" : "Sekretaris Yayasan :"}
+                      </span>
+                      <MaskedWhatsAppLink
+                        phone={legalOrg.secretaryPhone || "6281296106611"}
+                        text="Halo Sekretaris Yayasan MMB"
+                        variant="pill"
+                        className="text-[11px] sm:text-xs text-primary font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 pt-1 text-xs text-stone-600">
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>{locale === "en" ? legalOrg.point1TitleEn : legalOrg.point1TitleId}:</strong>{" "}
+                        {locale === "en" ? legalOrg.point1DescEn : legalOrg.point1DescId}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>{locale === "en" ? legalOrg.point2TitleEn : legalOrg.point2TitleId}:</strong>{" "}
+                        {locale === "en" ? legalOrg.point2DescEn : legalOrg.point2DescId}
+                      </span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <CheckCircle2 className="size-4 text-emerald-600 shrink-0 mt-0.5" />
+                      <span>
+                        <strong>{locale === "en" ? legalOrg.point3TitleEn : legalOrg.point3TitleId}:</strong>{" "}
+                        {locale === "en" ? legalOrg.point3DescEn : legalOrg.point3DescId}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-stone-50 border border-stone-200/80 text-xs text-stone-600">
+                  <span className="font-bold text-foreground block mb-0.5">
+                    {locale === "en" ? legalOrg.integrityTitleEn : legalOrg.integrityTitleId}
+                  </span>
+                  {locale === "en" ? legalOrg.integrityDescEn : legalOrg.integrityDescId}
+                </div>
+              </div>
+
+              {/* Right Column: Organizational Structure Diagram */}
+              <div className="lg:col-span-6 rounded-3xl bg-white p-7 sm:p-9 border border-stone-200/90 shadow-warm-xs flex flex-col justify-between space-y-5">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="size-12 rounded-2xl bg-primary-50 text-primary border border-primary/20 flex items-center justify-center font-bold">
+                      <Users2 className="size-6" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                        {locale === "en" ? (legalOrg.chartBadgeEn || "Governance Structure") : (legalOrg.chartBadgeId || "Struktur Tata Kelola")}
+                      </span>
+                      <h3 className="font-sans text-xl font-bold text-foreground">
+                        {locale === "en" ? (legalOrg.chartTitleEn || "Movement Organizational Chart") : (legalOrg.chartTitleId || "Bagan Organisasi Gerakan")}
+                      </h3>
+                    </div>
+                  </div>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    {locale === "en" ? legalOrg.chartSubtitleEn : legalOrg.chartSubtitleId}
+                  </p>
+                </div>
+
+                {/* Structured Hierarchy Tree */}
+                <div className="space-y-2.5 pt-1 text-xs">
+                  {/* Tier 1: Yayasan MMB */}
+                  <div className="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-300 text-center space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">
+                      {locale === "en" ? (legalOrg.tier1BadgeEn || "Level 1 • Legal Umbrella") : (legalOrg.tier1BadgeId || "Tingkat 1 • Naungan Hukum")}
+                    </span>
+                    <strong className="text-sm font-bold text-amber-950 block">
+                      {legalOrg.foundationName} ({legalOrg.foundationAbbr})
+                    </strong>
+                    <div className="text-[11px] font-semibold text-stone-800 pt-0.5">
+                      <span>{locale === "en" ? "Foundation Chairman:" : "Ketua Yayasan :"} </span>
+                      <span className="font-bold text-primary underline">{legalOrg.foundationHead}</span>
+                    </div>
+                    <div className="text-[10px] text-stone-600 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-0.5 pt-0.5">
+                      <span>SK AHU: <strong className="font-mono text-stone-800">{legalOrg.skAhu}</strong></span>
+                      <span>•</span>
+                      <span>{locale === "en" ? "Sec:" : "Sekretaris:"} <strong className="text-stone-800">{legalOrg.secretaryPhone}</strong></span>
+                    </div>
+                    <span className="text-[10px] text-stone-500 block">
+                      {locale === "en" ? legalOrg.tier1SubEn : legalOrg.tier1SubId}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-center text-stone-400 font-bold text-xs -my-1">↓</div>
+
+                  {/* Tier 2: Sekretaris Jenderal (Koordinator Nasional Gerakan ESM) */}
+                  <div className="p-3.5 rounded-2xl bg-[#2D060B] text-white text-center shadow-xs space-y-1">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-amber-300 block">
+                      {locale === "en" ? (legalOrg.tier2BadgeEn || "Level 2 • Secretary General (National Coordinator of ESM Movement)") : (legalOrg.tier2BadgeId || "Tingkat 2 • Sekretaris Jendral (Koordinator Nasional Gerakan ESM)")}
+                    </span>
+                    <strong className="text-sm font-bold text-white block">
+                      {legalOrg.tier2LeaderName}
+                    </strong>
+                    <span className="text-[10px] text-stone-300 block">
+                      {locale === "en" ? legalOrg.tier2RoleSubEn : legalOrg.tier2RoleSubId}
+                    </span>
+                  </div>
+
+                  <div className="flex justify-center text-stone-400 font-bold text-xs -my-1">↓</div>
+
+                  {/* Tier 3: Ladang Pelayanan Lapangan: Banten - Ternate (+ Connect) */}
+                  <div className="grid grid-cols-2 gap-2 text-left text-[11px]">
+                    <div className="p-2.5 rounded-xl bg-red-50/80 border border-red-200 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-primary flex items-center gap-1">
+                          <MapPin className="size-3 shrink-0" />
+                          <span>{legalOrg.tier3BantenTitle}</span>
+                        </span>
+                        <Badge className="bg-red-100 text-primary border-primary/20 text-[9px] px-1 py-0">Banten</Badge>
+                      </div>
+                      <span className="text-[10px] text-stone-600 block leading-tight">
+                        {locale === "en" ? legalOrg.tier3BantenDescEn : legalOrg.tier3BantenDescId}
+                      </span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-300 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-amber-900 flex items-center gap-1">
+                          <MapPin className="size-3 shrink-0" />
+                          <span>{legalOrg.tier3TernateTitle}</span>
+                        </span>
+                        <Badge className="bg-amber-100 text-amber-900 border-amber-300 text-[9px] px-1 py-0">Ternate</Badge>
+                      </div>
+                      <span className="text-[10px] text-stone-600 block leading-tight">
+                        {locale === "en" ? legalOrg.tier3TernateDescEn : legalOrg.tier3TernateDescId}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 text-center border-t border-stone-100">
+                  <a href="#tim" className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1">
+                    <span>{locale === "en" ? "Meet our leadership and team below" : "Kenali profil para pelayan di bawah ini"}</span>
+                    <span>↓</span>
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -904,15 +1124,13 @@ export default function TentangKamiPage() {
                         {/* Contact Action */}
                         <div className="pt-4 mt-4 border-t border-stone-100 flex items-center justify-center">
                           {m.whatsapp ? (
-                            <a
-                              href={`https://wa.me/${m.whatsapp}?text=${encodeURIComponent(`Shalom ${m.name}, saya ingin berkonsultasi mengenai pelayanan ESM.`)}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="inline-flex items-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-800 font-bold bg-emerald-50 hover:bg-emerald-100 px-3.5 py-1.5 rounded-full transition-colors border border-emerald-200"
-                            >
-                              <MessageCircle className="size-3.5" />
-                              <span>Hubungi via WhatsApp</span>
-                            </a>
+                            <MaskedWhatsAppLink
+                              phone={m.whatsapp}
+                              text={`Shalom ${m.name}, saya ingin berkonsultasi mengenai pelayanan ESM.`}
+                              variant="button"
+                              className="text-xs text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200"
+                              label="WA"
+                            />
                           ) : (
                             <span className="text-[11px] text-stone-400 font-medium">
                               Pelayan Gerakan ESM

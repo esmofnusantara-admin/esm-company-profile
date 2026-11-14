@@ -23,6 +23,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
 export default function ExplorePage() {
   const { t, locale } = useLanguage();
@@ -60,10 +61,10 @@ export default function ExplorePage() {
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
               <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#1A0306]">
-                <a href="https://wa.me/6281296106611?text=Halo%20Kak%2C%20aku%20mau%20gabung%20kelompok%20Explore%20ESM" target="_blank" rel="noopener noreferrer">
+                <Link href="/gabung">
                   <span>Cari Kakak Mentor & KTB</span>
                   <ArrowRight className="size-4 ml-1.5" />
-                </a>
+                </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                 <Link href="/sumber-daya">Lihat Modul Siswa</Link>
@@ -206,46 +207,46 @@ export default function ExplorePage() {
                 </h2>
               </div>
               <Badge variant="outline" className="border-stone-300 text-stone-700 w-fit">
-                Banten & Maluku Utara
+                Wilayah Banten (Serang & Cilegon)
               </Badge>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Card Banten */}
+              {/* Card Banten Serang */}
               <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-primary font-bold text-sm">
                     <MapPin className="size-4" />
-                    <span>Wilayah Banten (Serang & Cilegon)</span>
+                    <span>Wilayah Serang (Tanah Jawara)</span>
                   </div>
                   <Badge className="bg-red-50 text-primary border border-primary/20 text-[10px]">Aktif</Badge>
                 </div>
-                <h3 className="font-bold text-lg text-foreground">Komunitas Siswa Tanah Jawara</h3>
+                <h3 className="font-bold text-lg text-foreground">Komunitas Siswa Kota Serang</h3>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Pertemuan KTB siswa diadakan di dekat SMA/SMK mitra di Serang dan Cilegon setiap Jumat sore atau Sabtu pagi.
+                  Pertemuan KTB dan kelompok doa siswa diadakan di dekat SMA/SMK mitra di Kota Serang setiap Jumat sore sepulang sekolah.
                 </p>
                 <div className="pt-2 text-xs font-semibold text-stone-700 flex items-center gap-2">
                   <Calendar className="size-4 text-primary" />
-                  <span>Jumat / Sabtu • Waktu Disesuaikan Jadwal Sekolah</span>
+                  <span>Jumat Sore • Dekat SMA/SMK Pusat Kota Serang</span>
                 </div>
               </Card>
 
-              {/* Card Ternate */}
+              {/* Card Banten Cilegon */}
               <Card className="p-7 rounded-3xl bg-white border border-stone-200/90 shadow-warm-xs space-y-4">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-amber-700 font-bold text-sm">
+                  <div className="flex items-center gap-2 text-primary font-bold text-sm">
                     <MapPin className="size-4" />
-                    <span>Wilayah Maluku Utara (Kota Ternate)</span>
+                    <span>Wilayah Cilegon (Kota Baja)</span>
                   </div>
-                  <Badge className="bg-amber-50 text-amber-800 border border-amber-300 text-[10px]">Aktif</Badge>
+                  <Badge className="bg-red-50 text-primary border border-primary/20 text-[10px]">Aktif</Badge>
                 </div>
-                <h3 className="font-bold text-lg text-foreground">Komunitas Siswa Kota Rempah</h3>
+                <h3 className="font-bold text-lg text-foreground">Komunitas Siswa Cilegon</h3>
                 <p className="text-xs text-stone-600 leading-relaxed">
-                  Menjangkau siswa perantauan dari berbagai pulau di Maluku Utara yang bersekolah di Ternate, menyediakan keluarga rohani kedua.
+                  Pembinaan karakter dan diskusi firman bagi siswa-siswi sekolah menengah kejuruan dan umum di kawasan Cilegon.
                 </p>
                 <div className="pt-2 text-xs font-semibold text-stone-700 flex items-center gap-2">
-                  <Calendar className="size-4 text-amber-700" />
-                  <span>Sabtu Sore • Sekretariat Pelayanan Ternate</span>
+                  <Calendar className="size-4 text-primary" />
+                  <span>Sabtu Pagi • Pos Pembinaan Siswa Cilegon</span>
                 </div>
               </Card>
             </div>
@@ -268,12 +269,13 @@ export default function ExplorePage() {
                 Kakak-kakak pembina kami siap mengobrol, mendengarkan ceritamu, atau menghubungkanmu dengan teman-teman kelompok KTB terdekat di kotamu.
               </p>
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306]">
-                  <a href="https://wa.me/6281296106611?text=Halo%20Kak%2C%20aku%20mau%20gabung%20kelompok%20Explore%20ESM" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
-                    <Phone className="size-4" />
-                    <span>Chat Kakak Pembina di WhatsApp</span>
-                  </a>
-                </Button>
+                <MaskedWhatsAppLink
+                  phone="6281296106611"
+                  text="Halo Kak, aku mau tanya atau gabung kelompok Explore ESM"
+                  variant="button"
+                  className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306] text-sm"
+                  label="Chat Pembina WA"
+                />
                 <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
                   <Link href="/gabung">Formulir Pendaftaran</Link>
                 </Button>
