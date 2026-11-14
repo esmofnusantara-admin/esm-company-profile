@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -307,10 +308,70 @@ const pastActivityPhotos: ActivityPhoto[] = [
   },
 ];
 
-export function AgendaView() {
+interface AgendaViewProps {
+  defaultFilter?: string;
+  defaultTab?: string;
+}
+
+export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProps) {
   const { locale } = useLanguage();
-  const [activeFilter, setActiveFilter] = React.useState<string>("ALL");
+  const searchParams = useSearchParams();
+
+  // Read search parameter from URL: ?community=, ?kategori=, ?pelayanan=, ?filter=
+  const paramFilter =
+    searchParams.get("community") ||
+    searchParams.get("kategori") ||
+    searchParams.get("pelayanan") ||
+    searchParams.get("filter") ||
+    defaultFilter;
+
+  const normalizedFilter = React.useMemo(() => {
+    if (!paramFilter) return "ALL";
+    const upper = paramFilter.toUpperCase();
+    if (upper.includes("EXPLORE") || upper.includes("SISWA")) return "EXPLORE";
+    if (upper.includes("ENCOUNTER") || upper.includes("MAHASISWA") || upper.includes("KAMPUS")) return "ENCOUNTER";
+    if (upper.includes("CONNECT") || upper.includes("ALUMNI") || upper.includes("PROFESI")) return "CONNECT";
+    if (upper.includes("DOA") || upper.includes("SYAFAAT")) return "DOA";
+    return "ALL";
+  }, [paramFilter]);
+
+  const [activeFilter, setActiveFilter] = React.useState<string>(normalizedFilter);
   const [searchQuery, setSearchQuery] = React.useState<string>("");
+
+  // Sync if URL query param changes
+  React.useEffect(() => {
+    if (normalizedFilter) {
+      setActiveFilter(normalizedFilter);
+      // If a specific filter is set in URL, gently scroll down to agenda list
+      if (normalizedFilter !== "ALL") {
+        const el = document.getElementById("agenda-mendatang");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    }
+  }, [normalizedFilter]);
+
+  // Handle tab / section jump if provided in URL e.g. ?tab=galeri or ?tab=jadwal
+  React.useEffect(() => {
+    const tabParam = searchParams.get("tab") || defaultTab;
+    if (tabParam) {
+      const targetId =
+        tabParam === "galeri" || tabParam === "gallery"
+          ? "galeri-kegiatan"
+          : tabParam === "jadwal" || tabParam === "roadmap"
+          ? "jadwal-tahunan"
+          : tabParam === "faq"
+          ? "faq-agenda"
+          : "agenda-mendatang";
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        setTimeout(() => {
+          targetEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 150);
+      }
+    }
+  }, [searchParams, defaultTab]);
 
   // Modal RSVP state
   const { toast } = useToast();

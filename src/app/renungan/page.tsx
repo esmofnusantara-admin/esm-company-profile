@@ -31,10 +31,12 @@ import {
   ArrowRight,
   BookMarked,
   Volume2,
+  X,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
+import { DEVOTIONALS_DATA, type DevotionalItem } from "@/lib/devotionalsData";
 
 interface DailyVerse {
   day: string;
@@ -96,82 +98,7 @@ const GOLDEN_VERSES: DailyVerse[] = [
   },
 ];
 
-interface DevotionalArticle {
-  id: string;
-  title: string;
-  titleEn?: string;
-  category: string;
-  scripture: string;
-  author: string;
-  readTime: string;
-  excerpt: string;
-  date: string;
-  featured?: boolean;
-}
-
-const DEVOTIONAL_LIST: DevotionalArticle[] = [
-  {
-    id: "dev-1",
-    title: "Mengapa Keheningan Pagi Menentukan Kemenangan Hari Ini?",
-    titleEn: "Why Morning Silence Determines Today's Spiritual Victory",
-    category: "SAAT_TEDUH",
-    scripture: "Mazmur 5:4",
-    author: "Tim Pembina Rohani ESM",
-    readTime: "4 Menit Baca",
-    excerpt:
-      "Sebelum dunia membanjiri pikiran kita dengan notifikasi media sosial dan kecemasan tugas, luangkan 15 menit pertama untuk mendengar suara Bapa di surga.",
-    date: "14 November 2026",
-    featured: true,
-  },
-  {
-    id: "dev-2",
-    title: "Memuridkan di Tengah Kesibukan Kuliah & Tugas Akhir",
-    titleEn: "Discipling Amidst Campus Pressure & Academic Deadlines",
-    category: "PEMURIDAN",
-    scripture: "2 Timotius 2:2",
-    author: "Yohanes Setiawan (Koordinator ESM)",
-    readTime: "5 Menit Baca",
-    excerpt:
-      "Sering kali kita beralasan menunggu waktu luang untuk mendampingi adik tingkat. Namun murid sejati dibentuk dalam dinamika hidup sehari-hari yang realistis.",
-    date: "12 November 2026",
-  },
-  {
-    id: "dev-3",
-    title: "Mata yang Terarah Pada Ladang yang Menguning di Banten & Ternate",
-    titleEn: "Eyes Focused on the Ripe Harvest Fields in Banten & Ternate",
-    category: "MISI",
-    scripture: "Yohanes 4:35",
-    author: "Staf Misi Lapangan",
-    readTime: "4 Menit Baca",
-    excerpt:
-      "Ketika Yesus memandang orang banyak, hati-Nya tergerak oleh belas kasihan. Apakah kita masih memiliki hati yang berdenyut bagi jiwa-jiwa yang belum terjangkau?",
-    date: "10 November 2026",
-  },
-  {
-    id: "dev-4",
-    title: "Integritas Pelajar: Bersaksi Lewat Kejujuran di Ruang Ujian",
-    titleEn: "Student Integrity: Bearing Witness Through Honesty in Exam Rooms",
-    category: "KARAKTER",
-    scripture: "Amsal 11:3",
-    author: "Pembina Explore Siswa",
-    readTime: "3 Menit Baca",
-    excerpt:
-      "Kekristenan bukan hanya lagu di hari Minggu, melainkan ujian integritas saat pensil menulis jawaban tanpa menyontek di hadapan Tuhan yang melihat segalanya.",
-    date: "08 November 2026",
-  },
-  {
-    id: "dev-5",
-    title: "Menemukan Ketenteraman Batin di Tengah Kecemasan Masa Depan",
-    titleEn: "Finding Inner Serenity Amidst Future Career Anxiety",
-    category: "SAAT_TEDUH",
-    scripture: "Filipi 4:6-7",
-    author: "Staf Konseling Mahasiswa",
-    readTime: "5 Menit Baca",
-    excerpt:
-      "Kecemasan adalah sinyal agar kita mengalihkan beban kepada Tuhan lewat doa dan ucapan syukur. Damai sejahtera Allah yang melampaui segala akal akan memelihara hatimu.",
-    date: "05 November 2026",
-  },
-];
+// Using comprehensive DEVOTIONALS_DATA from @/lib/devotionalsData
 
 export default function RenunganPage() {
   const { locale } = useLanguage();
@@ -186,6 +113,7 @@ export default function RenunganPage() {
   const [timerRunning, setTimerRunning] = React.useState(false);
   const [timerSeconds, setTimerSeconds] = React.useState(600); // 10 minutes
   const [activeStep, setActiveStep] = React.useState<number>(1);
+  const [isQuietTimeModalOpen, setIsQuietTimeModalOpen] = React.useState(false);
 
   React.useEffect(() => {
     let interval: any = null;
@@ -223,12 +151,12 @@ export default function RenunganPage() {
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
-  const filteredArticles = DEVOTIONAL_LIST.filter((item) => {
+  const filteredArticles = DEVOTIONALS_DATA.filter((item) => {
     const matchesCat = selectedCategory === "ALL" || item.category === selectedCategory;
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.excerpt.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.scripture.toLowerCase().includes(searchQuery.toLowerCase());
+      item.scriptureRef.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCat && matchesSearch;
   });
 
@@ -435,8 +363,11 @@ export default function RenunganPage() {
               ))}
             </div>
 
-            {/* Interactive Quiet Time Timer Widget */}
-            <Card className="rounded-3xl border border-border/80 bg-gradient-to-r from-muted/50 via-card to-muted/50 p-6 sm:p-8 max-w-2xl mx-auto shadow-warm-sm">
+            {/* Interactive Quiet Time Timer Widget - Click to Pop Up */}
+            <Card
+              onClick={() => setIsQuietTimeModalOpen(true)}
+              className="rounded-3xl border-2 border-primary/20 hover:border-primary/50 bg-gradient-to-r from-card via-card to-primary/5 p-6 sm:p-8 max-w-2xl mx-auto shadow-warm-sm hover:shadow-warm-md transition-all cursor-pointer group"
+            >
               <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div className="space-y-1 text-center sm:text-left">
                   <div className="flex items-center justify-center sm:justify-start gap-2">
@@ -445,23 +376,27 @@ export default function RenunganPage() {
                       Fokus Saat Teduh 10 Menit
                     </span>
                   </div>
-                  <h4 className="text-lg font-bold text-foreground">
-                    Gunakan Pengingat Hening Ini
+                  <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors flex items-center justify-center sm:justify-start gap-2">
+                    <span>Gunakan Pengingat Hening Ini</span>
+                    <Sparkles className="size-4 text-amber-500 animate-spin" />
                   </h4>
                   <p className="text-xs text-muted-foreground">
-                    Fokus 10 menit tanpa interupsi bersama Firman Allah
+                    Klik untuk membuka panduan mengambang & baca renungan harian hari ini
                   </p>
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-foreground px-4 py-2 rounded-2xl bg-muted border border-border">
+                  <div className="text-3xl sm:text-4xl font-mono font-black tracking-tight text-foreground px-4 py-2 rounded-2xl bg-muted border border-border group-hover:border-primary/30 transition-colors">
                     {formatTimer(timerSeconds)}
                   </div>
 
                   <div className="flex items-center gap-2">
                     <Button
                       size="sm"
-                      onClick={() => setTimerRunning(!timerRunning)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setTimerRunning(!timerRunning);
+                      }}
                       className={cn(
                         "rounded-xl h-11 w-11 p-0 shadow-warm-xs",
                         timerRunning
@@ -475,7 +410,8 @@ export default function RenunganPage() {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         setTimerRunning(false);
                         setTimerSeconds(600);
                       }}
@@ -488,6 +424,136 @@ export default function RenunganPage() {
                 </div>
               </div>
             </Card>
+
+            {/* ============================================================
+                FLOATING POP-UP SAAT TEDUH (Modal Mengambang di Atas)
+                Requested: "ketika di click dia pop up mengambang gt diatas,
+                trus disuruh click renungan harian hari ini"
+                ============================================================ */}
+            {isQuietTimeModalOpen && (
+              <div
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md animate-in fade-in duration-200"
+                onClick={() => setIsQuietTimeModalOpen(false)}
+              >
+                <div
+                  className="relative w-full max-w-lg bg-card text-card-foreground rounded-3xl border-2 border-primary/30 shadow-2xl p-6 sm:p-8 space-y-6 animate-in zoom-in-95 duration-200 overflow-hidden"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {/* Decorative top accent glow */}
+                  <div className="absolute top-0 inset-x-0 h-1.5 bg-gradient-to-r from-amber-400 via-primary to-amber-500" />
+
+                  {/* Header with Title and Close Button */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="size-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold shadow-xs">
+                        <Timer className="size-5 animate-pulse" />
+                      </div>
+                      <div>
+                        <h3 className="text-base sm:text-lg font-bold text-foreground">
+                          Ruang Hening Saat Teduh
+                        </h3>
+                        <p className="text-xs text-muted-foreground">
+                          10 Menit Bersekutu Bersama Firman Allah
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsQuietTimeModalOpen(false)}
+                      className="size-8 rounded-full bg-muted hover:bg-muted/80 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors cursor-pointer"
+                    >
+                      <X className="size-4" />
+                    </button>
+                  </div>
+
+                  {/* Countdown Timer Centerpiece */}
+                  <div className="rounded-2xl bg-muted/60 border border-border p-5 text-center space-y-3">
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground block">
+                      Hitung Mundur Keheningan Pribadi
+                    </span>
+                    <div className="text-4xl sm:text-5xl font-mono font-black tracking-tight text-foreground">
+                      {formatTimer(timerSeconds)}
+                    </div>
+
+                    <div className="flex items-center justify-center gap-3 pt-1">
+                      <Button
+                        size="sm"
+                        onClick={() => setTimerRunning(!timerRunning)}
+                        className={cn(
+                          "rounded-xl px-5 py-2 font-bold gap-1.5 shadow-warm-xs",
+                          timerRunning
+                            ? "bg-warning hover:bg-warning/90 text-warning-foreground"
+                            : "bg-primary hover:bg-primary/90 text-primary-foreground"
+                        )}
+                      >
+                        {timerRunning ? (
+                          <>
+                            <Pause className="size-4" />
+                            <span>Jeda Hening</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="size-4" />
+                            <span>Mulai Waktu Hening</span>
+                          </>
+                        )}
+                      </Button>
+
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setTimerRunning(false);
+                          setTimerSeconds(600);
+                        }}
+                        className="rounded-xl px-3 border-border hover:bg-muted text-xs"
+                      >
+                        <RotateCcw className="size-3.5 mr-1" />
+                        <span>Reset</span>
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* 4 Focused Steps Quick Guide */}
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 rounded-xl bg-card border border-border/80">
+                      <span className="font-bold text-primary block">1. Sadari Hadirat-Nya</span>
+                      <span className="text-muted-foreground text-[11px]">Tarik napas & heningkan hati</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-card border border-border/80">
+                      <span className="font-bold text-primary block">2. Buka Firman</span>
+                      <span className="text-muted-foreground text-[11px]">Baca perlahan tanpa terburu</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-card border border-border/80">
+                      <span className="font-bold text-primary block">3. Refleksikan</span>
+                      <span className="text-muted-foreground text-[11px]">Tanyakan: Apa pesan-Nya?</span>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-card border border-border/80">
+                      <span className="font-bold text-primary block">4. Doakan</span>
+                      <span className="text-muted-foreground text-[11px]">Serahkan harimu pada Bapa</span>
+                    </div>
+                  </div>
+
+                  {/* Prominent CTA: "trus disuruh click renungan harian hari ini" */}
+                  <div className="pt-2 border-t border-border/60 space-y-2">
+                    <p className="text-xs text-center font-bold text-foreground">
+                      ✨ Sudah siap bersaat teduh? Mari mulai baca renungan hari ini:
+                    </p>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="w-full rounded-2xl py-6 font-bold shadow-warm-md bg-primary hover:bg-primary-700 text-white flex items-center justify-center gap-2 text-sm sm:text-base cursor-pointer"
+                    >
+                      <Link href="/renungan/berinvestasi-dalam-hidup-sesama">
+                        <BookOpen className="size-5 text-amber-300" />
+                        <span>Buka Renungan Hari Ini: Berinvestasi dalam Hidup Sesama</span>
+                        <ArrowRight className="size-4" />
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -565,10 +631,10 @@ export default function RenunganPage() {
 
                     <div className="pt-1">
                       <span className="text-xs font-bold text-primary block mb-1">
-                        Nas: {item.scripture}
+                        Nas: {item.scriptureRef}
                       </span>
                       <h3 className="text-base font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
-                        {item.title}
+                        <Link href={`/renungan/${item.slug}`}>{item.title}</Link>
                       </h3>
                     </div>
 
@@ -580,7 +646,7 @@ export default function RenunganPage() {
                   <div className="p-6 pt-0 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground mt-4">
                     <span>Oleh: {item.author}</span>
                     <Link
-                      href={`/artikel?q=${encodeURIComponent(item.title)}`}
+                      href={`/renungan/${item.slug}`}
                       className="font-bold text-primary flex items-center gap-1 hover:underline"
                     >
                       <span>Baca</span>

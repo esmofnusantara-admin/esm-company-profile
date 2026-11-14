@@ -98,7 +98,7 @@ export default function EncounterPage() {
                       <ArrowRight className="size-4 ml-1.5" />
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
+                  <Button asChild variant="outlineWhite" size="lg" className="rounded-full px-7 font-bold border-2 border-white/60 bg-white/15 text-white hover:bg-white/30 backdrop-blur-md transition-all shadow-sm">
                     <Link href="/sumber-daya">Modul Worldview KTB</Link>
                   </Button>
                 </div>
@@ -309,7 +309,7 @@ export default function EncounterPage() {
                   className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-[#180306] text-sm"
                   label="Chat Pembina Kampus WA"
                 />
-                <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-white/30 text-white hover:bg-white/10">
+                <Button asChild variant="outlineWhite" size="lg" className="rounded-full px-7 font-bold border-2 border-white/60 bg-white/15 text-white hover:bg-white/30 backdrop-blur-md transition-all shadow-sm">
                   <Link href="/gabung">Formulir Gabung Komunitas</Link>
                 </Button>
               </div>

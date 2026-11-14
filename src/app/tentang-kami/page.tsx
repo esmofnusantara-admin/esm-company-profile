@@ -396,7 +396,7 @@ export default function TentangKamiPage() {
                   <ArrowRight className="size-4" />
                 </a>
               </Button>
-              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-2 border-white/70 bg-white/15 text-white hover:bg-white/30 backdrop-blur-md shadow-sm">
+              <Button asChild variant="outlineWhite" size="lg" className="rounded-full px-7 font-bold border-2 border-white/70 bg-white/15 text-white hover:bg-white/30 backdrop-blur-md shadow-sm">
                 <a href="#tim" className="flex items-center gap-2">
                   <Users2 className="size-4 mr-1 text-amber-300" />
                   <span>Lihat Tim Pengurus & Staf</span>
@@ -727,7 +727,7 @@ export default function TentangKamiPage() {
                 </Button>
                 <Button
                   asChild
-                  variant="outline"
+                  variant="outlineWhite"
                   size="sm"
                   className="rounded-full px-5 text-xs font-bold border-2 border-white/60 bg-white/15 text-white hover:bg-white/25"
                 >

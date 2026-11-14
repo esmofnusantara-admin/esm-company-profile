@@ -23,7 +23,7 @@ const buttonVariants = cva(
         white:
           "bg-white text-primary-900 font-semibold shadow-warm-md hover:bg-canvas-subtle active:scale-[0.98]",
         outlineWhite:
-          "border border-white/30 text-white hover:bg-white/10 active:scale-[0.98]",
+          "border border-white/40 bg-white/15 text-white hover:bg-white/25 active:scale-[0.98] backdrop-blur-md shadow-xs",
       },
       size: {
         default: "h-10 px-4 py-2",
