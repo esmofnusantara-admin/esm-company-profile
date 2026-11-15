@@ -10,31 +10,28 @@ import {
   Loader2,
   Sparkles,
   Home,
-  Layers,
   BarChart3,
-  Images,
-  Film,
-  Plus,
-  Trash2,
-  Flame,
-  LayoutGrid,
+  Video,
+  Layers,
+  Heart,
+  Eye,
+  Play,
+  ExternalLink,
+  ChevronRight,
+  Info,
 } from "lucide-react";
-import {
-  HeroCardConfig,
-  HeroCardSlide,
-  HeroCardPillarItem,
-  defaultHeroCardConfig,
-} from "@/components/home/HeroVisualCard";
 
-interface HeroData {
+// ==========================================
+// INTERFACES UNTUK HOMEPAGE CMS
+// ==========================================
+
+export interface HeroData {
   kickerId: string;
   kickerEn: string;
   headlineId: string;
   headlineEn: string;
   subheadlineId: string;
   subheadlineEn: string;
-  mediaType: "IMAGE" | "VIDEO";
-  mediaUrl: string;
   primaryCtaTextId: string;
   primaryCtaTextEn: string;
   primaryCtaUrl: string;
@@ -43,21 +40,81 @@ interface HeroData {
   secondaryCtaUrl: string;
 }
 
-interface ValueCard {
-  titleId: string;
-  titleEn: string;
-  subtitleId: string;
-  subtitleEn: string;
-  descId: string;
-  descEn: string;
-  imageUrl: string;
-}
-
-interface StatItem {
+export interface StatItem {
   number: string;
   labelId: string;
   labelEn: string;
 }
+
+export interface WhyEsmData {
+  kickerId: string;
+  kickerEn: string;
+  headlineId: string;
+  headlineEn: string;
+  descriptionId: string;
+  descriptionEn: string;
+  historyLinkTextId: string;
+  historyLinkTextEn: string;
+  historyLinkUrl: string;
+
+  // Video Company Profile
+  videoBadgeId: string;
+  videoBadgeEn: string;
+  videoTitleId: string;
+  videoTitleEn: string;
+  videoSubtitleId: string;
+  videoSubtitleEn: string;
+  videoDuration: string;
+  videoThumbnail: string;
+  videoUrl: string;
+  footerTextId: string;
+  footerTextEn: string;
+  footerCtaTextId: string;
+  footerCtaTextEn: string;
+}
+
+export interface CommunityItem {
+  stageId: string;
+  stageEn: string;
+  titleId: string;
+  titleEn: string;
+  descId: string;
+  descEn: string;
+  linkTextId: string;
+  linkTextEn: string;
+  linkUrl: string;
+}
+
+export interface CommunitiesData {
+  kickerId: string;
+  kickerEn: string;
+  titleId: string;
+  titleEn: string;
+  subtitleId: string;
+  subtitleEn: string;
+  explore: CommunityItem;
+  encounter: CommunityItem;
+  connect: CommunityItem;
+}
+
+export interface CtaCardData {
+  badgeId: string;
+  badgeEn: string;
+  titleId: string;
+  titleEn: string;
+  descId: string;
+  descEn: string;
+  primaryCtaTextId: string;
+  primaryCtaTextEn: string;
+  primaryCtaUrl: string;
+  secondaryCtaTextId: string;
+  secondaryCtaTextEn: string;
+  secondaryCtaUrl: string;
+}
+
+// ==========================================
+// DEFAULT VALUES (SYNCHRONIZED WITH PUBLIC)
+// ==========================================
 
 const defaultHero: HeroData = {
   kickerId: "GERAKAN PEMURIDAN MISIONAL BAGI GENERASI MUDA",
@@ -68,8 +125,6 @@ const defaultHero: HeroData = {
     "Melatih siswa, mahasiswa, dan alumni untuk berakar dalam firman Tuhan, bertumbuh dalam komunitas murid, dan diutus ke tengah dunia kerja serta ladang misi.",
   subheadlineEn:
     "Training high school, university students, and alumni to be rooted in God's word, grow in disciple community, and be sent into the marketplace and mission fields.",
-  mediaType: "IMAGE",
-  mediaUrl: "",
   primaryCtaTextId: "Mulai Bergabung",
   primaryCtaTextEn: "Get Involved",
   primaryCtaUrl: "/pelayanan",
@@ -78,42 +133,6 @@ const defaultHero: HeroData = {
   secondaryCtaUrl: "/kemitraan",
 };
 
-const defaultValues: ValueCard[] = [
-  {
-    titleId: "Alkitabiah & Berpusat pada Kristus",
-    titleEn: "Biblical & Christ-Centered",
-    subtitleId: "Dasar Pengajaran Kokoh",
-    subtitleEn: "Firm Foundational Teaching",
-    descId:
-      "Setiap kurikulum pembinaan, pemuridan pribadi, dan persekutuan berlandaskan kebenaran firman Allah yang ortodoks dan otoritatif.",
-    descEn:
-      "Every training curriculum, personal discipleship, and fellowship is rooted in orthodox, authoritative Scripture.",
-    imageUrl: "",
-  },
-  {
-    titleId: "Misional & Berdampak Luas",
-    titleEn: "Missional & Broad Impact",
-    subtitleId: "Bukan Menara Gading",
-    subtitleEn: "Not an Ivory Tower",
-    descId:
-      "Mendorong generasi muda menjadi garam dan terang di sekolah, kampus, keluarga, hingga integritas dunia kerja profesional.",
-    descEn:
-      "Empowering young people to be salt and light in schools, campuses, families, and high-integrity professional fields.",
-    imageUrl: "",
-  },
-  {
-    titleId: "Komunitas Pemuridan Seumur Hidup",
-    titleEn: "Lifelong Discipleship Community",
-    subtitleId: "Relasi Erat Berakar",
-    subtitleEn: "Deeply Rooted Relationships",
-    descId:
-      "Mendampingi perjalanan iman generasi dari bangku SMA (Explore), kampus (Encounter), hingga dunia kerja (Connect).",
-    descEn:
-      "Walking alongside their faith journey from high school (Explore), campus (Encounter), to workplace (Connect).",
-    imageUrl: "",
-  },
-];
-
 const defaultStats: StatItem[] = [
   { number: "15+", labelId: "Tahun Pelayanan", labelEn: "Years of Ministry" },
   { number: "2", labelId: "Fokus Wilayah (Banten & Ternate)", labelEn: "Key Regions (Banten & Ternate)" },
@@ -121,30 +140,131 @@ const defaultStats: StatItem[] = [
   { number: "100+", labelId: "Keluarga & Mitra Misi", labelEn: "Mission Partners & Families" },
 ];
 
+const defaultWhyEsm: WhyEsmData = {
+  kickerId: "MENGAPA ESM HADIR?",
+  kickerEn: "WHY ESM EXISTS?",
+  headlineId: "Sebagai jembatan atas jurang antara pemuridan dan misi yang terdikotomi.",
+  headlineEn: "Bridging the chasm between dichotomized discipleship and mission.",
+  descriptionId:
+    "Kami meyakini pemuridan dan misi bukan dua jalan terpisah. Keduanya bergandengan tangan: murid Kristus hidup di tengah dunia, menghadirkan kebenaran, kabar baik, dan keadilan Allah ke dalamnya.",
+  descriptionEn:
+    "We believe discipleship and mission are not two separate paths. They walk hand in hand: disciples of Christ live in the world, bringing God's truth, good news, and justice into it.",
+  historyLinkTextId: "Pelajari Sejarah & Panggilan Awal",
+  historyLinkTextEn: "Learn Our History & Calling",
+  historyLinkUrl: "/tentang-kami",
+  videoBadgeId: "VIDEO COMPANY PROFILE ESM",
+  videoBadgeEn: "ESM COMPANY PROFILE VIDEO",
+  videoTitleId: "Mengenal Hati & Api Gerakan Pemuridan",
+  videoTitleEn: "Knowing the Heart & Fire of the Discipleship Movement",
+  videoSubtitleId:
+    "Dinamika pembinaan siswa sekolah, mahasiswa kampus, dan perintisan misi di Banten serta Maluku Utara.",
+  videoSubtitleEn:
+    "Dynamics of nurturing high school and university students, and mission pioneering in Banten and North Maluku.",
+  videoDuration: "03:45 • Profil ESM",
+  videoThumbnail: "/uploads/hero/kemitraan_hero.jpg",
+  videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  footerTextId: "Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara",
+  footerTextEn: "Learned & witnessed by hundreds of students, mentors, and mission partners across Nusantara",
+  footerCtaTextId: "Tonton Video",
+  footerCtaTextEn: "Watch Video",
+};
+
+const defaultCommunities: CommunitiesData = {
+  kickerId: "MATA RANTAI PEMURIDAN",
+  kickerEn: "DISCIPLESHIP CHAIN",
+  titleId: "Tiga Komunitas, Satu Kegerakan",
+  titleEn: "Three Communities, One Movement",
+  subtitleId:
+    "Menemani perjalanan iman dari bangku sekolah, ruang kuliah kampus, hingga dunia kerja dan keluarga.",
+  subtitleEn:
+    "Accompanying the journey of faith from school benches, university halls, to marketplace and family.",
+  explore: {
+    stageId: "Tahap 01 • Siswa Sekolah",
+    stageEn: "Stage 01 • High School Students",
+    titleId: "Explore",
+    titleEn: "Explore",
+    descId:
+      "Menemani remaja SMP & SMA mengenal Kristus secara personal, membangun ketahanan iman terhadap arus zaman, dan menjadi saksi di lingkungan sekolah.",
+    descEn:
+      "Walking alongside junior & senior high students discovering Christ personally, building faith resilience, and witnessing in school.",
+    linkTextId: "Pelajari Program Explore",
+    linkTextEn: "Explore the Program",
+    linkUrl: "/pelayanan/explore",
+  },
+  encounter: {
+    stageId: "Tahap 02 • Mahasiswa Kampus",
+    stageEn: "Stage 02 • University Students",
+    titleId: "Encounter",
+    titleEn: "Encounter",
+    descId:
+      "Membangun komunitas persekutuan mahasiswa yang kritis, berakar pada teologi Alkitab, serta aktif menggarami iklim intelektual di Banten dan Ternate.",
+    descEn:
+      "Building robust, discerning campus fellowship communities rooted in biblical theology and salting the intellectual climate in Banten and Ternate.",
+    linkTextId: "Pelajari Program Encounter",
+    linkTextEn: "Explore the Program",
+    linkUrl: "/pelayanan/encounter",
+  },
+  connect: {
+    stageId: "Tahap 03 • Alumni & Profesi",
+    stageEn: "Stage 03 • Alumni & Marketplace",
+    titleId: "Connect",
+    titleEn: "Connect",
+    descId:
+      "Wadah bagi kaum profesional dan alumni untuk saling meneguhkan integritas iman, mentoring adik-adik, serta mengutus dampak Kerajaan Allah di marketplace.",
+    descEn:
+      "A space for young professionals and alumni to sharpen faith integrity, mentor junior students, and advance God's Kingdom in the marketplace.",
+    linkTextId: "Pelajari Program Connect",
+    linkTextEn: "Explore the Program",
+    linkUrl: "/pelayanan/connect",
+  },
+};
+
+const defaultCtaCard: CtaCardData = {
+  badgeId: "Kemitraan & Perjalanan Misi",
+  badgeEn: "Partnership & Mission Journey",
+  titleId: "Setiap Murid yang Bertumbuh Dimulai dari Keberanian Melangkah.",
+  titleEn: "Every Growing Disciple Begins with the Courage to Step Forward.",
+  descId:
+    "Baik sebagai siswa, mahasiswa, mentor alumni, maupun mitra donatur, setiap dukungan Anda menghidupkan api pelayanan di Tanah Jawara (Banten) dan Kota Rempah (Ternate).",
+  descEn:
+    "Whether as a student, university undergrad, alumni mentor, or donor partner, every support of yours rekindles the flame of ministry in Banten and Ternate.",
+  primaryCtaTextId: "Dukung Misi (Kemitraan Donasi)",
+  primaryCtaTextEn: "Support the Mission (Donations)",
+  primaryCtaUrl: "/kemitraan",
+  secondaryCtaTextId: "Gabung Kelompok Pemuridan",
+  secondaryCtaTextEn: "Join Discipleship Group",
+  secondaryCtaUrl: "/gabung",
+};
+
 export default function AdminBerandaCMS() {
+  const [activeTab, setActiveTab] = useState<"hero" | "stats" | "whyEsm" | "communities" | "cta">("whyEsm");
+
   const [hero, setHero] = useState<HeroData>(defaultHero);
-  const [heroCard, setHeroCard] = useState<HeroCardConfig>(defaultHeroCardConfig);
-  const [values, setValues] = useState<ValueCard[]>(defaultValues);
   const [stats, setStats] = useState<StatItem[]>(defaultStats);
+  const [whyEsm, setWhyEsm] = useState<WhyEsmData>(defaultWhyEsm);
+  const [communities, setCommunities] = useState<CommunitiesData>(defaultCommunities);
+  const [ctaCard, setCtaCard] = useState<CtaCardData>(defaultCtaCard);
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
-  const [activeCardSubTab, setActiveCardSubTab] = useState<"mode" | "pillars" | "slider" | "video" | "image">("mode");
 
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [savedHero, savedHeroCard, savedValues, savedStats] = await Promise.all([
+        const [savedHero, savedStats, savedWhyEsm, savedCommunities, savedCta] = await Promise.all([
           getSiteConfig<HeroData>("home_hero", defaultHero),
-          getSiteConfig<HeroCardConfig>("home_hero_card", defaultHeroCardConfig),
-          getSiteConfig<ValueCard[]>("home_values", defaultValues),
           getSiteConfig<StatItem[]>("home_stats", defaultStats),
+          getSiteConfig<WhyEsmData>("home_why_esm", defaultWhyEsm),
+          getSiteConfig<CommunitiesData>("home_communities", defaultCommunities),
+          getSiteConfig<CtaCardData>("home_cta", defaultCtaCard),
         ]);
         if (savedHero) setHero(savedHero);
-        if (savedHeroCard) setHeroCard(savedHeroCard);
-        if (savedValues) setValues(savedValues);
         if (savedStats) setStats(savedStats);
+        if (savedWhyEsm) setWhyEsm(savedWhyEsm);
+        if (savedCommunities) setCommunities(savedCommunities);
+        if (savedCta) setCtaCard(savedCta);
       } catch (err) {
         console.error("Gagal memuat konfigurasi beranda:", err);
       } finally {
@@ -160,39 +280,18 @@ export default function AdminBerandaCMS() {
     try {
       await Promise.all([
         saveSiteConfig("home_hero", hero),
-        saveSiteConfig("home_hero_card", heroCard),
-        saveSiteConfig("home_values", values),
         saveSiteConfig("home_stats", stats),
+        saveSiteConfig("home_why_esm", whyEsm),
+        saveSiteConfig("home_communities", communities),
+        saveSiteConfig("home_cta", ctaCard),
       ]);
       setSavedSuccess(true);
       setTimeout(() => setSavedSuccess(false), 4000);
     } catch (err) {
-      alert("Gagal menyimpan perubahan.");
+      alert("Gagal menyimpan perubahan ke database.");
     } finally {
       setIsSaving(false);
     }
-  };
-
-  // Helper Tambah Slide
-  const handleAddSlide = () => {
-    const newSlide: HeroCardSlide = {
-      id: `slide-${Date.now()}`,
-      imageUrl: "",
-      titleId: "Judul Slide Foto Baru",
-      titleEn: "New Slide Photo Title",
-      captionId: "Deskripsi singkat foto kegiatan pemuridan.",
-      captionEn: "Brief description of the ministry activity photo.",
-    };
-    setHeroCard({
-      ...heroCard,
-      slides: [...(heroCard.slides || []), newSlide],
-    });
-  };
-
-  const handleRemoveSlide = (index: number) => {
-    const updated = [...(heroCard.slides || [])];
-    updated.splice(index, 1);
-    setHeroCard({ ...heroCard, slides: updated });
   };
 
   if (isLoading) {
@@ -205,774 +304,356 @@ export default function AdminBerandaCMS() {
 
   return (
     <div className="space-y-8 max-w-5xl pb-16">
-      {/* Header */}
+      {/* Header Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-5">
         <div>
           <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-1">
             <Home className="size-3.5" />
-            <span>KONTEN HALAMAN</span>
+            <span>KONTEN WEBSITE PUBLIK</span>
           </div>
           <h1 className="text-2xl font-serif font-bold text-foreground">
             Kelola Halaman Beranda (Homepage)
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Sunting teks hero, kartu visual (pilar 3C, swipe foto, video), nilai pokok, dan statistik dampak.
+            Sesuaikan teks hero, 4 statistik dampak, narasi & video profil gerakan, serta 3 komunitas pelayanan.
           </p>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              <span>Menyimpan...</span>
-            </>
-          ) : savedSuccess ? (
-            <>
-              <CheckCircle2 className="size-4 text-emerald-300" />
-              <span>Tersimpan!</span>
-            </>
-          ) : (
-            <>
-              <Save className="size-4" />
-              <span>Simpan Perubahan</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-background text-xs font-semibold text-foreground hover:bg-muted/30 transition-all shadow-xs"
+          >
+            <Eye className="size-3.5 text-muted-foreground" />
+            <span>Pratinjau Web</span>
+            <ExternalLink className="size-3 text-muted-foreground" />
+          </a>
+
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : savedSuccess ? (
+              <>
+                <CheckCircle2 className="size-4 text-emerald-300" />
+                <span>Tersimpan!</span>
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                <span>Simpan Perubahan</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {savedSuccess && (
-        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2">
+        <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold flex items-center gap-2.5 animate-in fade-in-50">
           <CheckCircle2 className="size-4 text-emerald-600 shrink-0" />
-          <span>Semua perubahan halaman beranda berhasil disimpan dan langsung aktif di website publik!</span>
+          <span>Semua perubahan konten beranda berhasil disimpan ke database dan langsung aktif di website publik!</span>
         </div>
       )}
 
-      {/* ========================================================
-          SECTION 1: HERO UTAMA (TEKS & LATAR)
-          ======================================================== */}
-      <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
-        <div className="border-b border-border pb-3 flex items-center justify-between">
-          <div>
-            <h2 className="text-base font-bold text-foreground">1. Hero Section (Header & Slogan Utama)</h2>
-            <p className="text-xs text-muted-foreground">Bagian teks besar di sebelah kiri dan latar belakang hero.</p>
-          </div>
-        </div>
+      {/* Tabs Navigation */}
+      <div className="flex flex-wrap items-center gap-2 border-b border-border pb-2">
+        <button
+          type="button"
+          onClick={() => setActiveTab("whyEsm")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "whyEsm"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <Video className="size-3.5" />
+          <span>3. Mengapa ESM Hadir & Video</span>
+          <span className="text-[10px] bg-amber-400 text-stone-900 px-1.5 py-0.5 rounded-full font-black">
+            Aktif
+          </span>
+        </button>
 
-        {/* Media Foto / Video Latar */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-muted/20 p-4 rounded-xl border border-border/60">
-          <div>
-            <label className="text-xs font-bold text-foreground uppercase tracking-wider block mb-2">
-              Tipe Media Latar Belakang Hero (Opsional)
-            </label>
-            <div className="flex items-center gap-4">
-              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-                <input
-                  type="radio"
-                  name="mediaType"
-                  value="IMAGE"
-                  checked={hero.mediaType === "IMAGE"}
-                  onChange={() => setHero({ ...hero, mediaType: "IMAGE" })}
-                  className="text-primary focus:ring-primary"
-                />
-                <span>Foto / Gambar</span>
-              </label>
-              <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-                <input
-                  type="radio"
-                  name="mediaType"
-                  value="VIDEO"
-                  checked={hero.mediaType === "VIDEO"}
-                  onChange={() => setHero({ ...hero, mediaType: "VIDEO" })}
-                  className="text-primary focus:ring-primary"
-                />
-                <span>Video (MP4 / WebM)</span>
-              </label>
-            </div>
-          </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab("hero")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "hero"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <Home className="size-3.5" />
+          <span>1. Hero Utama</span>
+        </button>
 
-          <MediaUploader
-            label={hero.mediaType === "VIDEO" ? "Upload / Link Video Latar" : "Upload / Link Foto Latar"}
-            value={hero.mediaUrl}
-            onChange={(url) => setHero({ ...hero, mediaUrl: url })}
-            folder="hero"
-            accept={hero.mediaType === "VIDEO" ? "video" : "image"}
-            helperText="Format disarankan: 1920x1080px (diberi opacity lembut di latar)."
-          />
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab("stats")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "stats"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <BarChart3 className="size-3.5" />
+          <span>2. Angka Dampak (4 Metrik)</span>
+        </button>
 
-        {/* Kicker */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">Kicker / Label Kecil (ID)</label>
-            <input
-              type="text"
-              value={hero.kickerId}
-              onChange={(e) => setHero({ ...hero, kickerId: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-foreground">Kicker (EN)</label>
-              <AutoTranslateButton
-                sourceText={hero.kickerId}
-                onTranslated={(txt) => setHero({ ...hero, kickerEn: txt })}
-              />
-            </div>
-            <input
-              type="text"
-              value={hero.kickerEn}
-              onChange={(e) => setHero({ ...hero, kickerEn: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab("communities")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "communities"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <Layers className="size-3.5" />
+          <span>4. Tiga Komunitas (3C)</span>
+        </button>
 
-        {/* Headline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">Headline Utama (ID)</label>
-            <textarea
-              rows={2}
-              value={hero.headlineId}
-              onChange={(e) => setHero({ ...hero, headlineId: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-foreground">Headline (EN)</label>
-              <AutoTranslateButton
-                sourceText={hero.headlineId}
-                onTranslated={(txt) => setHero({ ...hero, headlineEn: txt })}
-              />
-            </div>
-            <textarea
-              rows={2}
-              value={hero.headlineEn}
-              onChange={(e) => setHero({ ...hero, headlineEn: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-        </div>
-
-        {/* Subheadline */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-xs font-bold text-foreground block mb-1.5">Subheadline Penjelas (ID)</label>
-            <textarea
-              rows={3}
-              value={hero.subheadlineId}
-              onChange={(e) => setHero({ ...hero, subheadlineId: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-foreground">Subheadline (EN)</label>
-              <AutoTranslateButton
-                sourceText={hero.subheadlineId}
-                onTranslated={(txt) => setHero({ ...hero, subheadlineEn: txt })}
-              />
-            </div>
-            <textarea
-              rows={3}
-              value={hero.subheadlineEn}
-              onChange={(e) => setHero({ ...hero, subheadlineEn: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-        </div>
-
-        {/* CTA Buttons */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-foreground block">Tombol Aksi Utama (Primary CTA)</label>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="text"
-                placeholder="Teks ID"
-                value={hero.primaryCtaTextId}
-                onChange={(e) => setHero({ ...hero, primaryCtaTextId: e.target.value })}
-                className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-              />
-              <input
-                type="text"
-                placeholder="Teks EN"
-                value={hero.primaryCtaTextEn}
-                onChange={(e) => setHero({ ...hero, primaryCtaTextEn: e.target.value })}
-                className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Tautan URL (contoh: /pelayanan)"
-              value={hero.primaryCtaUrl}
-              onChange={(e) => setHero({ ...hero, primaryCtaUrl: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-xs font-bold text-foreground block">Tombol Aksi Kedua (Secondary CTA)</label>
-            <div className="grid grid-cols-2 gap-2">
-              <input
-                type="text"
-                placeholder="Teks ID"
-                value={hero.secondaryCtaTextId}
-                onChange={(e) => setHero({ ...hero, secondaryCtaTextId: e.target.value })}
-                className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-              />
-              <input
-                type="text"
-                placeholder="Teks EN"
-                value={hero.secondaryCtaTextEn}
-                onChange={(e) => setHero({ ...hero, secondaryCtaTextEn: e.target.value })}
-                className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-              />
-            </div>
-            <input
-              type="text"
-              placeholder="Tautan URL (contoh: /kemitraan)"
-              value={hero.secondaryCtaUrl}
-              onChange={(e) => setHero({ ...hero, secondaryCtaUrl: e.target.value })}
-              className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-            />
-          </div>
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab("cta")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "cta"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <Heart className="size-3.5" />
+          <span>5. Ajakan Kemitraan</span>
+        </button>
       </div>
 
       {/* ========================================================
-          SECTION 2: KARTU VISUAL HERO (TEKS 3C, SWIPE FOTO, & VIDEO)
+          TAB 3: MENGAPA ESM HADIR? & VIDEO PROFIL GERAKAN
           ======================================================== */}
-      <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
-        <div className="border-b border-border pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-1">
-              <LayoutGrid className="size-3.5" />
-              <span>KARTU HIGHLIGHT HERO KANAN</span>
-            </div>
-            <h2 className="text-base font-bold text-foreground">
-              2. Kartu Visual Hero (Pilar Teks, Swipe Foto, & Video)
-            </h2>
-            <p className="text-xs text-muted-foreground">
-              Atur konten kartu di sisi kanan hero: teks pilar 3C, galeri swipe multi-foto, atau pemutar video.
-            </p>
-          </div>
-        </div>
-
-        {/* Subtabs Navigasi Pengaturan Kartu */}
-        <div className="flex flex-wrap items-center gap-1.5 p-1 rounded-xl bg-muted/40 border border-border">
-          <button
-            type="button"
-            onClick={() => setActiveCardSubTab("mode")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeCardSubTab === "mode" ? "bg-primary text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            Pilih Mode Tampilan
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCardSubTab("pillars")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeCardSubTab === "pillars" ? "bg-primary text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            📋 Teks Pilar 3C
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCardSubTab("slider")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeCardSubTab === "slider" ? "bg-primary text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            🖼️ Swipe Foto ({heroCard.slides?.length || 0})
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCardSubTab("video")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeCardSubTab === "video" ? "bg-primary text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            🎬 Video
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveCardSubTab("image")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-              activeCardSubTab === "image" ? "bg-primary text-white shadow-xs" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            📷 Foto Tunggal
-          </button>
-        </div>
-
-        {/* SUBTAB 1: PILIH MODE TAMPILAN */}
-        {activeCardSubTab === "mode" && (
-          <div className="space-y-4 p-4 rounded-xl border border-border bg-muted/10">
-            <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
-              Mode Tampilan Kartu di Website Publik:
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                {
-                  id: "TABS",
-                  title: "🔄 Tab Interaktif (Lengkap)",
-                  desc: "Pengunjung dapat berpindah bebas antara Tab Pilar 3C, Swipe Foto, dan Video.",
-                },
-                {
-                  id: "PILLARS",
-                  title: "📋 Hanya Pilar Teks 3C",
-                  desc: "Menampilkan kartu teks 3 pilar pemuridan (Explore, Encounter, Connect).",
-                },
-                {
-                  id: "SLIDER",
-                  title: "🖼️ Hanya Swipe Galeri",
-                  desc: "Menampilkan carousel foto kegiatan yang bisa digeser (swipe).",
-                },
-                {
-                  id: "VIDEO",
-                  title: "🎬 Hanya Video",
-                  desc: "Menampilkan pemutar video profil/gerakan langsung di hero.",
-                },
-                {
-                  id: "IMAGE",
-                  title: "📷 Hanya Foto Tunggal",
-                  desc: "Menampilkan 1 foto dokumentasi utama dengan caption.",
-                },
-              ].map((m) => (
-                <label
-                  key={m.id}
-                  className={`p-3.5 rounded-xl border cursor-pointer transition-all flex flex-col justify-between ${
-                    heroCard.displayMode === m.id
-                      ? "border-primary bg-primary/5 ring-1 ring-primary"
-                      : "border-border bg-card hover:bg-muted/30"
-                  }`}
-                >
-                  <div className="flex items-start gap-2.5">
-                    <input
-                      type="radio"
-                      name="displayMode"
-                      value={m.id}
-                      checked={heroCard.displayMode === m.id}
-                      onChange={() => setHeroCard({ ...heroCard, displayMode: m.id as any })}
-                      className="mt-0.5 text-primary focus:ring-primary"
-                    />
-                    <div>
-                      <span className="text-xs font-bold text-foreground block">{m.title}</span>
-                      <span className="text-[11px] text-muted-foreground block mt-0.5 leading-snug">
-                        {m.desc}
-                      </span>
-                    </div>
-                  </div>
-                </label>
-              ))}
+      {activeTab === "whyEsm" && (
+        <div className="space-y-6">
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 flex items-start gap-3">
+            <Info className="size-4 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="font-bold">Bagian ini mengontrol Section 3 di Beranda:</p>
+              <p className="text-stone-600 mt-0.5">
+                Kolom kiri menampilkan teks narasi visi & panggilan, sedangkan kolom kanan menampilkan kartu pemutar Video Company Profile ESM.
+              </p>
             </div>
           </div>
-        )}
 
-        {/* SUBTAB 2: KONTEN PILAR TEKS 3C */}
-        {activeCardSubTab === "pillars" && (
-          <div className="space-y-5 p-4 rounded-xl border border-border bg-muted/10">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-              Pengaturan Kartu Pilar Teks
-            </h3>
+          {/* Kolom Kiri: Narasi Panggilan */}
+          <div className="bg-card rounded-2xl border border-border p-6 space-y-5 shadow-warm-sm">
+            <div className="border-b border-border pb-3">
+              <h2 className="text-sm font-bold text-foreground">A. Narasi Visi (Kolom Kiri)</h2>
+              <p className="text-xs text-muted-foreground">Label kecil, judul utama berani, dan paragraf penjelas gerakan.</p>
+            </div>
 
-            {/* Judul & Subjudul Kartu */}
+            {/* Kicker Badge */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Judul Kartu (ID)</label>
+                <label className="text-xs font-bold text-foreground block mb-1">Badge Kicker (ID)</label>
                 <input
                   type="text"
-                  value={heroCard.titleId}
-                  onChange={(e) => setHeroCard({ ...heroCard, titleId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  value={whyEsm.kickerId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, kickerId: e.target.value })}
+                  placeholder="MENGAPA ESM HADIR?"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Judul Kartu (EN)</label>
+                  <label className="text-xs font-bold text-foreground">Badge Kicker (EN)</label>
                   <AutoTranslateButton
-                    sourceText={heroCard.titleId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, titleEn: txt })}
+                    sourceText={whyEsm.kickerId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, kickerEn: txt })}
                   />
                 </div>
                 <input
                   type="text"
-                  value={heroCard.titleEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, titleEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  value={whyEsm.kickerEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, kickerEn: e.target.value })}
+                  placeholder="WHY ESM EXISTS?"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
                 />
               </div>
+            </div>
 
+            {/* Headline */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Subjudul Kartu (ID)</label>
-                <input
-                  type="text"
-                  value={heroCard.subtitleId}
-                  onChange={(e) => setHeroCard({ ...heroCard, subtitleId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                <label className="text-xs font-bold text-foreground block mb-1">
+                  Headline Utama (ID) <span className="text-stone-400 font-normal">(Kata &ldquo;pemuridan&rdquo; dan &ldquo;misi&rdquo; otomatis di-highlight)</span>
+                </label>
+                <textarea
+                  rows={2}
+                  value={whyEsm.headlineId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, headlineId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Subjudul (EN)</label>
+                  <label className="text-xs font-bold text-foreground">Headline Utama (EN)</label>
                   <AutoTranslateButton
-                    sourceText={heroCard.subtitleId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, subtitleEn: txt })}
+                    sourceText={whyEsm.headlineId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, headlineEn: txt })}
                   />
                 </div>
-                <input
-                  type="text"
-                  value={heroCard.subtitleEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, subtitleEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Badge Status (ID)</label>
-                <input
-                  type="text"
-                  value={heroCard.badgeTextId}
-                  onChange={(e) => setHeroCard({ ...heroCard, badgeTextId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Badge Status (EN)</label>
-                <input
-                  type="text"
-                  value={heroCard.badgeTextEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, badgeTextEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                <textarea
+                  rows={2}
+                  value={whyEsm.headlineEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, headlineEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
                 />
               </div>
             </div>
 
-            {/* Daftar 3 Pilar */}
-            <div className="space-y-4 pt-3 border-t border-border">
-              <label className="text-xs font-bold text-foreground uppercase tracking-wider block">
-                Item Pilar Pemuridan:
-              </label>
-
-              {heroCard.pillars?.map((p, idx) => (
-                <div key={idx} className="p-3.5 rounded-xl border border-border bg-card space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-primary">Pilar {idx + 1}</span>
-                    <select
-                      value={p.icon}
-                      onChange={(e) => {
-                        const updated = [...heroCard.pillars];
-                        updated[idx].icon = e.target.value as any;
-                        setHeroCard({ ...heroCard, pillars: updated });
-                      }}
-                      className="px-2 py-1 text-xs rounded-lg border border-border bg-background"
-                    >
-                      <option value="compass">Ikon Kompas (Explore)</option>
-                      <option value="graduation">Ikon Toga (Encounter)</option>
-                      <option value="briefcase">Ikon Koper (Connect)</option>
-                      <option value="flame">Ikon Api</option>
-                      <option value="heart">Ikon Kasih</option>
-                      <option value="users">Ikon Komunitas</option>
-                    </select>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] font-bold text-foreground block mb-1">Judul Pilar (ID)</label>
-                      <input
-                        type="text"
-                        value={p.titleId}
-                        onChange={(e) => {
-                          const updated = [...heroCard.pillars];
-                          updated[idx].titleId = e.target.value;
-                          setHeroCard({ ...heroCard, pillars: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold text-foreground">Judul Pilar (EN)</label>
-                        <AutoTranslateButton
-                          sourceText={p.titleId}
-                          onTranslated={(txt) => {
-                            const updated = [...heroCard.pillars];
-                            updated[idx].titleEn = txt;
-                            setHeroCard({ ...heroCard, pillars: updated });
-                          }}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        value={p.titleEn}
-                        onChange={(e) => {
-                          const updated = [...heroCard.pillars];
-                          updated[idx].titleEn = e.target.value;
-                          setHeroCard({ ...heroCard, pillars: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-foreground block mb-1">Deskripsi Pilar (ID)</label>
-                      <textarea
-                        rows={2}
-                        value={p.descId}
-                        onChange={(e) => {
-                          const updated = [...heroCard.pillars];
-                          updated[idx].descId = e.target.value;
-                          setHeroCard({ ...heroCard, pillars: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold text-foreground">Deskripsi Pilar (EN)</label>
-                        <AutoTranslateButton
-                          sourceText={p.descId}
-                          onTranslated={(txt) => {
-                            const updated = [...heroCard.pillars];
-                            updated[idx].descEn = txt;
-                            setHeroCard({ ...heroCard, pillars: updated });
-                          }}
-                        />
-                      </div>
-                      <textarea
-                        rows={2}
-                        value={p.descEn}
-                        onChange={(e) => {
-                          const updated = [...heroCard.pillars];
-                          updated[idx].descEn = e.target.value;
-                          setHeroCard({ ...heroCard, pillars: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                  </div>
+            {/* Description */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Deskripsi Narasi (ID)</label>
+                <textarea
+                  rows={3}
+                  value={whyEsm.descriptionId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, descriptionId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Deskripsi Narasi (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={whyEsm.descriptionId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, descriptionEn: txt })}
+                  />
                 </div>
-              ))}
+                <textarea
+                  rows={3}
+                  value={whyEsm.descriptionEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, descriptionEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
             </div>
 
-            {/* Bottom CTA Card */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-border">
+            {/* History Link Button */}
+            <div className="pt-2 border-t border-border/60 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Teks Footer CTA (ID)</label>
+                <label className="text-xs font-bold text-foreground block mb-1">Teks Tautan Sejarah (ID)</label>
                 <input
                   type="text"
-                  value={heroCard.ctaTextId}
-                  onChange={(e) => setHeroCard({ ...heroCard, ctaTextId: e.target.value })}
+                  value={whyEsm.historyLinkTextId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, historyLinkTextId: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
               </div>
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Teks Footer CTA (EN)</label>
+                <label className="text-xs font-bold text-foreground block mb-1">Teks Tautan (EN)</label>
                 <input
                   type="text"
-                  value={heroCard.ctaTextEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, ctaTextEn: e.target.value })}
+                  value={whyEsm.historyLinkTextEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, historyLinkTextEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Tujuan URL</label>
+                <input
+                  type="text"
+                  value={whyEsm.historyLinkUrl}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, historyLinkUrl: e.target.value })}
+                  placeholder="/tentang-kami"
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
               </div>
             </div>
           </div>
-        )}
 
-        {/* SUBTAB 3: SWIPE FOTO CAROUSEL */}
-        {activeCardSubTab === "slider" && (
-          <div className="space-y-5 p-4 rounded-xl border border-border bg-muted/10">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border pb-3">
-              <div>
-                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-                  Daftar Slide Foto Swipe
-                </h3>
-                <p className="text-[11px] text-muted-foreground">
-                  Foto-foto ini dapat di-swipe ke kiri & kanan oleh pengunjung website.
+          {/* Kolom Kanan: Video Company Profile Card */}
+          <div className="bg-card rounded-2xl border border-border p-6 space-y-5 shadow-warm-sm">
+            <div className="border-b border-border pb-3">
+              <h2 className="text-sm font-bold text-foreground">B. Kartu Video Profil Gerakan (Kolom Kanan)</h2>
+              <p className="text-xs text-muted-foreground">
+                Thumbnail video, judul, durasi, tautan YouTube/MP4, dan teks footer bar.
+              </p>
+            </div>
+
+            {/* Video Link & Duration */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2">
+                <label className="text-xs font-bold text-foreground block mb-1">
+                  URL Video YouTube / Video Publik
+                </label>
+                <input
+                  type="text"
+                  value={whyEsm.videoUrl}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoUrl: e.target.value })}
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Bisa menggunakan format link YouTube standar (watch?v=...), youtu.be, atau embed.
                 </p>
               </div>
 
-              <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={heroCard.autoSlide}
-                    onChange={(e) => setHeroCard({ ...heroCard, autoSlide: e.target.checked })}
-                    className="rounded text-primary focus:ring-primary"
-                  />
-                  <span>Auto-Slide Otomatis</span>
-                </label>
-
-                <div className="flex items-center gap-1.5 text-xs">
-                  <span className="text-muted-foreground">Interval:</span>
-                  <input
-                    type="number"
-                    min={2}
-                    max={20}
-                    value={heroCard.slideIntervalSeconds || 5}
-                    onChange={(e) =>
-                      setHeroCard({ ...heroCard, slideIntervalSeconds: Number(e.target.value) || 5 })
-                    }
-                    className="w-14 px-2 py-1 text-xs rounded-lg border border-border bg-background text-center font-bold"
-                  />
-                  <span className="text-muted-foreground">detik</span>
-                </div>
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Badge Durasi Video</label>
+                <input
+                  type="text"
+                  value={whyEsm.videoDuration}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoDuration: e.target.value })}
+                  placeholder="03:45 • Profil ESM"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
               </div>
             </div>
 
-            {/* List of Slides */}
-            <div className="space-y-4">
-              {heroCard.slides?.map((slide, idx) => (
-                <div key={slide.id || idx} className="p-4 rounded-xl border border-border bg-card space-y-3">
-                  <div className="flex items-center justify-between border-b border-border pb-2">
-                    <span className="text-xs font-bold text-primary">Slide Foto #{idx + 1}</span>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveSlide(idx)}
-                      className="text-xs text-rose-500 hover:text-rose-700 flex items-center gap-1 font-semibold"
-                    >
-                      <Trash2 className="size-3.5" />
-                      <span>Hapus Slide</span>
-                    </button>
-                  </div>
+            {/* Thumbnail Upload */}
+            <MediaUploader
+              label="Thumbnail Sampul Video"
+              value={whyEsm.videoThumbnail}
+              onChange={(url) => setWhyEsm({ ...whyEsm, videoThumbnail: url })}
+              folder="hero"
+              accept="image"
+              helperText="Format disarankan: Foto 16:9 lanskap (1920x1080px). Digunakan sebagai latar pemutar video."
+            />
 
-                  <MediaUploader
-                    label="Unggah / Link Foto Slide"
-                    value={slide.imageUrl}
-                    onChange={(url) => {
-                      const updated = [...heroCard.slides];
-                      updated[idx].imageUrl = url;
-                      setHeroCard({ ...heroCard, slides: updated });
-                    }}
-                    folder="hero-slides"
-                    accept="image"
-                    helperText="Disarankan rasio landscape 16:9 atau 4:3."
-                  />
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-[11px] font-bold text-foreground block mb-1">Judul Foto (ID)</label>
-                      <input
-                        type="text"
-                        value={slide.titleId || ""}
-                        onChange={(e) => {
-                          const updated = [...heroCard.slides];
-                          updated[idx].titleId = e.target.value;
-                          setHeroCard({ ...heroCard, slides: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold text-foreground">Judul Foto (EN)</label>
-                        <AutoTranslateButton
-                          sourceText={slide.titleId || ""}
-                          onTranslated={(txt) => {
-                            const updated = [...heroCard.slides];
-                            updated[idx].titleEn = txt;
-                            setHeroCard({ ...heroCard, slides: updated });
-                          }}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        value={slide.titleEn || ""}
-                        onChange={(e) => {
-                          const updated = [...heroCard.slides];
-                          updated[idx].titleEn = e.target.value;
-                          setHeroCard({ ...heroCard, slides: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="text-[11px] font-bold text-foreground block mb-1">Caption / Keterangan (ID)</label>
-                      <input
-                        type="text"
-                        value={slide.captionId || ""}
-                        onChange={(e) => {
-                          const updated = [...heroCard.slides];
-                          updated[idx].captionId = e.target.value;
-                          setHeroCard({ ...heroCard, slides: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                    <div>
-                      <div className="flex items-center justify-between mb-1">
-                        <label className="text-[11px] font-bold text-foreground">Caption (EN)</label>
-                        <AutoTranslateButton
-                          sourceText={slide.captionId || ""}
-                          onTranslated={(txt) => {
-                            const updated = [...heroCard.slides];
-                            updated[idx].captionEn = txt;
-                            setHeroCard({ ...heroCard, slides: updated });
-                          }}
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        value={slide.captionEn || ""}
-                        onChange={(e) => {
-                          const updated = [...heroCard.slides];
-                          updated[idx].captionEn = e.target.value;
-                          setHeroCard({ ...heroCard, slides: updated });
-                        }}
-                        className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                      />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              type="button"
-              onClick={handleAddSlide}
-              className="w-full py-2.5 rounded-xl border-2 border-dashed border-border hover:border-primary/50 text-xs font-bold text-primary flex items-center justify-center gap-1.5 transition-colors bg-card hover:bg-muted/30"
-            >
-              <Plus className="size-4" />
-              <span>Tambah Slide Foto Baru</span>
-            </button>
-          </div>
-        )}
-
-        {/* SUBTAB 4: KONTEN VIDEO */}
-        {activeCardSubTab === "video" && (
-          <div className="space-y-4 p-4 rounded-xl border border-border bg-muted/10">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-              Pengaturan Pemutar Video Hero
-            </h3>
-
+            {/* Badge & Title Video */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <MediaUploader
-                label="Unggah File Video (MP4) atau Tempel URL YouTube"
-                value={heroCard.videoUrl}
-                onChange={(url) => setHeroCard({ ...heroCard, videoUrl: url })}
-                folder="hero-video"
-                accept="video"
-                helperText="Mendukung URL YouTube (https://www.youtube.com/watch?v=...) atau direct video MP4."
-              />
-
-              <MediaUploader
-                label="Upload Poster / Thumbnail Video"
-                value={heroCard.videoThumbnail}
-                onChange={(url) => setHeroCard({ ...heroCard, videoThumbnail: url })}
-                folder="hero-video"
-                accept="image"
-                helperText="Gambar yang ditampilkan sebelum video diputar."
-              />
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Badge Video (ID)</label>
+                <input
+                  type="text"
+                  value={whyEsm.videoBadgeId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoBadgeId: e.target.value })}
+                  placeholder="VIDEO COMPANY PROFILE ESM"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Badge Video (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={whyEsm.videoBadgeId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, videoBadgeEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={whyEsm.videoBadgeEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoBadgeEn: e.target.value })}
+                  placeholder="ESM COMPANY PROFILE VIDEO"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -980,310 +661,691 @@ export default function AdminBerandaCMS() {
                 <label className="text-xs font-bold text-foreground block mb-1">Judul Video (ID)</label>
                 <input
                   type="text"
-                  value={heroCard.videoTitleId}
-                  onChange={(e) => setHeroCard({ ...heroCard, videoTitleId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  value={whyEsm.videoTitleId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoTitleId: e.target.value })}
+                  placeholder="Mengenal Hati & Api Gerakan Pemuridan"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
                   <label className="text-xs font-bold text-foreground">Judul Video (EN)</label>
                   <AutoTranslateButton
-                    sourceText={heroCard.videoTitleId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, videoTitleEn: txt })}
+                    sourceText={whyEsm.videoTitleId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, videoTitleEn: txt })}
                   />
                 </div>
                 <input
                   type="text"
-                  value={heroCard.videoTitleEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, videoTitleEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Keterangan Video (ID)</label>
-                <textarea
-                  rows={2}
-                  value={heroCard.videoCaptionId}
-                  onChange={(e) => setHeroCard({ ...heroCard, videoCaptionId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Keterangan Video (EN)</label>
-                  <AutoTranslateButton
-                    sourceText={heroCard.videoCaptionId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, videoCaptionEn: txt })}
-                  />
-                </div>
-                <textarea
-                  rows={2}
-                  value={heroCard.videoCaptionEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, videoCaptionEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  value={whyEsm.videoTitleEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoTitleEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-semibold"
                 />
               </div>
             </div>
-          </div>
-        )}
 
-        {/* SUBTAB 5: KONTEN FOTO TUNGGAL */}
-        {activeCardSubTab === "image" && (
-          <div className="space-y-4 p-4 rounded-xl border border-border bg-muted/10">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
-              Pengaturan Foto Tunggal
-            </h3>
-
-            <MediaUploader
-              label="Unggah / Link Foto Tunggal"
-              value={heroCard.singleImageUrl}
-              onChange={(url) => setHeroCard({ ...heroCard, singleImageUrl: url })}
-              folder="hero-single"
-              accept="image"
-            />
-
+            {/* Subtitle Video */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Judul Foto (ID)</label>
-                <input
-                  type="text"
-                  value={heroCard.singleImageTitleId}
-                  onChange={(e) => setHeroCard({ ...heroCard, singleImageTitleId: e.target.value })}
+                <label className="text-xs font-bold text-foreground block mb-1">Keterangan Singkat Video (ID)</label>
+                <textarea
+                  rows={2}
+                  value={whyEsm.videoSubtitleId}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoSubtitleId: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Judul Foto (EN)</label>
+                  <label className="text-xs font-bold text-foreground">Keterangan Singkat Video (EN)</label>
                   <AutoTranslateButton
-                    sourceText={heroCard.singleImageTitleId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, singleImageTitleEn: txt })}
-                  />
-                </div>
-                <input
-                  type="text"
-                  value={heroCard.singleImageTitleEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, singleImageTitleEn: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Caption / Keterangan (ID)</label>
-                <textarea
-                  rows={2}
-                  value={heroCard.singleImageCaptionId}
-                  onChange={(e) => setHeroCard({ ...heroCard, singleImageCaptionId: e.target.value })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Caption (EN)</label>
-                  <AutoTranslateButton
-                    sourceText={heroCard.singleImageCaptionId}
-                    onTranslated={(txt) => setHeroCard({ ...heroCard, singleImageCaptionEn: txt })}
+                    sourceText={whyEsm.videoSubtitleId}
+                    onTranslated={(txt) => setWhyEsm({ ...whyEsm, videoSubtitleEn: txt })}
                   />
                 </div>
                 <textarea
                   rows={2}
-                  value={heroCard.singleImageCaptionEn}
-                  onChange={(e) => setHeroCard({ ...heroCard, singleImageCaptionEn: e.target.value })}
+                  value={whyEsm.videoSubtitleEn}
+                  onChange={(e) => setWhyEsm({ ...whyEsm, videoSubtitleEn: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
               </div>
             </div>
+
+            {/* Footer Bar Under Video */}
+            <div className="pt-2 border-t border-border/60 space-y-4">
+              <label className="text-xs font-bold text-foreground block">
+                Bar Informasi di Bawah Video Card
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground block mb-1">Teks Footer (ID)</label>
+                  <input
+                    type="text"
+                    value={whyEsm.footerTextId}
+                    onChange={(e) => setWhyEsm({ ...whyEsm, footerTextId: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-[11px] font-medium text-muted-foreground">Teks Footer (EN)</label>
+                    <AutoTranslateButton
+                      sourceText={whyEsm.footerTextId}
+                      onTranslated={(txt) => setWhyEsm({ ...whyEsm, footerTextEn: txt })}
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={whyEsm.footerTextEn}
+                    onChange={(e) => setWhyEsm({ ...whyEsm, footerTextEn: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground block mb-1">Teks Tombol Tonton (ID)</label>
+                  <input
+                    type="text"
+                    value={whyEsm.footerCtaTextId}
+                    onChange={(e) => setWhyEsm({ ...whyEsm, footerCtaTextId: e.target.value })}
+                    placeholder="Tonton Video"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-medium text-muted-foreground block mb-1">Teks Tombol Tonton (EN)</label>
+                  <input
+                    type="text"
+                    value={whyEsm.footerCtaTextEn}
+                    onChange={(e) => setWhyEsm({ ...whyEsm, footerCtaTextEn: e.target.value })}
+                    placeholder="Watch Video"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* ========================================================
-          SECTION 3: NILAI POKOK
+          TAB 1: HERO UTAMA (HEADER & SLOGAN)
           ======================================================== */}
-      <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
-        <div className="border-b border-border pb-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-1">
-            <Layers className="size-3.5" />
-            <span>3 PILAR UTAMA</span>
+      {activeTab === "hero" && (
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">1. Hero Section (Header & Slogan Utama)</h2>
+            <p className="text-xs text-muted-foreground">
+              Teks pembuka beranda berlatar gradien Crimson Ruby di bagian paling atas.
+            </p>
           </div>
-          <h2 className="text-base font-bold text-foreground">3. Tiga Nilai Pokok (Core Values)</h2>
-          <p className="text-xs text-muted-foreground">3 kartu pondasi pelayanan di bawah hero beranda.</p>
-        </div>
 
-        <div className="space-y-6">
-          {values.map((val, idx) => (
-            <div key={idx} className="p-4 rounded-xl border border-border bg-muted/20 space-y-4">
-              <div className="flex items-center justify-between font-bold text-xs text-foreground">
-                <span>Kartu {idx + 1}</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">Judul (ID)</label>
-                  <input
-                    type="text"
-                    value={val.titleId}
-                    onChange={(e) => {
-                      const updated = [...values];
-                      updated[idx].titleId = e.target.value;
-                      setValues(updated);
-                    }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-bold text-foreground">Judul (EN)</label>
-                    <AutoTranslateButton
-                      sourceText={val.titleId}
-                      onTranslated={(txt) => {
-                        const updated = [...values];
-                        updated[idx].titleEn = txt;
-                        setValues(updated);
-                      }}
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    value={val.titleEn}
-                    onChange={(e) => {
-                      const updated = [...values];
-                      updated[idx].titleEn = e.target.value;
-                      setValues(updated);
-                    }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-bold text-foreground block mb-1">Deskripsi (ID)</label>
-                  <textarea
-                    rows={2}
-                    value={val.descId}
-                    onChange={(e) => {
-                      const updated = [...values];
-                      updated[idx].descId = e.target.value;
-                      setValues(updated);
-                    }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                  />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-bold text-foreground">Deskripsi (EN)</label>
-                    <AutoTranslateButton
-                      sourceText={val.descId}
-                      onTranslated={(txt) => {
-                        const updated = [...values];
-                        updated[idx].descEn = txt;
-                        setValues(updated);
-                      }}
-                    />
-                  </div>
-                  <textarea
-                    rows={2}
-                    value={val.descEn}
-                    onChange={(e) => {
-                      const updated = [...values];
-                      updated[idx].descEn = e.target.value;
-                      setValues(updated);
-                    }}
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                  />
-                </div>
-              </div>
-
-              <MediaUploader
-                label="Foto / Ikon Ilustrasi (Opsional)"
-                value={val.imageUrl}
-                onChange={(url) => {
-                  const updated = [...values];
-                  updated[idx].imageUrl = url;
-                  setValues(updated);
-                }}
-                folder="values"
-                accept="image"
+          {/* Kicker */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1.5">Kicker / Label Kecil (ID)</label>
+              <input
+                type="text"
+                value={hero.kickerId}
+                onChange={(e) => setHero({ ...hero, kickerId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
               />
             </div>
-          ))}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-foreground">Kicker (EN)</label>
+                <AutoTranslateButton
+                  sourceText={hero.kickerId}
+                  onTranslated={(txt) => setHero({ ...hero, kickerEn: txt })}
+                />
+              </div>
+              <input
+                type="text"
+                value={hero.kickerEn}
+                onChange={(e) => setHero({ ...hero, kickerEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* Headline */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1.5">Headline Utama (ID)</label>
+              <textarea
+                rows={2}
+                value={hero.headlineId}
+                onChange={(e) => setHero({ ...hero, headlineId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-foreground">Headline (EN)</label>
+                <AutoTranslateButton
+                  sourceText={hero.headlineId}
+                  onTranslated={(txt) => setHero({ ...hero, headlineEn: txt })}
+                />
+              </div>
+              <textarea
+                rows={2}
+                value={hero.headlineEn}
+                onChange={(e) => setHero({ ...hero, headlineEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* Subheadline */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1.5">Subheadline Penjelas (ID)</label>
+              <textarea
+                rows={3}
+                value={hero.subheadlineId}
+                onChange={(e) => setHero({ ...hero, subheadlineId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-xs font-bold text-foreground">Subheadline (EN)</label>
+                <AutoTranslateButton
+                  sourceText={hero.subheadlineId}
+                  onTranslated={(txt) => setHero({ ...hero, subheadlineEn: txt })}
+                />
+              </div>
+              <textarea
+                rows={3}
+                value={hero.subheadlineEn}
+                onChange={(e) => setHero({ ...hero, subheadlineEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+          </div>
+
+          {/* CTA Buttons */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-foreground block">Tombol Aksi Utama (Primary CTA)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Teks ID"
+                  value={hero.primaryCtaTextId}
+                  onChange={(e) => setHero({ ...hero, primaryCtaTextId: e.target.value })}
+                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+                <input
+                  type="text"
+                  placeholder="Teks EN"
+                  value={hero.primaryCtaTextEn}
+                  onChange={(e) => setHero({ ...hero, primaryCtaTextEn: e.target.value })}
+                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Tautan URL (contoh: /pelayanan)"
+                value={hero.primaryCtaUrl}
+                onChange={(e) => setHero({ ...hero, primaryCtaUrl: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-foreground block">Tombol Aksi Kedua (Secondary CTA)</label>
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  placeholder="Teks ID"
+                  value={hero.secondaryCtaTextId}
+                  onChange={(e) => setHero({ ...hero, secondaryCtaTextId: e.target.value })}
+                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+                <input
+                  type="text"
+                  placeholder="Teks EN"
+                  value={hero.secondaryCtaTextEn}
+                  onChange={(e) => setHero({ ...hero, secondaryCtaTextEn: e.target.value })}
+                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <input
+                type="text"
+                placeholder="Tautan URL (contoh: /kemitraan)"
+                value={hero.secondaryCtaUrl}
+                onChange={(e) => setHero({ ...hero, secondaryCtaUrl: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ========================================================
-          SECTION 4: STATISTIK DAMPAK
+          TAB 2: STATISTIK ANGKA DAMPAK (4 METRIK)
           ======================================================== */}
-      <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
-        <div className="border-b border-border pb-3">
-          <div className="flex items-center gap-2 text-xs font-bold text-primary uppercase tracking-wider mb-1">
-            <BarChart3 className="size-3.5" />
-            <span>ANGKA DAMPAK</span>
+      {activeTab === "stats" && (
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">2. Statistik Dampak Pelayanan</h2>
+            <p className="text-xs text-muted-foreground">
+              4 angka statistik utama yang ditampilkan tepat di bawah Hero beranda.
+            </p>
           </div>
-          <h2 className="text-base font-bold text-foreground">4. Statistik Dampak Pelayanan</h2>
-          <p className="text-xs text-muted-foreground">4 angka statistik utama yang merefleksikan karya pelayanan.</p>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {stats.map((st, idx) => (
-            <div key={idx} className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Angka / Metrik</label>
-                <input
-                  type="text"
-                  value={st.number}
-                  onChange={(e) => {
-                    const updated = [...stats];
-                    updated[idx].number = e.target.value;
-                    setStats(updated);
-                  }}
-                  className="w-full px-3 py-2 text-xs font-bold text-primary rounded-xl border border-border bg-background"
-                />
-              </div>
-
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Label Penjelasan (ID)</label>
-                <input
-                  type="text"
-                  value={st.labelId}
-                  onChange={(e) => {
-                    const updated = [...stats];
-                    updated[idx].labelId = e.target.value;
-                    setStats(updated);
-                  }}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-foreground">Label (EN)</label>
-                  <AutoTranslateButton
-                    sourceText={st.labelId}
-                    onTranslated={(txt) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {stats.map((st, idx) => (
+              <div key={idx} className="p-4 rounded-xl border border-border bg-muted/20 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-muted-foreground">Metrik {idx + 1}</span>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Angka / Metrik (contoh: 15+, 500+)</label>
+                  <input
+                    type="text"
+                    value={st.number}
+                    onChange={(e) => {
                       const updated = [...stats];
-                      updated[idx].labelEn = txt;
+                      updated[idx].number = e.target.value;
                       setStats(updated);
                     }}
+                    className="w-full px-3 py-2 text-xs font-bold text-primary rounded-xl border border-border bg-background"
                   />
                 </div>
+
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Label Penjelasan (ID)</label>
+                  <input
+                    type="text"
+                    value={st.labelId}
+                    onChange={(e) => {
+                      const updated = [...stats];
+                      updated[idx].labelId = e.target.value;
+                      setStats(updated);
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-bold text-foreground">Label Penjelasan (EN)</label>
+                    <AutoTranslateButton
+                      sourceText={st.labelId}
+                      onTranslated={(txt) => {
+                        const updated = [...stats];
+                        updated[idx].labelEn = txt;
+                        setStats(updated);
+                      }}
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={st.labelEn}
+                    onChange={(e) => {
+                      const updated = [...stats];
+                      updated[idx].labelEn = e.target.value;
+                      setStats(updated);
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          TAB 4: TIGA KOMUNITAS (MATA RANTAI PEMURIDAN)
+          ======================================================== */}
+      {activeTab === "communities" && (
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">4. Tiga Komunitas Pelayanan (Mata Rantai Pemuridan)</h2>
+            <p className="text-xs text-muted-foreground">
+              Bagian 3 komunitas: Explore (Siswa), Encounter (Mahasiswa), dan Connect (Alumni).
+            </p>
+          </div>
+
+          {/* Section Header */}
+          <div className="p-4 rounded-xl bg-muted/20 border border-border/80 space-y-4">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">Judul Section</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Kicker (ID)</label>
                 <input
                   type="text"
-                  value={st.labelEn}
-                  onChange={(e) => {
-                    const updated = [...stats];
-                    updated[idx].labelEn = e.target.value;
-                    setStats(updated);
-                  }}
+                  value={communities.kickerId}
+                  onChange={(e) => setCommunities({ ...communities, kickerId: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Kicker (EN)</label>
+                <input
+                  type="text"
+                  value={communities.kickerEn}
+                  onChange={(e) => setCommunities({ ...communities, kickerEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Judul Utama (ID)</label>
+                <input
+                  type="text"
+                  value={communities.titleId}
+                  onChange={(e) => setCommunities({ ...communities, titleId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-bold"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Judul Utama (EN)</label>
+                <input
+                  type="text"
+                  value={communities.titleEn}
+                  onChange={(e) => setCommunities({ ...communities, titleEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-bold"
                 />
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* 3 Komunitas Items */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Explore */}
+            <div className="p-4 rounded-2xl border border-border bg-muted/10 space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                  Komunitas 1 (Explore)
+                </span>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Stage Pill (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.explore.stageId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        explore: { ...communities.explore, stageId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Deskripsi Singkat (ID)</label>
+                  <textarea
+                    rows={3}
+                    value={communities.explore.descId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        explore: { ...communities.explore, descId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Teks Tautan (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.explore.linkTextId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        explore: { ...communities.explore, linkTextId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Encounter */}
+            <div className="p-4 rounded-2xl border border-border bg-muted/10 space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-500/10 px-2 py-0.5 rounded-full">
+                  Komunitas 2 (Encounter)
+                </span>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Stage Pill (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.encounter.stageId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        encounter: { ...communities.encounter, stageId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Deskripsi Singkat (ID)</label>
+                  <textarea
+                    rows={3}
+                    value={communities.encounter.descId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        encounter: { ...communities.encounter, descId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Teks Tautan (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.encounter.linkTextId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        encounter: { ...communities.encounter, linkTextId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Connect */}
+            <div className="p-4 rounded-2xl border border-border bg-muted/10 space-y-3 flex flex-col justify-between">
+              <div className="space-y-3">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                  Komunitas 3 (Connect)
+                </span>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Stage Pill (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.connect.stageId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        connect: { ...communities.connect, stageId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Deskripsi Singkat (ID)</label>
+                  <textarea
+                    rows={3}
+                    value={communities.connect.descId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        connect: { ...communities.connect, descId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-bold text-foreground block mb-1">Teks Tautan (ID)</label>
+                  <input
+                    type="text"
+                    value={communities.connect.linkTextId}
+                    onChange={(e) =>
+                      setCommunities({
+                        ...communities,
+                        connect: { ...communities.connect, linkTextId: e.target.value },
+                      })
+                    }
+                    className="w-full px-3 py-1.5 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* ========================================================
+          TAB 5: KARTU AJAKAN KEMITRAAN & MISI
+          ======================================================== */}
+      {activeTab === "cta" && (
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-6 shadow-warm-sm">
+          <div className="border-b border-border pb-3">
+            <h2 className="text-base font-bold text-foreground">5. Kartu Ajakan Kemitraan & Misi</h2>
+            <p className="text-xs text-muted-foreground">
+              Kartu warna Garnet gelap di atas bagian Tanya Jawab (FAQ) yang mengajak pengunjung bergabung atau mendukung.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Badge Atas (ID)</label>
+              <input
+                type="text"
+                value={ctaCard.badgeId}
+                onChange={(e) => setCtaCard({ ...ctaCard, badgeId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-foreground">Badge Atas (EN)</label>
+                <AutoTranslateButton
+                  sourceText={ctaCard.badgeId}
+                  onTranslated={(txt) => setCtaCard({ ...ctaCard, badgeEn: txt })}
+                />
+              </div>
+              <input
+                type="text"
+                value={ctaCard.badgeEn}
+                onChange={(e) => setCtaCard({ ...ctaCard, badgeEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Judul Ajakan (ID)</label>
+              <textarea
+                rows={2}
+                value={ctaCard.titleId}
+                onChange={(e) => setCtaCard({ ...ctaCard, titleId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-bold"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-foreground">Judul Ajakan (EN)</label>
+                <AutoTranslateButton
+                  sourceText={ctaCard.titleId}
+                  onTranslated={(txt) => setCtaCard({ ...ctaCard, titleEn: txt })}
+                />
+              </div>
+              <textarea
+                rows={2}
+                value={ctaCard.titleEn}
+                onChange={(e) => setCtaCard({ ...ctaCard, titleEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background font-bold"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-foreground block mb-1">Deskripsi Ajakan (ID)</label>
+              <textarea
+                rows={3}
+                value={ctaCard.descId}
+                onChange={(e) => setCtaCard({ ...ctaCard, descId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-bold text-foreground">Deskripsi Ajakan (EN)</label>
+                <AutoTranslateButton
+                  sourceText={ctaCard.descId}
+                  onTranslated={(txt) => setCtaCard({ ...ctaCard, descEn: txt })}
+                />
+              </div>
+              <textarea
+                rows={3}
+                value={ctaCard.descEn}
+                onChange={(e) => setCtaCard({ ...ctaCard, descEn: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-foreground block">Tombol Donasi / Kemitraan</label>
+              <input
+                type="text"
+                placeholder="Teks ID"
+                value={ctaCard.primaryCtaTextId}
+                onChange={(e) => setCtaCard({ ...ctaCard, primaryCtaTextId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+              <input
+                type="text"
+                placeholder="Tautan URL"
+                value={ctaCard.primaryCtaUrl}
+                onChange={(e) => setCtaCard({ ...ctaCard, primaryCtaUrl: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-foreground block">Tombol Gabung Komunitas</label>
+              <input
+                type="text"
+                placeholder="Teks ID"
+                value={ctaCard.secondaryCtaTextId}
+                onChange={(e) => setCtaCard({ ...ctaCard, secondaryCtaTextId: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+              <input
+                type="text"
+                placeholder="Tautan URL"
+                value={ctaCard.secondaryCtaUrl}
+                onChange={(e) => setCtaCard({ ...ctaCard, secondaryCtaUrl: e.target.value })}
+                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

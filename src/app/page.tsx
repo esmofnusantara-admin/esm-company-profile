@@ -67,6 +67,21 @@ export default function HomePage() {
 
   const hero = homeContent?.hero;
   const stats = homeContent?.stats;
+  const whyEsm = homeContent?.whyEsm;
+  const communities = homeContent?.communities;
+  const ctaCard = homeContent?.ctaCard;
+
+  const getYouTubeEmbedUrl = (url?: string) => {
+    if (!url) return "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1";
+    if (url.includes("/embed/")) {
+      return url.includes("autoplay=1") ? url : `${url}${url.includes("?") ? "&" : "?"}autoplay=1`;
+    }
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (match && match[1]) {
+      return `https://www.youtube-nocookie.com/embed/${match[1]}?autoplay=1`;
+    }
+    return url;
+  };
 
   const heroKicker = hero
     ? locale === "en"
@@ -334,22 +349,70 @@ export default function HomePage() {
               {/* Left Column: Bold Narrative with Amber Accent Bar */}
               <div className="lg:col-span-5 space-y-6">
                 <span className="text-xs font-bold uppercase tracking-widest text-primary bg-primary/10 px-3.5 py-1.5 rounded-full border border-primary/20">
-                  {t.whyEsm.kicker}
+                  {whyEsm
+                    ? locale === "en"
+                      ? whyEsm.kickerEn || whyEsm.kickerId
+                      : whyEsm.kickerId
+                    : t.whyEsm.kicker}
                 </span>
                 <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground leading-[1.18]">
-                  {t.whyEsm.headlineStart}
-                  <span className="text-primary italic font-serif"> {t.whyEsm.discipleship} </span>
-                  {t.whyEsm.and}
-                  <span className="text-accent italic font-serif"> {t.whyEsm.mission} </span>
-                  {t.whyEsm.headlineEnd}
+                  {whyEsm ? (
+                    (() => {
+                      const rawHeadline =
+                        locale === "en"
+                          ? whyEsm.headlineEn || whyEsm.headlineId
+                          : whyEsm.headlineId;
+                      if (!rawHeadline) return null;
+                      const parts = rawHeadline.split(/(pemuridan|discipleship|misi|mission)/i);
+                      return parts.map((part: string, idx: number) => {
+                        const lower = part.toLowerCase();
+                        if (lower === "pemuridan" || lower === "discipleship") {
+                          return (
+                            <span key={idx} className="text-primary italic font-serif">
+                              {" "}{part}{" "}
+                            </span>
+                          );
+                        }
+                        if (lower === "misi" || lower === "mission") {
+                          return (
+                            <span key={idx} className="text-accent italic font-serif">
+                              {" "}{part}{" "}
+                            </span>
+                          );
+                        }
+                        return <React.Fragment key={idx}>{part}</React.Fragment>;
+                      });
+                    })()
+                  ) : (
+                    <>
+                      {t.whyEsm.headlineStart}
+                      <span className="text-primary italic font-serif"> {t.whyEsm.discipleship} </span>
+                      {t.whyEsm.and}
+                      <span className="text-accent italic font-serif"> {t.whyEsm.mission} </span>
+                      {t.whyEsm.headlineEnd}
+                    </>
+                  )}
                 </h2>
                 <p className="text-base text-stone-600 leading-relaxed">
-                  {t.whyEsm.description}
+                  {whyEsm
+                    ? locale === "en"
+                      ? whyEsm.descriptionEn || whyEsm.descriptionId
+                      : whyEsm.descriptionId
+                    : t.whyEsm.description}
                 </p>
                 <div className="pt-2">
                   <Button asChild variant="link" className="px-0 font-bold text-primary hover:underline text-sm">
-                    <Link href="/tentang-kami" className="flex items-center gap-1.5">
-                      <span>Pelajari Sejarah & Panggilan Awal</span>
+                    <Link
+                      href={whyEsm?.historyLinkUrl || "/tentang-kami"}
+                      className="flex items-center gap-1.5"
+                    >
+                      <span>
+                        {whyEsm
+                          ? locale === "en"
+                            ? whyEsm.historyLinkTextEn || whyEsm.historyLinkTextId
+                            : whyEsm.historyLinkTextId
+                          : "Pelajari Sejarah & Panggilan Awal"}
+                      </span>
                       <ChevronRight className="size-4" />
                     </Link>
                   </Button>
@@ -361,8 +424,14 @@ export default function HomePage() {
                 <div className="relative rounded-3xl overflow-hidden border border-stone-200/90 shadow-warm-md bg-stone-900 group">
                   <div className="relative aspect-video w-full">
                     <Image
-                      src="/uploads/hero/kemitraan_hero.jpg"
-                      alt="Video Profil Gerakan ESM"
+                      src={whyEsm?.videoThumbnail || "/uploads/hero/kemitraan_hero.jpg"}
+                      alt={
+                        whyEsm
+                          ? locale === "en"
+                            ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                            : whyEsm.videoTitleId
+                          : "Video Profil Gerakan ESM"
+                      }
                       fill
                       className="object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
                     />
@@ -382,13 +451,25 @@ export default function HomePage() {
 
                       <div className="space-y-1 pt-1">
                         <span className="inline-block px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-400 text-stone-950 shadow-xs">
-                          Video Company Profile ESM
+                          {whyEsm
+                            ? locale === "en"
+                              ? whyEsm.videoBadgeEn || whyEsm.videoBadgeId
+                              : whyEsm.videoBadgeId
+                            : "Video Company Profile ESM"}
                         </span>
                         <h3 className="font-sans text-base sm:text-xl font-black text-white drop-shadow-md">
-                          Mengenal Hati & Api Gerakan Pemuridan
+                          {whyEsm
+                            ? locale === "en"
+                              ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                              : whyEsm.videoTitleId
+                            : "Mengenal Hati & Api Gerakan Pemuridan"}
                         </h3>
                         <p className="text-xs text-stone-300 max-w-md hidden sm:block">
-                          Dinamika pembinaan siswa sekolah, mahasiswa kampus, dan perintisan misi di Banten serta Maluku Utara.
+                          {whyEsm
+                            ? locale === "en"
+                              ? whyEsm.videoSubtitleEn || whyEsm.videoSubtitleId
+                              : whyEsm.videoSubtitleId
+                            : "Dinamika pembinaan siswa sekolah, mahasiswa kampus, dan perintisan misi di Banten serta Maluku Utara."}
                         </p>
                       </div>
                     </div>
@@ -396,7 +477,7 @@ export default function HomePage() {
                     {/* Video Duration Badge */}
                     <div className="absolute bottom-4 right-4 px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-[11px] font-mono font-bold text-white flex items-center gap-1.5 border border-white/10">
                       <span className="size-1.5 rounded-full bg-red-500 animate-pulse" />
-                      <span>03:45 • Profil ESM</span>
+                      <span>{whyEsm?.videoDuration || "03:45 • Profil ESM"}</span>
                     </div>
                   </div>
                 </div>
@@ -404,14 +485,24 @@ export default function HomePage() {
                 <div className="rounded-2xl bg-white p-4 border border-stone-200/90 shadow-warm-xs flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2 text-stone-600 font-medium">
                     <Sparkles className="size-4 text-amber-500 shrink-0" />
-                    <span>Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara</span>
+                    <span>
+                      {whyEsm
+                        ? locale === "en"
+                          ? whyEsm.footerTextEn || whyEsm.footerTextId
+                          : whyEsm.footerTextId
+                        : "Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara"}
+                    </span>
                   </div>
                   <button
                     type="button"
                     onClick={() => setVideoModalOpen(true)}
                     className="text-xs font-bold text-primary hover:underline shrink-0"
                   >
-                    Tonton Video
+                    {whyEsm
+                      ? locale === "en"
+                        ? whyEsm.footerCtaTextEn || whyEsm.footerCtaTextId
+                        : whyEsm.footerCtaTextId
+                      : "Tonton Video"}
                   </button>
                 </div>
               </div>
@@ -432,13 +523,31 @@ export default function HomePage() {
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest text-primary shadow-xs">
                   <span className="size-1.5 rounded-full bg-primary animate-pulse" />
-                  <span>{locale === "en" ? "DISCIPLESHIP CHAIN" : "MATA RANTAI PEMURIDAN"}</span>
+                  <span>
+                    {communities
+                      ? locale === "en"
+                        ? communities.kickerEn || communities.kickerId
+                        : communities.kickerId
+                      : locale === "en"
+                      ? "DISCIPLESHIP CHAIN"
+                      : "MATA RANTAI PEMURIDAN"}
+                  </span>
                 </div>
                 <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground">
-                  {locale === "en" ? "Three Communities, One Movement" : "Tiga Komunitas, Satu Kegerakan"}
+                  {communities
+                    ? locale === "en"
+                      ? communities.titleEn || communities.titleId
+                      : communities.titleId
+                    : locale === "en"
+                    ? "Three Communities, One Movement"
+                    : "Tiga Komunitas, Satu Kegerakan"}
                 </h2>
                 <p className="text-sm sm:text-base text-stone-600 max-w-2xl leading-relaxed">
-                  {locale === "en"
+                  {communities
+                    ? locale === "en"
+                      ? communities.subtitleEn || communities.subtitleId
+                      : communities.subtitleId
+                    : locale === "en"
                     ? "Accompanying the journey of faith from school benches, university halls, to marketplace and family."
                     : "Menemani perjalanan iman dari bangku sekolah, ruang kuliah kampus, hingga dunia kerja dan keluarga."}
                 </p>
@@ -488,7 +597,7 @@ export default function HomePage() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
                 {/* 1. Explore (Siswa Sekolah) */}
                 <div className="rounded-[2.25rem] bg-gradient-to-b from-white via-white to-[#FAF6F2] p-8 shadow-warm-xs hover:shadow-warm-md hover:border-primary/50 transition-all duration-300 flex flex-col justify-between group border border-stone-200/90 relative overflow-hidden">
-                  {/* Subtle, Proportionate Bicycle Wheel Background Graphic (45% smaller, light stroke, never obscures text) */}
+                  {/* Subtle, Proportionate Bicycle Wheel Background Graphic */}
                   <div className="absolute -bottom-6 -right-6 w-36 h-36 sm:w-40 sm:h-40 pointer-events-none text-primary/[0.08] group-hover:text-primary/[0.16] transition-all duration-700">
                     <svg className="w-full h-full transition-transform duration-1000 group-hover:rotate-45" viewBox="0 0 160 160" fill="none">
                       <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="1.5" />
@@ -505,9 +614,8 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-6 relative z-10">
-                    {/* Header: Proportionate Bicycle Wheel Hub + Loop Arrow + Stage Pill */}
+                    {/* Header: Wheel Hub + Loop Arrow + Stage Pill */}
                     <div className="flex items-center justify-between gap-2.5">
-                      {/* Refined Bicycle Wheel Hub (~45% smaller) */}
                       <div className="relative group/hub shrink-0 size-11 sm:size-12 flex items-center justify-center">
                         <svg className="absolute inset-0 size-full text-primary/70 transition-transform duration-700 group-hover:rotate-90" viewBox="0 0 48 48" fill="none">
                           <circle cx="24" cy="24" r="21" stroke="currentColor" strokeWidth="1.5" />
@@ -523,7 +631,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Clean Loop Arrow */}
                       <svg className="w-10 h-5 text-stone-400 group-hover:text-primary transition-colors hidden sm:block shrink-0" viewBox="0 0 50 20" fill="none">
                         <path
                           d="M 3 13 C 12 13, 16 5, 23 5 C 30 5, 32 15, 25 15 C 20 15, 22 7, 30 7 L 43 10"
@@ -537,21 +644,44 @@ export default function HomePage() {
 
                       {/* Stage Pill */}
                       <Badge variant="outline" className="text-[11px] font-bold border border-primary/30 text-primary bg-red-50 rounded-full px-3 py-1 shrink-0">
-                        Tahap 01 • Siswa Sekolah
+                        {communities?.explore
+                          ? locale === "en"
+                            ? communities.explore.stageEn || communities.explore.stageId
+                            : communities.explore.stageId
+                          : "Tahap 01 • Siswa Sekolah"}
                       </Badge>
                     </div>
 
                     <div className="space-y-2.5">
-                      <h3 className="text-2xl font-black text-foreground">Explore</h3>
+                      <h3 className="text-2xl font-black text-foreground">
+                        {communities?.explore
+                          ? locale === "en"
+                            ? communities.explore.titleEn || communities.explore.titleId
+                            : communities.explore.titleId
+                          : "Explore"}
+                      </h3>
                       <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
-                        Menemani remaja SMP & SMA mengenal Kristus secara personal, membangun ketahanan iman terhadap arus zaman, dan menjadi saksi di lingkungan sekolah.
+                        {communities?.explore
+                          ? locale === "en"
+                            ? communities.explore.descEn || communities.explore.descId
+                            : communities.explore.descId
+                          : "Menemani remaja SMP & SMA mengenal Kristus secara personal, membangun ketahanan iman terhadap arus zaman, dan menjadi saksi di lingkungan sekolah."}
                       </p>
                     </div>
                   </div>
 
                   <div className="pt-6 mt-6 border-t border-stone-200/80 relative z-10">
-                    <Link href="/pelayanan/explore" className="text-xs font-bold text-primary flex items-center gap-1.5 group-hover:underline">
-                      <span>Pelajari Program Explore</span>
+                    <Link
+                      href={communities?.explore?.linkUrl || "/pelayanan/explore"}
+                      className="text-xs font-bold text-primary flex items-center gap-1.5 group-hover:underline"
+                    >
+                      <span>
+                        {communities?.explore
+                          ? locale === "en"
+                            ? communities.explore.linkTextEn || communities.explore.linkTextId
+                            : communities.explore.linkTextId
+                          : "Pelajari Program Explore"}
+                      </span>
                       <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
@@ -559,7 +689,6 @@ export default function HomePage() {
 
                 {/* 2. Encounter (Mahasiswa Kampus) */}
                 <div className="rounded-[2.25rem] bg-gradient-to-b from-white via-white to-[#FDFBF7] p-8 shadow-warm-xs hover:shadow-warm-md hover:border-amber-400/60 transition-all duration-300 flex flex-col justify-between group border border-stone-200/90 relative overflow-hidden">
-                  {/* Subtle, Proportionate Bicycle Wheel Background Graphic (Gold Accent) */}
                   <div className="absolute -bottom-6 -right-6 w-36 h-36 sm:w-40 sm:h-40 pointer-events-none text-amber-600/[0.08] group-hover:text-amber-600/[0.16] transition-all duration-700">
                     <svg className="w-full h-full transition-transform duration-1000 group-hover:rotate-45" viewBox="0 0 160 160" fill="none">
                       <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="1.5" />
@@ -576,9 +705,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-6 relative z-10">
-                    {/* Header: Proportionate Bicycle Wheel Hub + Loop Arrow + Stage Pill */}
                     <div className="flex items-center justify-between gap-2.5">
-                      {/* Refined Bicycle Wheel Hub (~45% smaller) */}
                       <div className="relative group/hub shrink-0 size-11 sm:size-12 flex items-center justify-center">
                         <svg className="absolute inset-0 size-full text-amber-600/70 transition-transform duration-700 group-hover:rotate-90" viewBox="0 0 48 48" fill="none">
                           <circle cx="24" cy="24" r="21" stroke="currentColor" strokeWidth="1.5" />
@@ -594,7 +721,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Clean Loop Arrow */}
                       <svg className="w-10 h-5 text-stone-400 group-hover:text-amber-600 transition-colors hidden sm:block shrink-0" viewBox="0 0 50 20" fill="none">
                         <path
                           d="M 3 13 C 12 13, 16 5, 23 5 C 30 5, 32 15, 25 15 C 20 15, 22 7, 30 7 L 43 10"
@@ -608,21 +734,44 @@ export default function HomePage() {
 
                       {/* Stage Pill */}
                       <Badge variant="outline" className="text-[11px] font-bold border border-amber-400/40 text-amber-900 bg-amber-50 rounded-full px-3 py-1 shrink-0">
-                        Tahap 02 • Mahasiswa Kampus
+                        {communities?.encounter
+                          ? locale === "en"
+                            ? communities.encounter.stageEn || communities.encounter.stageId
+                            : communities.encounter.stageId
+                          : "Tahap 02 • Mahasiswa Kampus"}
                       </Badge>
                     </div>
 
                     <div className="space-y-2.5">
-                      <h3 className="text-2xl font-black text-foreground">Encounter</h3>
+                      <h3 className="text-2xl font-black text-foreground">
+                        {communities?.encounter
+                          ? locale === "en"
+                            ? communities.encounter.titleEn || communities.encounter.titleId
+                            : communities.encounter.titleId
+                          : "Encounter"}
+                      </h3>
                       <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
-                        Membangun komunitas persekutuan mahasiswa yang kritis, berakar pada teologi Alkitab, serta aktif menggarami iklim intelektual di Banten dan Ternate.
+                        {communities?.encounter
+                          ? locale === "en"
+                            ? communities.encounter.descEn || communities.encounter.descId
+                            : communities.encounter.descId
+                          : "Membangun komunitas persekutuan mahasiswa yang kritis, berakar pada teologi Alkitab, serta aktif menggarami iklim intelektual di Banten dan Ternate."}
                       </p>
                     </div>
                   </div>
 
                   <div className="pt-6 mt-6 border-t border-stone-200/80 relative z-10">
-                    <Link href="/pelayanan/encounter" className="text-xs font-bold text-amber-800 flex items-center gap-1.5 group-hover:underline">
-                      <span>Pelajari Program Encounter</span>
+                    <Link
+                      href={communities?.encounter?.linkUrl || "/pelayanan/encounter"}
+                      className="text-xs font-bold text-amber-800 flex items-center gap-1.5 group-hover:underline"
+                    >
+                      <span>
+                        {communities?.encounter
+                          ? locale === "en"
+                            ? communities.encounter.linkTextEn || communities.encounter.linkTextId
+                            : communities.encounter.linkTextId
+                          : "Pelajari Program Encounter"}
+                      </span>
                       <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
@@ -630,7 +779,6 @@ export default function HomePage() {
 
                 {/* 3. Connect (Alumni & Profesi) */}
                 <div className="rounded-[2.25rem] bg-gradient-to-b from-white via-white to-[#FAF6F2] p-8 shadow-warm-xs hover:shadow-warm-md hover:border-primary/50 transition-all duration-300 flex flex-col justify-between group border border-stone-200/90 relative overflow-hidden">
-                  {/* Subtle, Proportionate Bicycle Wheel Background Graphic (45% smaller, light stroke, never obscures text) */}
                   <div className="absolute -bottom-6 -right-6 w-36 h-36 sm:w-40 sm:h-40 pointer-events-none text-primary/[0.08] group-hover:text-primary/[0.16] transition-all duration-700">
                     <svg className="w-full h-full transition-transform duration-1000 group-hover:rotate-45" viewBox="0 0 160 160" fill="none">
                       <circle cx="80" cy="80" r="72" stroke="currentColor" strokeWidth="1.5" />
@@ -647,9 +795,7 @@ export default function HomePage() {
                   </div>
 
                   <div className="space-y-6 relative z-10">
-                    {/* Header: Proportionate Bicycle Wheel Hub + Loop Arrow + Stage Pill */}
                     <div className="flex items-center justify-between gap-2.5">
-                      {/* Refined Bicycle Wheel Hub (~45% smaller) */}
                       <div className="relative group/hub shrink-0 size-11 sm:size-12 flex items-center justify-center">
                         <svg className="absolute inset-0 size-full text-primary/70 transition-transform duration-700 group-hover:rotate-90" viewBox="0 0 48 48" fill="none">
                           <circle cx="24" cy="24" r="21" stroke="currentColor" strokeWidth="1.5" />
@@ -665,7 +811,6 @@ export default function HomePage() {
                         </div>
                       </div>
 
-                      {/* Clean Loop Arrow */}
                       <svg className="w-10 h-5 text-stone-400 group-hover:text-primary transition-colors hidden sm:block shrink-0" viewBox="0 0 50 20" fill="none">
                         <path
                           d="M 3 13 C 12 13, 16 5, 23 5 C 30 5, 32 15, 25 15 C 20 15, 22 7, 30 7 L 43 10"
@@ -679,21 +824,44 @@ export default function HomePage() {
 
                       {/* Stage Pill */}
                       <Badge variant="outline" className="text-[11px] font-bold border border-primary/30 text-primary bg-red-50 rounded-full px-3 py-1 shrink-0">
-                        Tahap 03 • Alumni & Profesi
+                        {communities?.connect
+                          ? locale === "en"
+                            ? communities.connect.stageEn || communities.connect.stageId
+                            : communities.connect.stageId
+                          : "Tahap 03 • Alumni & Profesi"}
                       </Badge>
                     </div>
 
                     <div className="space-y-2.5">
-                      <h3 className="text-2xl font-black text-foreground">Connect</h3>
+                      <h3 className="text-2xl font-black text-foreground">
+                        {communities?.connect
+                          ? locale === "en"
+                            ? communities.connect.titleEn || communities.connect.titleId
+                            : communities.connect.titleId
+                          : "Connect"}
+                      </h3>
                       <p className="text-xs sm:text-sm text-stone-700 leading-relaxed font-medium">
-                        Wadah bagi kaum profesional dan alumni untuk saling meneguhkan integritas iman, mentoring adik-adik, serta mengutus dampak Kerajaan Allah di marketplace.
+                        {communities?.connect
+                          ? locale === "en"
+                            ? communities.connect.descEn || communities.connect.descId
+                            : communities.connect.descId
+                          : "Wadah bagi kaum profesional dan alumni untuk saling meneguhkan integritas iman, mentoring adik-adik, serta mengutus dampak Kerajaan Allah di marketplace."}
                       </p>
                     </div>
                   </div>
 
                   <div className="pt-6 mt-6 border-t border-stone-200/80 relative z-10">
-                    <Link href="/pelayanan/connect" className="text-xs font-bold text-primary flex items-center gap-1.5 group-hover:underline">
-                      <span>Pelajari Program Connect</span>
+                    <Link
+                      href={communities?.connect?.linkUrl || "/pelayanan/connect"}
+                      className="text-xs font-bold text-primary flex items-center gap-1.5 group-hover:underline"
+                    >
+                      <span>
+                        {communities?.connect
+                          ? locale === "en"
+                            ? communities.connect.linkTextEn || communities.connect.linkTextId
+                            : communities.connect.linkTextId
+                          : "Pelajari Program Connect"}
+                      </span>
                       <ChevronRight className="size-3.5 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </div>
@@ -730,13 +898,25 @@ export default function HomePage() {
                 <div className="space-y-4">
                   <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-400/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-amber-200">
                     <Heart className="size-3 text-amber-300" />
-                    Kemitraan & Perjalanan Misi
+                    {ctaCard
+                      ? locale === "en"
+                        ? ctaCard.badgeEn || ctaCard.badgeId
+                        : ctaCard.badgeId
+                      : "Kemitraan & Perjalanan Misi"}
                   </div>
                   <h3 className="font-sans text-2xl sm:text-3xl font-black tracking-tight leading-snug">
-                    Setiap Murid yang Bertumbuh Dimulai dari Keberanian Melangkah.
+                    {ctaCard
+                      ? locale === "en"
+                        ? ctaCard.titleEn || ctaCard.titleId
+                        : ctaCard.titleId
+                      : "Setiap Murid yang Bertumbuh Dimulai dari Keberanian Melangkah."}
                   </h3>
                   <p className="text-xs sm:text-sm text-white/80 leading-relaxed font-normal">
-                    Baik sebagai siswa, mahasiswa, mentor alumni, maupun mitra donatur, setiap dukungan Anda menghidupkan api pelayanan di Tanah Jawara (Banten) dan Kota Rempah (Ternate).
+                    {ctaCard
+                      ? locale === "en"
+                        ? ctaCard.descEn || ctaCard.descId
+                        : ctaCard.descId
+                      : "Baik sebagai siswa, mahasiswa, mentor alumni, maupun mitra donatur, setiap dukungan Anda menghidupkan api pelayanan di Tanah Jawara (Banten) dan Kota Rempah (Ternate)."}
                   </p>
                 </div>
 
@@ -746,8 +926,14 @@ export default function HomePage() {
                     size="lg"
                     className="w-full rounded-full shadow-warm-md text-xs sm:text-sm font-bold bg-gradient-to-r from-primary to-red-600 hover:from-primary-600 hover:to-red-700 transition-all py-6"
                   >
-                    <Link href="/kemitraan">
-                      <span>Dukung Misi (Kemitraan Donasi)</span>
+                    <Link href={ctaCard?.primaryCtaUrl || "/kemitraan"}>
+                      <span>
+                        {ctaCard
+                          ? locale === "en"
+                            ? ctaCard.primaryCtaTextEn || ctaCard.primaryCtaTextId
+                            : ctaCard.primaryCtaTextId
+                          : "Dukung Misi (Kemitraan Donasi)"}
+                      </span>
                       <ArrowRight className="size-4 ml-1.5" />
                     </Link>
                   </Button>
@@ -757,8 +943,14 @@ export default function HomePage() {
                     variant="outlineWhite"
                     className="w-full rounded-full text-xs sm:text-sm font-semibold border-white/30 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all py-6"
                   >
-                    <Link href="/gabung">
-                      <span>Gabung Kelompok Pemuridan</span>
+                    <Link href={ctaCard?.secondaryCtaUrl || "/gabung"}>
+                      <span>
+                        {ctaCard
+                          ? locale === "en"
+                            ? ctaCard.secondaryCtaTextEn || ctaCard.secondaryCtaTextId
+                            : ctaCard.secondaryCtaTextId
+                          : "Gabung Kelompok Pemuridan"}
+                      </span>
                     </Link>
                   </Button>
                 </div>
@@ -1045,16 +1237,34 @@ export default function HomePage() {
               <div className="aspect-video w-full bg-black flex items-center justify-center">
                 <iframe
                   className="w-full h-full"
-                  src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1"
-                  title="Video Company Profile ESM Indonesia"
+                  src={getYouTubeEmbedUrl(whyEsm?.videoUrl)}
+                  title={
+                    whyEsm
+                      ? locale === "en"
+                        ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                        : whyEsm.videoTitleId
+                      : "Video Company Profile ESM Indonesia"
+                  }
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
               </div>
               <div className="p-4 sm:p-6 bg-stone-950 text-white flex items-center justify-between">
                 <div>
-                  <h4 className="font-bold text-base">Profil Gerakan Evangelical Student Movement (ESM)</h4>
-                  <p className="text-xs text-stone-400">Panggilan Misi dan Pemuridan bagi Generasi Muda di Banten & Ternate</p>
+                  <h4 className="font-bold text-base">
+                    {whyEsm
+                      ? locale === "en"
+                        ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                        : whyEsm.videoTitleId
+                      : "Profil Gerakan Evangelical Student Movement (ESM)"}
+                  </h4>
+                  <p className="text-xs text-stone-400">
+                    {whyEsm
+                      ? locale === "en"
+                        ? whyEsm.videoSubtitleEn || whyEsm.videoSubtitleId
+                        : whyEsm.videoSubtitleId
+                      : "Panggilan Misi dan Pemuridan bagi Generasi Muda di Banten & Ternate"}
+                  </p>
                 </div>
                 <Button
                   onClick={() => setVideoModalOpen(false)}
