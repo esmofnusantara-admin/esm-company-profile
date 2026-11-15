@@ -6,9 +6,33 @@ import net from "net";
  */
 let dbOfflineUntil = 0;
 
-function probePort(port = 5433, host = "127.0.0.1") {
+function getDatabaseHostAndPort(): { host: string; port: number } {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) {
+    try {
+      const url = new URL(dbUrl);
+      return {
+        host: url.hostname || "127.0.0.1",
+        port: url.port ? parseInt(url.port, 10) : 5432,
+      };
+    } catch {
+      const match = dbUrl.match(/@([^:/]+)(?::(\d+))?/);
+      if (match) {
+        return {
+          host: match[1] || "127.0.0.1",
+          port: match[2] ? parseInt(match[2], 10) : 5432,
+        };
+      }
+    }
+  }
+  const envPort = process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 5432;
+  return { host: "127.0.0.1", port: envPort };
+}
+
+function probePort() {
+  const { host, port } = getDatabaseHostAndPort();
   const socket = new net.Socket();
-  socket.setTimeout(120);
+  socket.setTimeout(1500);
 
   socket.on("connect", () => {
     socket.destroy();
@@ -17,37 +41,47 @@ function probePort(port = 5433, host = "127.0.0.1") {
 
   socket.on("timeout", () => {
     socket.destroy();
-    dbOfflineUntil = Date.now() + 20000;
+    if (process.env.NODE_ENV !== "production") {
+      dbOfflineUntil = Date.now() + 15000;
+    }
   });
 
   socket.on("error", () => {
     socket.destroy();
-    dbOfflineUntil = Date.now() + 20000;
+    if (process.env.NODE_ENV !== "production") {
+      dbOfflineUntil = Date.now() + 15000;
+    }
   });
 
   try {
     socket.connect(port, host);
   } catch {
-    dbOfflineUntil = Date.now() + 20000;
+    if (process.env.NODE_ENV !== "production") {
+      dbOfflineUntil = Date.now() + 15000;
+    }
   }
 }
 
-// Immediate probe on module initialization (resolves in ~4ms)
+// Immediate probe on module initialization
 probePort();
 
 export function isDbKnownOffline(): boolean {
+  if (process.env.NODE_ENV === "production") {
+    // Di production Docker, jangan matikan koneksi DB pre-emptif via probe port
+    return false;
+  }
   const now = Date.now();
   if (now > dbOfflineUntil && dbOfflineUntil !== 0) {
-    // 20 detik telah berlalu, lakukan probe ulang di background
     probePort();
   }
   return now < dbOfflineUntil;
 }
 
-export function markDbOffline(durationMs = 20000): void {
+export function markDbOffline(durationMs = 15000): void {
   dbOfflineUntil = Date.now() + durationMs;
 }
 
 export function markDbOnline(): void {
   dbOfflineUntil = 0;
 }
+

@@ -599,9 +599,33 @@ export default function AdminBerandaCMS() {
                   placeholder="https://www.youtube.com/watch?v=..."
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
                 />
-                <p className="text-[11px] text-muted-foreground mt-1">
-                  Bisa menggunakan format link YouTube standar (watch?v=...), youtu.be, atau embed.
-                </p>
+                <div className="flex flex-wrap items-center gap-2 mt-2">
+                  <p className="text-[11px] text-muted-foreground">
+                    Bisa menggunakan format link YouTube standar (watch?v=...), youtu.be, atau embed.
+                  </p>
+                  {whyEsm.videoUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const match = whyEsm.videoUrl.match(
+                          /(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                        );
+                        if (match && match[1]) {
+                          setWhyEsm({
+                            ...whyEsm,
+                            videoThumbnail: `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`,
+                          });
+                        } else {
+                          alert("Masukkan link YouTube yang valid terlebih dahulu.");
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-900 border border-amber-500/30 text-[11px] font-bold hover:bg-amber-500/25 transition-all cursor-pointer"
+                    >
+                      <Sparkles className="size-3 text-amber-600" />
+                      <span>Ambil Thumbnail Otomatis dari YouTube</span>
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -618,12 +642,12 @@ export default function AdminBerandaCMS() {
 
             {/* Thumbnail Upload */}
             <MediaUploader
-              label="Thumbnail Sampul Video"
+              label="Foto Sampul / Thumbnail Pemutar Video"
               value={whyEsm.videoThumbnail}
               onChange={(url) => setWhyEsm({ ...whyEsm, videoThumbnail: url })}
               folder="hero"
               accept="image"
-              helperText="Format disarankan: Foto 16:9 lanskap (1920x1080px). Digunakan sebagai latar pemutar video."
+              helperText="Format disarankan: Foto 16:9 lanskap (1920x1080px). Anda bisa klik 'Ganti Foto / Upload Baru' untuk memilih foto dari laptop, atau klik 'Ambil Thumbnail Otomatis dari YouTube' di atas."
             />
 
             {/* Badge & Title Video */}

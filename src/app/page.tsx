@@ -44,6 +44,7 @@ export default function HomePage() {
 
   // Video Company Profile Modal State
   const [videoModalOpen, setVideoModalOpen] = React.useState(false);
+  const [thumbnailError, setThumbnailError] = React.useState(false);
 
   React.useEffect(() => {
     fetch("/api/articles?limit=2&status=PUBLISHED")
@@ -55,11 +56,12 @@ export default function HomePage() {
       })
       .catch(() => {});
 
-    fetch("/api/content?section=home")
+    fetch(`/api/content?section=home&_t=${Date.now()}`, { cache: "no-store" })
       .then((r) => r.json())
       .then((res) => {
         if (res.success && res.data) {
           setHomeContent(res.data);
+          setThumbnailError(false);
         }
       })
       .catch(() => {});
@@ -70,6 +72,17 @@ export default function HomePage() {
   const whyEsm = homeContent?.whyEsm;
   const communities = homeContent?.communities;
   const ctaCard = homeContent?.ctaCard;
+
+  const getYouTubeThumbnail = (url?: string) => {
+    if (!url) return null;
+    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    return match && match[1] ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : null;
+  };
+
+  const videoThumbnailSrc =
+    whyEsm?.videoThumbnail && whyEsm.videoThumbnail.trim() !== ""
+      ? whyEsm.videoThumbnail
+      : getYouTubeThumbnail(whyEsm?.videoUrl) || "/uploads/hero/kemitraan_hero.jpg";
 
   const getYouTubeEmbedUrl = (url?: string) => {
     if (!url) return "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1";
@@ -422,19 +435,26 @@ export default function HomePage() {
               {/* Right Column: Video Company Profile Player */}
               <div className="lg:col-span-7 space-y-4">
                 <div className="relative rounded-3xl overflow-hidden border border-stone-200/90 shadow-warm-md bg-stone-900 group">
-                  <div className="relative aspect-video w-full">
-                    <Image
-                      src={whyEsm?.videoThumbnail || "/uploads/hero/kemitraan_hero.jpg"}
-                      alt={
-                        whyEsm
-                          ? locale === "en"
-                            ? whyEsm.videoTitleEn || whyEsm.videoTitleId
-                            : whyEsm.videoTitleId
-                          : "Video Profil Gerakan ESM"
-                      }
-                      fill
-                      className="object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
-                    />
+                  <div className="relative aspect-video w-full bg-stone-900">
+                    {/* Background fallback gradient in case image is missing or loading */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-primary/30 to-amber-950/40" />
+
+                    {videoThumbnailSrc && !thumbnailError && (
+                      <Image
+                        src={videoThumbnailSrc}
+                        alt={
+                          whyEsm
+                            ? locale === "en"
+                              ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                              : whyEsm.videoTitleId
+                            : "Video Profil Gerakan ESM"
+                        }
+                        fill
+                        sizes="(max-width: 768px) 100vw, 55vw"
+                        onError={() => setThumbnailError(true)}
+                        className="object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
+                      />
+                    )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
 
                     {/* Play Button Overlay */}

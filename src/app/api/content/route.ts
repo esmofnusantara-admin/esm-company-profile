@@ -3,6 +3,9 @@ import { prisma } from "@/lib/db";
 import { defaultLegalOrg } from "@/lib/legalOrgConfig";
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // In-memory defaults for all site configurations
 const DEFAULT_CONFIGS: Record<string, any> = {
   site_theme: {
@@ -321,45 +324,46 @@ export async function GET(request: NextRequest) {
       let testimonies: any[] = [];
       let faqs: any[] = [];
 
-      if (!isDbKnownOffline()) {
-        try {
-          const [cfg, tst, fq] = await Promise.all([
-            prisma.siteConfig
-              .findMany({
-                where: {
-                  key: {
-                    in: [
-                      "home_hero",
-                      "home_stats",
-                      "home_why_esm",
-                      "home_communities",
-                      "home_cta",
-                      "site_settings",
-                    ],
-                  },
+      try {
+        const [cfg, tst, fq] = await Promise.all([
+          prisma.siteConfig
+            .findMany({
+              where: {
+                key: {
+                  in: [
+                    "home_hero",
+                    "home_stats",
+                    "home_why_esm",
+                    "home_communities",
+                    "home_cta",
+                    "site_settings",
+                  ],
                 },
-              })
-              .catch(() => []),
-            prisma.testimony
-              .findMany({
-                where: { isActive: true },
-                orderBy: { sortOrder: "asc" },
-              })
-              .catch(() => []),
-            prisma.fAQ
-              .findMany({
-                where: { page: "GENERAL", isActive: true },
-                orderBy: { sortOrder: "asc" },
-              })
-              .catch(() => []),
-          ]);
-          configs = cfg;
-          testimonies = tst;
-          faqs = fq;
-          markDbOnline();
-        } catch (err) {
-          markDbOffline();
-        }
+              },
+            })
+            .catch((err) => {
+              console.warn("[api/content] siteConfig query error:", err);
+              return [];
+            }),
+          prisma.testimony
+            .findMany({
+              where: { isActive: true },
+              orderBy: { sortOrder: "asc" },
+            })
+            .catch(() => []),
+          prisma.fAQ
+            .findMany({
+              where: { page: "GENERAL", isActive: true },
+              orderBy: { sortOrder: "asc" },
+            })
+            .catch(() => []),
+        ]);
+        configs = cfg;
+        testimonies = tst;
+        faqs = fq;
+        if (cfg.length > 0) markDbOnline();
+      } catch (err) {
+        console.warn("[api/content] section=home database error:", err);
       }
 
       const configMap: Record<string, any> = { ...DEFAULT_CONFIGS };
@@ -371,29 +375,41 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Fallback ke in-memory cache HANYA jika key tidak ditemukan di database
       if (memCache) {
         for (const [k, v] of memCache.entries()) {
-          try {
-            configMap[k] = JSON.parse(v);
-          } catch {
-            configMap[k] = v;
+          if (!configs.find((c) => c.key === k)) {
+            try {
+              configMap[k] = JSON.parse(v);
+            } catch {
+              configMap[k] = v;
+            }
           }
         }
       }
 
-      return NextResponse.json({
-        success: true,
-        data: {
-          hero: configMap["home_hero"] || DEFAULT_CONFIGS["home_hero"],
-          stats: configMap["home_stats"] || DEFAULT_CONFIGS["home_stats"],
-          whyEsm: configMap["home_why_esm"] || DEFAULT_CONFIGS["home_why_esm"],
-          communities: configMap["home_communities"] || DEFAULT_CONFIGS["home_communities"],
-          ctaCard: configMap["home_cta"] || DEFAULT_CONFIGS["home_cta"],
-          settings: configMap["site_settings"] || DEFAULT_CONFIGS["site_settings"],
-          testimonies: testimonies.length > 0 ? testimonies : fallbackTestimonies,
-          faqs,
+      return NextResponse.json(
+        {
+          success: true,
+          data: {
+            hero: configMap["home_hero"] || DEFAULT_CONFIGS["home_hero"],
+            stats: configMap["home_stats"] || DEFAULT_CONFIGS["home_stats"],
+            whyEsm: configMap["home_why_esm"] || DEFAULT_CONFIGS["home_why_esm"],
+            communities: configMap["home_communities"] || DEFAULT_CONFIGS["home_communities"],
+            ctaCard: configMap["home_cta"] || DEFAULT_CONFIGS["home_cta"],
+            settings: configMap["site_settings"] || DEFAULT_CONFIGS["site_settings"],
+            testimonies: testimonies.length > 0 ? testimonies : fallbackTestimonies,
+            faqs,
+          },
         },
-      });
+        {
+          headers: {
+            "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        }
+      );
     }
 
     // 3. Section 'about'

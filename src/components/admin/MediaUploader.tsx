@@ -1,7 +1,17 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { UploadCloud, Link as LinkIcon, X, Loader2, Image as ImageIcon, Video as VideoIcon, FileText } from "lucide-react";
+import {
+  UploadCloud,
+  Link as LinkIcon,
+  X,
+  Loader2,
+  Image as ImageIcon,
+  Video as VideoIcon,
+  FileText,
+  RefreshCw,
+  ExternalLink,
+} from "lucide-react";
 import Image from "next/image";
 
 interface MediaUploaderProps {
@@ -24,6 +34,7 @@ export function MediaUploader({
   const [isUploading, setIsUploading] = useState(false);
   const [inputUrl, setInputUrl] = useState("");
   const [mode, setMode] = useState<"upload" | "url">("upload");
+  const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,6 +55,7 @@ export function MediaUploader({
       const data = await res.json();
       if (res.ok && data.url) {
         onChange(data.url);
+        setImageError(false);
       } else {
         alert(data.error || "Gagal mengunggah file.");
       }
@@ -59,6 +71,7 @@ export function MediaUploader({
   const handleSetUrl = () => {
     if (!inputUrl.trim()) return;
     onChange(inputUrl.trim());
+    setImageError(false);
     setInputUrl("");
   };
 
@@ -72,6 +85,23 @@ export function MediaUploader({
 
   return (
     <div className="space-y-2">
+      {/* Hidden File Input (Used for both initial upload and replacement) */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept={
+          accept === "image"
+            ? "image/*"
+            : accept === "video"
+            ? "video/*"
+            : accept === "pdf"
+            ? "application/pdf"
+            : "image/*,video/*,application/pdf"
+        }
+        onChange={handleFileUpload}
+        className="hidden"
+      />
+
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold text-foreground uppercase tracking-wider">
           {label}
@@ -81,16 +111,20 @@ export function MediaUploader({
             type="button"
             onClick={() => setMode("upload")}
             className={`px-2 py-0.5 rounded-md font-semibold transition-colors ${
-              mode === "upload" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              mode === "upload"
+                ? "bg-card text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
-            Upload
+            Upload File
           </button>
           <button
             type="button"
             onClick={() => setMode("url")}
             className={`px-2 py-0.5 rounded-md font-semibold transition-colors ${
-              mode === "url" ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground"
+              mode === "url"
+                ? "bg-card text-foreground shadow-xs"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             Link / URL
@@ -98,14 +132,38 @@ export function MediaUploader({
         </div>
       </div>
 
-      {/* Preview Area */}
+      {/* Mode URL Active: Show URL Input Directly */}
+      {mode === "url" && (
+        <div className="flex items-center gap-2 p-3 bg-card rounded-xl border border-border">
+          <div className="relative flex-1">
+            <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+            <input
+              type="url"
+              placeholder={value ? `Ganti URL saat ini: ${value}` : "https://... (URL gambar, YouTube, atau MP4)"}
+              value={inputUrl}
+              onChange={(e) => setInputUrl(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleSetUrl}
+            className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs"
+          >
+            Terapkan URL
+          </button>
+        </div>
+      )}
+
+      {/* When Media is Present */}
       {value ? (
-        <div className="relative rounded-xl border border-border bg-card p-3 overflow-hidden group">
+        <div className="relative rounded-xl border border-border bg-card p-3 overflow-hidden shadow-xs">
           <div className="flex items-center gap-4">
+            {/* Visual Thumbnail */}
             {isVideo ? (
-              <div className="size-20 rounded-lg bg-black/90 flex items-center justify-center shrink-0 overflow-hidden relative">
+              <div className="size-20 rounded-lg bg-black/90 flex items-center justify-center shrink-0 overflow-hidden relative border border-border">
                 {value.includes("youtube") || value.includes("youtu.be") ? (
-                  <span className="text-[10px] text-red-400 font-bold">YouTube Video</span>
+                  <span className="text-[10px] text-red-400 font-bold px-1 text-center">YouTube</span>
                 ) : (
                   <video src={value} className="w-full h-full object-cover" />
                 )}
@@ -117,109 +175,116 @@ export function MediaUploader({
                 <span className="text-[9px] font-bold mt-1">PDF DOC</span>
               </div>
             ) : (
-              <div className="size-20 rounded-lg bg-muted relative overflow-hidden shrink-0 border border-border">
-                <Image
-                  src={value}
-                  alt="Preview"
-                  fill
-                  sizes="80px"
-                  className="object-cover"
-                />
+              <div className="size-20 rounded-lg bg-muted relative overflow-hidden shrink-0 border border-border flex items-center justify-center">
+                {!imageError ? (
+                  <Image
+                    src={value}
+                    alt="Preview"
+                    fill
+                    sizes="80px"
+                    className="object-cover"
+                    onError={() => setImageError(true)}
+                  />
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-muted-foreground p-1 text-center">
+                    <ImageIcon className="size-6 mb-1 text-amber-600" />
+                    <span className="text-[8px] font-semibold text-amber-700">File Belum Ada</span>
+                  </div>
+                )}
               </div>
             )}
 
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-foreground truncate">{value}</p>
-              <p className="text-[11px] text-muted-foreground mt-0.5">
-                {isVideo ? "Video siap ditayangkan" : isPdf ? "Dokumen PDF terpasang" : "Gambar terpasang"}
-              </p>
-              <div className="flex items-center gap-2 mt-2">
+            {/* Information & Action Buttons */}
+            <div className="flex-1 min-w-0 space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                  {isVideo ? "Video Aktif" : isPdf ? "Dokumen PDF" : "Foto Terpasang"}
+                </span>
+                <span className="text-[11px] text-muted-foreground truncate">{value}</span>
+              </div>
+
+              {imageError && (
+                <p className="text-[11px] text-amber-700 font-medium">
+                  ⚠️ Gambar saat ini tidak ditemukan di server. Silakan klik tombol <b>Ganti Foto</b> di bawah untuk mengunggah foto baru.
+                </p>
+              )}
+
+              {/* Action Buttons Row */}
+              <div className="flex flex-wrap items-center gap-2 pt-1">
                 <button
                   type="button"
-                  onClick={() => onChange("")}
-                  className="inline-flex items-center gap-1 text-[11px] text-destructive hover:underline font-semibold"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-all shadow-xs cursor-pointer disabled:opacity-50"
                 >
-                  <X className="size-3" /> Hapus Media
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="size-3.5 animate-spin" />
+                      <span>Mengunggah...</span>
+                    </>
+                  ) : (
+                    <>
+                      <UploadCloud className="size-3.5" />
+                      <span>Ganti Foto / Upload Baru</span>
+                    </>
+                  )}
                 </button>
+
                 <a
                   href={value}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[11px] text-primary hover:underline font-semibold"
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border text-xs font-semibold text-foreground hover:bg-muted/40 transition-colors"
                 >
-                  Lihat File ↗
+                  <span>Buka File</span>
+                  <ExternalLink className="size-3 text-muted-foreground" />
                 </a>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange("");
+                    setImageError(false);
+                  }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-destructive/20 text-xs font-semibold text-destructive hover:bg-destructive/10 transition-colors"
+                >
+                  <X className="size-3" />
+                  <span>Hapus</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
-      ) : (
-        /* Empty State */
-        <div>
-          {mode === "upload" ? (
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="border-2 border-dashed border-border hover:border-primary/50 bg-card hover:bg-muted/30 rounded-xl p-5 text-center cursor-pointer transition-colors"
-            >
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept={
-                  accept === "image"
-                    ? "image/*"
-                    : accept === "video"
-                    ? "video/*"
-                    : accept === "pdf"
-                    ? "application/pdf"
-                    : "image/*,video/*,application/pdf"
-                }
-                onChange={handleFileUpload}
-                className="hidden"
-              />
-              <div className="flex flex-col items-center justify-center gap-1.5">
-                {isUploading ? (
-                  <>
-                    <Loader2 className="size-7 animate-spin text-primary" />
-                    <span className="text-xs font-bold text-foreground">Mengunggah media...</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="size-9 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-                      <UploadCloud className="size-5" />
-                    </div>
-                    <span className="text-xs font-bold text-foreground">
-                      Klik untuk upload file {accept === "video" ? "video" : accept === "pdf" ? "PDF" : "gambar/video"}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground">
-                      Maksimal ukuran 50MB (JPG, PNG, WEBP, MP4, PDF)
-                    </span>
-                  </>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <div className="relative flex-1">
-                <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  type="url"
-                  placeholder="https://... (URL gambar, video direct mp4, atau YouTube)"
-                  value={inputUrl}
-                  onChange={(e) => setInputUrl(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-              </div>
-              <button
-                type="button"
-                onClick={handleSetUrl}
-                className="px-3 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs"
-              >
-                Gunakan
-              </button>
-            </div>
-          )}
+      ) : mode === "upload" ? (
+        /* Empty State (Upload Mode) */
+        <div
+          onClick={() => fileInputRef.current?.click()}
+          className="border-2 border-dashed border-border hover:border-primary/50 bg-card hover:bg-muted/30 rounded-xl p-6 text-center cursor-pointer transition-all group"
+        >
+          <div className="flex flex-col items-center justify-center gap-2">
+            {isUploading ? (
+              <>
+                <Loader2 className="size-8 animate-spin text-primary" />
+                <span className="text-xs font-bold text-foreground">Mengunggah media ke server...</span>
+              </>
+            ) : (
+              <>
+                <div className="size-10 rounded-full bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <UploadCloud className="size-5" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-foreground block">
+                    Klik untuk memilih foto / file dari laptop
+                  </span>
+                  <span className="text-[11px] text-muted-foreground block mt-0.5">
+                    Format: JPG, PNG, WEBP, MP4 (Maksimal 50MB)
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
-      )}
+      ) : null}
 
       {helperText && (
         <p className="text-[11px] text-muted-foreground">{helperText}</p>

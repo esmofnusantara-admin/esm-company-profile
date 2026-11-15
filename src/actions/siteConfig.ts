@@ -106,33 +106,35 @@ export async function saveSiteConfig(key: string, data: any) {
   const value = JSON.stringify(data);
   memoryConfigCache.set(key, value);
 
-  if (!isDbKnownOffline()) {
-    try {
-      await prisma.siteConfig.upsert({
-        where: { key },
-        update: { value },
-        create: { key, value },
-      });
-      markDbOnline();
-    } catch (error) {
-      markDbOffline();
-      console.warn(`[WARN] PostgreSQL offline, konfigurasi disimpan di in-memory cache [${key}].`);
-    }
+  let dbSaved = false;
+  try {
+    await prisma.siteConfig.upsert({
+      where: { key },
+      update: { value },
+      create: { key, value },
+    });
+    dbSaved = true;
+    markDbOnline();
+  } catch (error) {
+    markDbOffline();
+    console.warn(`[WARN] PostgreSQL save error for [${key}], kept in memory cache:`, error);
   }
 
   // Revalidate paths affected
-  revalidatePath("/");
-  revalidatePath("/tentang-kami");
-  revalidatePath("/pelayanan");
-  revalidatePath("/pelayanan/3c");
-  revalidatePath("/pelayanan/explore");
-  revalidatePath("/pelayanan/encounter");
-  revalidatePath("/pelayanan/connect");
-  revalidatePath("/kemitraan");
-  revalidatePath("/admin/konten/beranda");
-  revalidatePath("/admin/konten/tentang-kami");
-  revalidatePath("/admin/konten/pelayanan");
-  revalidatePath("/admin/pengaturan");
+  try {
+    revalidatePath("/");
+    revalidatePath("/tentang-kami");
+    revalidatePath("/pelayanan");
+    revalidatePath("/pelayanan/3c");
+    revalidatePath("/pelayanan/explore");
+    revalidatePath("/pelayanan/encounter");
+    revalidatePath("/pelayanan/connect");
+    revalidatePath("/kemitraan");
+    revalidatePath("/admin/konten/beranda");
+    revalidatePath("/admin/konten/tentang-kami");
+    revalidatePath("/admin/konten/pelayanan");
+    revalidatePath("/admin/pengaturan");
+  } catch {}
 
-  return { success: true };
+  return { success: true, dbSaved };
 }
