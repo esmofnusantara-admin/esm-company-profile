@@ -11,8 +11,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-esm_password}
       POSTGRES_DB: ${POSTGRES_DB:-esm_db}
     ports:
-      # Port 5433 pada host dipetakan ke 5432 container untuk mencegah konflik port lokal
-      - "${POSTGRES_PORT:-5433}:5432"
+      # Hanya diexpose ke localhost VPS (mencegah serangan brute-force dari internet publik)
+      - "127.0.0.1:${POSTGRES_PORT:-5433}:5432"
     volumes:
       # Data persisten database tidak akan hilang saat container dimatikan/di-rebuild
       - esm_pgdata:/var/lib/postgresql/data
@@ -39,7 +39,8 @@ services:
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-esm-production-secret-key-32-chars-long}
       PORT: 3000
     ports:
-      - "${APP_PORT:-3000}:3000"
+      # Hanya diexpose ke localhost VPS (akses publik wajib melalui Nginx port 80/443)
+      - "127.0.0.1:${APP_PORT:-3000}:3000"
     volumes:
       # Upload foto/berkas media persisten aman dari restart container
       - esm_uploads:/app/public/uploads
