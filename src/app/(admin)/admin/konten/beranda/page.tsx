@@ -19,7 +19,14 @@ import {
   ExternalLink,
   ChevronRight,
   Info,
+  HelpCircle,
+  Plus,
+  Trash2,
+  Edit2,
+  Check,
 } from "lucide-react";
+import { getFAQs, createFAQ, updateFAQ, deleteFAQ, FAQInput } from "@/actions/faq";
+import { FAQPage } from "@prisma/client";
 
 // ==========================================
 // INTERFACES UNTUK HOMEPAGE CMS
@@ -237,7 +244,7 @@ const defaultCtaCard: CtaCardData = {
 };
 
 export default function AdminBerandaCMS() {
-  const [activeTab, setActiveTab] = useState<"hero" | "stats" | "whyEsm" | "communities" | "cta">("whyEsm");
+  const [activeTab, setActiveTab] = useState<"hero" | "stats" | "whyEsm" | "communities" | "cta" | "faq">("whyEsm");
 
   const [hero, setHero] = useState<HeroData>(defaultHero);
   const [stats, setStats] = useState<StatItem[]>(defaultStats);
@@ -245,26 +252,52 @@ export default function AdminBerandaCMS() {
   const [communities, setCommunities] = useState<CommunitiesData>(defaultCommunities);
   const [ctaCard, setCtaCard] = useState<CtaCardData>(defaultCtaCard);
 
+  // FAQ state for Beranda
+  const [faqs, setFaqs] = useState<any[]>([]);
+  const [isFaqModalOpen, setIsFaqModalOpen] = useState(false);
+  const [editingFaq, setEditingFaq] = useState<any | null>(null);
+  const [isFaqSaving, setIsFaqSaving] = useState(false);
+  const [faqForm, setFaqForm] = useState<FAQInput>({
+    question: "",
+    questionEn: "",
+    answer: "",
+    answerEn: "",
+    sortOrder: 1,
+    isActive: true,
+    page: FAQPage.GENERAL,
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+
+  const loadFaqs = async () => {
+    try {
+      const items = await getFAQs(FAQPage.GENERAL);
+      setFaqs(items || []);
+    } catch (e) {
+      console.error("Gagal memuat FAQ beranda:", e);
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [savedHero, savedStats, savedWhyEsm, savedCommunities, savedCta] = await Promise.all([
+        const [savedHero, savedStats, savedWhyEsm, savedCommunities, savedCta, loadedFaqs] = await Promise.all([
           getSiteConfig<HeroData>("home_hero", defaultHero),
           getSiteConfig<StatItem[]>("home_stats", defaultStats),
           getSiteConfig<WhyEsmData>("home_why_esm", defaultWhyEsm),
           getSiteConfig<CommunitiesData>("home_communities", defaultCommunities),
           getSiteConfig<CtaCardData>("home_cta", defaultCtaCard),
+          getFAQs(FAQPage.GENERAL),
         ]);
         if (savedHero) setHero(savedHero);
         if (savedStats) setStats(savedStats);
         if (savedWhyEsm) setWhyEsm(savedWhyEsm);
         if (savedCommunities) setCommunities(savedCommunities);
         if (savedCta) setCtaCard(savedCta);
+        if (loadedFaqs) setFaqs(loadedFaqs);
       } catch (err) {
         console.error("Gagal memuat konfigurasi beranda:", err);
       } finally {
@@ -273,6 +306,48 @@ export default function AdminBerandaCMS() {
     }
     loadData();
   }, []);
+
+  const handleFaqSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!faqForm.question || !faqForm.answer) {
+      alert("Pertanyaan dan jawaban FAQ wajib diisi.");
+      return;
+    }
+    setIsFaqSaving(true);
+    try {
+      if (editingFaq) {
+        await updateFAQ(editingFaq.id, faqForm);
+      } else {
+        await createFAQ({ ...faqForm, page: FAQPage.GENERAL });
+      }
+      setIsFaqModalOpen(false);
+      setEditingFaq(null);
+      setFaqForm({
+        question: "",
+        questionEn: "",
+        answer: "",
+        answerEn: "",
+        sortOrder: faqs.length + 1,
+        isActive: true,
+        page: FAQPage.GENERAL,
+      });
+      await loadFaqs();
+    } catch {
+      alert("Gagal menyimpan pertanyaan FAQ.");
+    } finally {
+      setIsFaqSaving(false);
+    }
+  };
+
+  const handleFaqDelete = async (id: string) => {
+    if (!confirm("Hapus pertanyaan FAQ ini dari Beranda?")) return;
+    try {
+      await deleteFAQ(id);
+      await loadFaqs();
+    } catch {
+      alert("Gagal menghapus FAQ.");
+    }
+  };
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -431,6 +506,22 @@ export default function AdminBerandaCMS() {
         >
           <Heart className="size-3.5" />
           <span>5. Ajakan Kemitraan</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("faq")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+            activeTab === "faq"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <HelpCircle className="size-3.5" />
+          <span>6. Tanya Jawab (FAQ)</span>
+          <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-bold">
+            {faqs.length}
+          </span>
         </button>
       </div>
 
@@ -1392,6 +1483,261 @@ export default function AdminBerandaCMS() {
                 className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
               />
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          TAB 6: TANYA JAWAB (FAQ BERANDA)
+          ======================================================== */}
+      {activeTab === "faq" && (
+        <div className="space-y-6">
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <Info className="size-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Pertanyaan yang Sering Diajukan di Beranda (Section 5):</p>
+                <p className="text-stone-600 mt-0.5">
+                  Daftar FAQ ini muncul pada kolom kanan Section 5 di Beranda publik (berdampingan dengan kartu Ajakan Kemitraan). Semua perubahan di sini otomatis tersinkronisasi dengan database PostgreSQL dan langsung live di halaman depan.
+                </p>
+              </div>
+            </div>
+            <a
+              href="/admin/konten/faq"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-400 bg-amber-50 text-amber-900 font-bold text-xs shrink-0 hover:bg-amber-100 transition-colors"
+            >
+              <span>Kelola Semua Kategori FAQ</span>
+              <ExternalLink className="size-3" />
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Daftar Pertanyaan FAQ Beranda ({faqs.length})</h3>
+              <p className="text-xs text-muted-foreground">Urutan pertanyaan akan ditampilkan sesuai nomor urut di website publik.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingFaq(null);
+                setFaqForm({
+                  question: "",
+                  questionEn: "",
+                  answer: "",
+                  answerEn: "",
+                  sortOrder: faqs.length + 1,
+                  isActive: true,
+                  page: FAQPage.GENERAL,
+                });
+                setIsFaqModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-xs hover:bg-primary/90 transition-all cursor-pointer"
+            >
+              <Plus className="size-4" />
+              <span>Tambah FAQ Beranda</span>
+            </button>
+          </div>
+
+          {faqs.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-border rounded-2xl bg-card">
+              <HelpCircle className="size-8 mx-auto text-muted-foreground/50 mb-2" />
+              <p className="text-xs text-muted-foreground font-medium">Belum ada pertanyaan FAQ untuk Beranda.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Klik tombol &ldquo;Tambah FAQ Beranda&rdquo; untuk menambahkan pertanyaan baru.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {faqs.map((faq, idx) => (
+                <div
+                  key={faq.id || idx}
+                  className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 hover:border-primary/30 transition-colors"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                          Urutan #{faq.sortOrder ?? idx + 1}
+                        </span>
+                        {faq.isActive === false && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">
+                            Nonaktif
+                          </span>
+                        )}
+                      </div>
+                      <h4 className="text-sm font-bold text-foreground">{faq.question}</h4>
+                      {faq.questionEn && (
+                        <p className="text-xs text-primary font-medium italic">{faq.questionEn}</p>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingFaq(faq);
+                          setFaqForm({
+                            question: faq.question || "",
+                            questionEn: faq.questionEn || "",
+                            answer: faq.answer || "",
+                            answerEn: faq.answerEn || "",
+                            sortOrder: faq.sortOrder ?? idx + 1,
+                            isActive: faq.isActive ?? true,
+                            page: faq.page || FAQPage.GENERAL,
+                          });
+                          setIsFaqModalOpen(true);
+                        }}
+                        className="p-2 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                        title="Sunting FAQ"
+                      >
+                        <Edit2 className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleFaqDelete(faq.id)}
+                        className="p-2 rounded-lg border border-border text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                        title="Hapus FAQ"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="text-xs text-muted-foreground pt-2 border-t border-border/50 space-y-1.5 leading-relaxed">
+                    <p>{faq.answer}</p>
+                    {faq.answerEn && (
+                      <p className="italic text-foreground/80 pl-3 border-l-2 border-primary/30">
+                        {faq.answerEn}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL TAMBAH / SUNTING FAQ BERANDA
+          ======================================================== */}
+      {isFaqModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-card rounded-2xl border border-border w-full max-w-lg p-6 space-y-4 shadow-warm-lg my-8 animate-in fade-in-50">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="size-4 text-primary" />
+                <h3 className="font-bold text-sm text-foreground">
+                  {editingFaq ? "Sunting Pertanyaan FAQ Beranda" : "Tambah Pertanyaan FAQ Beranda"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsFaqModalOpen(false)}
+                className="text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Batal
+              </button>
+            </div>
+
+            <form onSubmit={handleFaqSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Nomor Urut Tampil</label>
+                  <input
+                    type="number"
+                    value={faqForm.sortOrder}
+                    onChange={(e) => setFaqForm({ ...faqForm, sortOrder: parseInt(e.target.value, 10) || 1 })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Status Publikasi</label>
+                  <select
+                    value={faqForm.isActive ? "true" : "false"}
+                    onChange={(e) => setFaqForm({ ...faqForm, isActive: e.target.value === "true" })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  >
+                    <option value="true">Aktif (Tampil di Web)</option>
+                    <option value="false">Nonaktif (Draf)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Pertanyaan (ID)</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Contoh: Apakah ESM adalah gereja lokal atau yayasan misi?"
+                  value={faqForm.question}
+                  onChange={(e) => setFaqForm({ ...faqForm, question: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Question (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={faqForm.question}
+                    onTranslated={(txt) => setFaqForm({ ...faqForm, questionEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Is ESM a church denomination or an independent mission?"
+                  value={faqForm.questionEn || ""}
+                  onChange={(e) => setFaqForm({ ...faqForm, questionEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Jawaban (ID)</label>
+                <textarea
+                  rows={4}
+                  required
+                  placeholder="Tuliskan jawaban yang ramah, jelas, dan informatif..."
+                  value={faqForm.answer}
+                  onChange={(e) => setFaqForm({ ...faqForm, answer: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Answer (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={faqForm.answer}
+                    onTranslated={(txt) => setFaqForm({ ...faqForm, answerEn: txt })}
+                  />
+                </div>
+                <textarea
+                  rows={4}
+                  placeholder="Write an informative English answer..."
+                  value={faqForm.answerEn || ""}
+                  onChange={(e) => setFaqForm({ ...faqForm, answerEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsFaqModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isFaqSaving}
+                  className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+                >
+                  {isFaqSaving && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>Simpan FAQ</span>
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

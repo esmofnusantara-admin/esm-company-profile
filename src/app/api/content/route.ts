@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { defaultLegalOrg } from "@/lib/legalOrgConfig";
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
+import { initialFAQs } from "@/lib/faqData";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -353,17 +354,34 @@ export async function GET(request: NextRequest) {
             .catch(() => []),
           prisma.fAQ
             .findMany({
-              where: { page: "GENERAL", isActive: true },
-              orderBy: { sortOrder: "asc" },
+              where: {
+                OR: [{ page: "GENERAL" }, { page: null as any }],
+                isActive: true,
+              },
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
             })
             .catch(() => []),
         ]);
         configs = cfg;
         testimonies = tst;
-        faqs = fq;
-        if (cfg.length > 0) markDbOnline();
+        if (fq && fq.length > 0) {
+          faqs = fq;
+        } else {
+          // If no GENERAL faqs found, check if any active FAQs exist in DB
+          try {
+            const anyFaqs = await prisma.fAQ.findMany({
+              where: { isActive: true },
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
+            });
+            faqs = anyFaqs.length > 0 ? anyFaqs : initialFAQs.filter((f) => f.page === "GENERAL");
+          } catch {
+            faqs = initialFAQs.filter((f) => f.page === "GENERAL");
+          }
+        }
+        if (cfg.length > 0 || fq.length > 0) markDbOnline();
       } catch (err) {
         console.warn("[api/content] section=home database error:", err);
+        faqs = initialFAQs.filter((f) => f.page === "GENERAL");
       }
 
       const configMap: Record<string, any> = { ...DEFAULT_CONFIGS };

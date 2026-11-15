@@ -178,8 +178,8 @@ export default function HomePage() {
 
   const activeFaqs: { q: string; a: string }[] = (homeContent?.faqs && Array.isArray(homeContent.faqs) && homeContent.faqs.length > 0)
     ? homeContent.faqs.map((f: any) => ({
-      q: locale === "en" && f.questionEn ? f.questionEn : f.question,
-      a: locale === "en" && f.answerEn ? f.answerEn : f.answer,
+      q: (locale === "en" && f.questionEn ? f.questionEn : (f.question || f.q)) || "",
+      a: (locale === "en" && f.answerEn ? f.answerEn : (f.answer || f.a)) || "",
     }))
     : defaultFaqItems;
 

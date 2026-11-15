@@ -201,55 +201,62 @@ export default function DevotionalDetailPage() {
             User Request: "buat aja gambar diatas, trus dibawahnya isinya gt"
             Dramatic atmospheric banner across top with full title & scripture
             ============================================================ */}
-        <section className="relative overflow-hidden bg-[#120204] text-white">
-          <div className="relative min-h-[380px] sm:min-h-[440px] md:min-h-[480px] flex items-center justify-center">
-            {/* Background Image */}
+        {/* ============================================================
+            2. GAMBAR DI ATAS (HERO BANNER AT TOP)
+            User Request: "untuk space gambar di judul itu lebih gede dan lebih terang,
+            jadi lebih keliatan gambarnya mungkin di 70-85% dengan kondisi judul atau teks didepannya juga keliatan"
+            ============================================================ */}
+        <section className="relative overflow-hidden bg-[#0A0203] text-white">
+          <div className="relative min-h-[480px] sm:min-h-[560px] md:min-h-[640px] flex items-center justify-center py-16 sm:py-24 md:py-28">
+            {/* Background Image: Bright & Vibrant (70-85% Clear Visibility) */}
             <Image
               src={devotional.coverImage}
               alt={devotional.title}
               fill
               priority
-              className="object-cover object-center"
+              className="object-cover object-center brightness-95 contrast-105"
             />
 
-            {/* Cinematic Gradient Vignette Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#140305] via-[#24060A]/85 to-black/50" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#140305]/60 to-[#140305]/95" />
+            {/* Balanced Scrim: lets 75-85% image visibility shine through while protecting text readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0E0305]/95 via-black/35 to-black/30" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(0,0,0,0.1)_0%,_rgba(0,0,0,0.5)_100%)]" />
 
             {/* Content atop banner */}
-            <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 text-center space-y-5">
+            <div className="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center space-y-6">
               {/* Category & Read Time */}
               <div className="flex flex-wrap items-center justify-center gap-2.5">
-                <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-xs font-bold text-amber-200 shadow-sm">
-                  <Sparkles className="size-3 text-amber-300" />
+                <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md border border-white/25 text-xs font-bold text-amber-300 shadow-md">
+                  <Sparkles className="size-3 text-amber-400" />
                   <span>{devotional.categoryLabel}</span>
                 </span>
-                <span className="text-xs font-medium text-stone-300 bg-black/40 px-3 py-1 rounded-full border border-white/10">
-                  <Clock className="size-3 inline mr-1" />
+                <span className="text-xs font-semibold text-stone-100 bg-black/60 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/20 shadow-md">
+                  <Clock className="size-3 inline mr-1 text-amber-300" />
                   {devotional.readTime}
                 </span>
               </div>
 
               {/* Devotional Title */}
-              <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight tracking-tight drop-shadow-md max-w-3xl mx-auto">
+              <h1 className="font-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-[0_4px_16px_rgba(0,0,0,0.95)] max-w-3xl mx-auto">
                 {devotional.title}
               </h1>
 
               {/* Scripture Badge */}
-              <div className="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-amber-300 bg-black/50 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-300/40 shadow-sm">
+              <div className="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-amber-200 bg-black/65 backdrop-blur-md px-4 py-1.5 rounded-full border border-amber-300/60 shadow-[0_4px_16px_rgba(0,0,0,0.7)]">
                 <span className="size-2 rounded-full bg-amber-400 animate-pulse" />
                 <span>{devotional.scriptureRef}</span>
               </div>
 
               {/* Golden Verse Quote */}
-              <p className="font-serif italic text-sm sm:text-base md:text-lg text-stone-200/95 max-w-2xl mx-auto leading-relaxed pt-1">
-                &ldquo;{devotional.goldenVerse}&rdquo;
-              </p>
+              <div className="max-w-2xl mx-auto bg-black/45 backdrop-blur-md px-6 py-4 rounded-2xl border border-white/20 shadow-xl">
+                <p className="font-serif italic text-sm sm:text-base md:text-lg text-stone-100 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
+                  &ldquo;{devotional.goldenVerse}&rdquo;
+                </p>
+              </div>
 
               {/* Author & Date Bar */}
-              <div className="pt-4 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-stone-300 border-t border-white/15 max-w-lg mx-auto">
-                <div className="flex items-center gap-2.5">
-                  <div className="size-9 rounded-full overflow-hidden bg-stone-800 border border-white/30 relative shrink-0">
+              <div className="pt-2 flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-stone-200 max-w-lg mx-auto">
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-black/60 backdrop-blur-md border border-white/25 shadow-md">
+                  <div className="size-8 rounded-full overflow-hidden bg-stone-800 border border-white/40 relative shrink-0">
                     <Image
                       src={devotional.authorAvatar || devotional.coverImage}
                       alt={devotional.author}
@@ -258,12 +265,12 @@ export default function DevotionalDetailPage() {
                     />
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-white">{devotional.author}</p>
-                    <p className="text-stone-400 text-[11px]">{devotional.authorRole}</p>
+                    <p className="font-bold text-white text-xs">{devotional.author}</p>
+                    <p className="text-stone-300 text-[11px]">{devotional.authorRole}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 text-stone-200 font-semibold bg-white/10 px-3 py-1 rounded-full border border-white/15">
+                <div className="flex items-center gap-1.5 text-stone-100 font-semibold bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/25 shadow-md">
                   <Calendar className="size-3.5 text-amber-300" />
                   <span>{devotional.date}</span>
                 </div>
