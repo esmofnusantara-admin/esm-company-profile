@@ -76,12 +76,14 @@ export function MediaUploader({
   };
 
   const isVideo =
+    accept === "video" ||
     value?.endsWith(".mp4") ||
     value?.endsWith(".webm") ||
+    value?.endsWith(".mov") ||
     value?.includes("youtube.com") ||
     value?.includes("youtu.be");
 
-  const isPdf = value?.endsWith(".pdf");
+  const isPdf = accept === "pdf" || value?.endsWith(".pdf");
 
   return (
     <div className="space-y-2">

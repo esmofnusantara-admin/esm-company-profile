@@ -63,8 +63,8 @@ const DEFAULT_CONFIGS: Record<string, any> = {
     videoSubtitleEn:
       "Dynamics of nurturing high school and university students, and mission pioneering in Banten and North Maluku.",
     videoDuration: "03:45 • Profil ESM",
-    videoThumbnail: "/uploads/hero/kemitraan_hero.jpg",
-    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    videoThumbnail: "",
+    videoUrl: "",
     footerTextId: "Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara",
     footerTextEn: "Learned & witnessed by hundreds of students, mentors, and mission partners across Nusantara",
     footerCtaTextId: "Tonton Video",

@@ -26,6 +26,7 @@ import {
   CheckCircle2,
   Play,
   X,
+  Loader2,
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ export default function HomePage() {
   const { t, locale } = useLanguage();
   const [featuredArticles, setFeaturedArticles] = React.useState<any[]>([]);
   const [homeContent, setHomeContent] = React.useState<any>(null);
+  const [isLoadingContent, setIsLoadingContent] = React.useState(true);
 
   // Interactive prayer state
   const [hasPrayed, setHasPrayed] = React.useState(false);
@@ -54,7 +56,7 @@ export default function HomePage() {
           setFeaturedArticles(data.data);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
 
     fetch(`/api/content?section=home&_t=${Date.now()}`, { cache: "no-store" })
       .then((r) => r.json())
@@ -64,7 +66,12 @@ export default function HomePage() {
           setThumbnailError(false);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("Gagal memuat konten beranda:", err);
+      })
+      .finally(() => {
+        setIsLoadingContent(false);
+      });
   }, []);
 
   const hero = homeContent?.hero;
@@ -73,23 +80,35 @@ export default function HomePage() {
   const communities = homeContent?.communities;
   const ctaCard = homeContent?.ctaCard;
 
+  const isDirectVideo = Boolean(
+    whyEsm?.videoUrl &&
+    (whyEsm.videoUrl.endsWith(".mp4") ||
+      whyEsm.videoUrl.endsWith(".webm") ||
+      whyEsm.videoUrl.endsWith(".mov") ||
+      whyEsm.videoUrl.startsWith("/uploads/"))
+  );
+
   const getYouTubeThumbnail = (url?: string) => {
     if (!url) return null;
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const match = url.match(
+      /(?:youtube\.com\/(?:watch\?v=|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
     return match && match[1] ? `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg` : null;
   };
 
   const videoThumbnailSrc =
     whyEsm?.videoThumbnail && whyEsm.videoThumbnail.trim() !== ""
       ? whyEsm.videoThumbnail
-      : getYouTubeThumbnail(whyEsm?.videoUrl) || "/uploads/hero/kemitraan_hero.jpg";
+      : getYouTubeThumbnail(whyEsm?.videoUrl) || "";
 
   const getYouTubeEmbedUrl = (url?: string) => {
-    if (!url) return "https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?autoplay=1";
+    if (!url) return "";
     if (url.includes("/embed/")) {
       return url.includes("autoplay=1") ? url : `${url}${url.includes("?") ? "&" : "?"}autoplay=1`;
     }
-    const match = url.match(/(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    const match = url.match(
+      /(?:youtube\.com\/(?:watch\?v=|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
     if (match && match[1]) {
       return `https://www.youtube-nocookie.com/embed/${match[1]}?autoplay=1`;
     }
@@ -159,9 +178,9 @@ export default function HomePage() {
 
   const activeFaqs: { q: string; a: string }[] = (homeContent?.faqs && Array.isArray(homeContent.faqs) && homeContent.faqs.length > 0)
     ? homeContent.faqs.map((f: any) => ({
-        q: locale === "en" && f.questionEn ? f.questionEn : f.question,
-        a: locale === "en" && f.answerEn ? f.answerEn : f.answer,
-      }))
+      q: locale === "en" && f.questionEn ? f.questionEn : f.question,
+      a: locale === "en" && f.answerEn ? f.answerEn : f.answer,
+    }))
     : defaultFaqItems;
 
   const defaultTestimonies = [
@@ -183,15 +202,43 @@ export default function HomePage() {
 
   const activeTestimonies: TestimonyItem[] = (homeContent?.testimonies && Array.isArray(homeContent.testimonies) && homeContent.testimonies.length > 0)
     ? homeContent.testimonies.map((tm: any) => ({
-        name: tm.authorName,
-        role: tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
-        theme: tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
-        quote: locale === "en" && tm.contentEn ? tm.contentEn : tm.content,
-      }))
+      name: tm.authorName,
+      role: tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
+      theme: tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
+      quote: locale === "en" && tm.contentEn ? tm.contentEn : tm.content,
+    }))
     : defaultTestimonies;
 
   const [activeTestimonyIndex, setActiveTestimonyIndex] = React.useState(0);
   const currentTestimony = activeTestimonies[activeTestimonyIndex % activeTestimonies.length];
+
+  if (isLoadingContent) {
+    return (
+      <div className="min-h-screen bg-[#FAF7F2] flex flex-col items-center justify-center p-6 text-center">
+        <div className="relative mb-6">
+          <div className="size-20 rounded-2xl bg-white shadow-warm-md border border-stone-200/80 p-3 flex items-center justify-center animate-pulse">
+            <Image
+              src="/logo-esm.png"
+              alt="ESM Nusantara Logo"
+              width={56}
+              height={56}
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="absolute -bottom-2 -right-2 size-7 rounded-full bg-primary text-white flex items-center justify-center shadow-xs">
+            <Loader2 className="size-4 animate-spin" />
+          </div>
+        </div>
+        <h2 className="font-serif text-xl font-bold text-foreground mb-1">
+          ESM Nusantara
+        </h2>
+        <p className="text-xs text-stone-500 font-medium max-w-xs animate-pulse">
+          Tunggu Sebentar ya, Sedang kami siapkan..
+        </p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -549,8 +596,8 @@ export default function HomePage() {
                         ? communities.kickerEn || communities.kickerId
                         : communities.kickerId
                       : locale === "en"
-                      ? "DISCIPLESHIP CHAIN"
-                      : "MATA RANTAI PEMURIDAN"}
+                        ? "DISCIPLESHIP CHAIN"
+                        : "MATA RANTAI PEMURIDAN"}
                   </span>
                 </div>
                 <h2 className="font-sans text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-foreground">
@@ -559,8 +606,8 @@ export default function HomePage() {
                       ? communities.titleEn || communities.titleId
                       : communities.titleId
                     : locale === "en"
-                    ? "Three Communities, One Movement"
-                    : "Tiga Komunitas, Satu Kegerakan"}
+                      ? "Three Communities, One Movement"
+                      : "Tiga Komunitas, Satu Kegerakan"}
                 </h2>
                 <p className="text-sm sm:text-base text-stone-600 max-w-2xl leading-relaxed">
                   {communities
@@ -568,8 +615,8 @@ export default function HomePage() {
                       ? communities.subtitleEn || communities.subtitleId
                       : communities.subtitleId
                     : locale === "en"
-                    ? "Accompanying the journey of faith from school benches, university halls, to marketplace and family."
-                    : "Menemani perjalanan iman dari bangku sekolah, ruang kuliah kampus, hingga dunia kerja dan keluarga."}
+                      ? "Accompanying the journey of faith from school benches, university halls, to marketplace and family."
+                      : "Menemani perjalanan iman dari bangku sekolah, ruang kuliah kampus, hingga dunia kerja dan keluarga."}
                 </p>
               </div>
               <Button asChild variant="outline" size="sm" className="rounded-full px-5 font-bold border-stone-300 bg-white shadow-xs shrink-0 hover:bg-stone-50">
@@ -1134,11 +1181,10 @@ export default function HomePage() {
                         setHasPrayed((prev) => !prev);
                         setPrayerCount((c) => (hasPrayed ? c - 1 : c + 1));
                       }}
-                      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${
-                        hasPrayed
+                      className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${hasPrayed
                           ? "bg-amber-400 text-[#180306] scale-105"
                           : "bg-white/10 text-white hover:bg-white/20"
-                      }`}
+                        }`}
                     >
                       <Heart className={`size-3.5 ${hasPrayed ? "fill-current text-[#180306]" : ""}`} />
                       <span>{hasPrayed ? "Didoakan" : "Mendoakan"}</span>
@@ -1217,11 +1263,10 @@ export default function HomePage() {
                         key={i}
                         type="button"
                         onClick={() => setActiveTestimonyIndex(i)}
-                        className={`size-2 rounded-full transition-all ${
-                          i === (activeTestimonyIndex % activeTestimonies.length)
+                        className={`size-2 rounded-full transition-all ${i === (activeTestimonyIndex % activeTestimonies.length)
                             ? "bg-primary w-5"
                             : "bg-stone-300 hover:bg-stone-400"
-                        }`}
+                          }`}
                         aria-label={`Go to slide ${i + 1}`}
                       />
                     ))}
@@ -1255,19 +1300,38 @@ export default function HomePage() {
                 <X className="size-5" />
               </button>
               <div className="aspect-video w-full bg-black flex items-center justify-center">
-                <iframe
-                  className="w-full h-full"
-                  src={getYouTubeEmbedUrl(whyEsm?.videoUrl)}
-                  title={
-                    whyEsm
-                      ? locale === "en"
-                        ? whyEsm.videoTitleEn || whyEsm.videoTitleId
-                        : whyEsm.videoTitleId
-                      : "Video Company Profile ESM Indonesia"
-                  }
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                {isDirectVideo ? (
+                  <video
+                    src={whyEsm?.videoUrl}
+                    controls
+                    autoPlay
+                    playsInline
+                    className="w-full h-full object-contain bg-black"
+                  >
+                    Browser Anda tidak mendukung pemutar video HTML5.
+                  </video>
+                ) : whyEsm?.videoUrl && getYouTubeEmbedUrl(whyEsm.videoUrl) ? (
+                  <iframe
+                    className="w-full h-full"
+                    src={getYouTubeEmbedUrl(whyEsm.videoUrl)}
+                    title={
+                      whyEsm
+                        ? locale === "en"
+                          ? whyEsm.videoTitleEn || whyEsm.videoTitleId
+                          : whyEsm.videoTitleId
+                        : "Video Company Profile ESM Indonesia"
+                    }
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                ) : (
+                  <div className="p-8 text-center text-white/70 space-y-2">
+                    <p className="font-bold text-sm">Video Belum Diatur</p>
+                    <p className="text-xs text-stone-400">
+                      Silakan unggah video atau masukkan tautan YouTube melalui CMS Admin Beranda.
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="p-4 sm:p-6 bg-stone-950 text-white flex items-center justify-between">
                 <div>

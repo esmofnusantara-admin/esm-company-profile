@@ -161,8 +161,8 @@ const defaultWhyEsm: WhyEsmData = {
   videoSubtitleEn:
     "Dynamics of nurturing high school and university students, and mission pioneering in Banten and North Maluku.",
   videoDuration: "03:45 • Profil ESM",
-  videoThumbnail: "/uploads/hero/kemitraan_hero.jpg",
-  videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+  videoThumbnail: "",
+  videoUrl: "",
   footerTextId: "Dipelajari & disaksikan oleh ratusan siswa, pembina, serta sahabat misi di Nusantara",
   footerTextEn: "Learned & witnessed by hundreds of students, mentors, and mission partners across Nusantara",
   footerCtaTextId: "Tonton Video",
@@ -586,69 +586,94 @@ export default function AdminBerandaCMS() {
               </p>
             </div>
 
-            {/* Video Link & Duration */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <label className="text-xs font-bold text-foreground block mb-1">
-                  URL Video YouTube / Video Publik
-                </label>
-                <input
-                  type="text"
-                  value={whyEsm.videoUrl}
-                  onChange={(e) => setWhyEsm({ ...whyEsm, videoUrl: e.target.value })}
-                  placeholder="https://www.youtube.com/watch?v=..."
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background focus:ring-2 focus:ring-primary/20"
-                />
-                <div className="flex flex-wrap items-center gap-2 mt-2">
+            {/* 1. File Video Utama (Bisa Upload MP4/WebM atau Tempel Link YouTube) */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <div>
+                  <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                    1. File / Sumber Video Utama
+                  </h3>
                   <p className="text-[11px] text-muted-foreground">
-                    Bisa menggunakan format link YouTube standar (watch?v=...), youtu.be, atau embed.
+                    Anda dapat <b>Upload file video (MP4/WebM)</b> langsung dari laptop, atau klik tab <b>Link / URL</b> untuk menempel tautan video YouTube.
                   </p>
-                  {whyEsm.videoUrl && (
+                </div>
+              </div>
+
+              <MediaUploader
+                label="Sumber Video Profil (Upload MP4 / Link YouTube)"
+                value={whyEsm.videoUrl}
+                onChange={(url) => setWhyEsm({ ...whyEsm, videoUrl: url })}
+                folder="videos"
+                accept="video"
+                helperText="Dukungan: File video lokal MP4/WebM/MOV (maks 50MB) atau link YouTube standar (https://www.youtube.com/watch?v=... atau youtu.be/...)."
+              />
+
+              {/* YouTube Thumbnail Extractor (Muncul jika URL adalah YouTube) */}
+              {whyEsm.videoUrl &&
+                (whyEsm.videoUrl.includes("youtube.com") || whyEsm.videoUrl.includes("youtu.be")) && (
+                  <div className="flex items-center justify-between p-3 rounded-xl bg-amber-500/10 border border-amber-500/20">
+                    <div className="flex items-center gap-2 text-xs text-amber-900 font-semibold">
+                      <Sparkles className="size-4 text-amber-600 shrink-0" />
+                      <span>Tautan YouTube terdeteksi. Pasang foto sampul video dari YouTube secara otomatis?</span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => {
                         const match = whyEsm.videoUrl.match(
-                          /(?:youtube\.com\/(?:watch\?v=|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+                          /(?:youtube\.com\/(?:watch\?v=|v\/|shorts\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/
                         );
                         if (match && match[1]) {
                           setWhyEsm({
                             ...whyEsm,
                             videoThumbnail: `https://img.youtube.com/vi/${match[1]}/maxresdefault.jpg`,
                           });
+                          alert("Thumbnail berhasil diambil dari video YouTube!");
                         } else {
-                          alert("Masukkan link YouTube yang valid terlebih dahulu.");
+                          alert("Link YouTube tidak valid.");
                         }
                       }}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-900 border border-amber-500/30 text-[11px] font-bold hover:bg-amber-500/25 transition-all cursor-pointer"
+                      className="px-3 py-1.5 rounded-lg bg-amber-500 text-stone-950 font-bold text-xs hover:bg-amber-400 transition-all shadow-xs cursor-pointer shrink-0"
                     >
-                      <Sparkles className="size-3 text-amber-600" />
-                      <span>Ambil Thumbnail Otomatis dari YouTube</span>
+                      Gunakan Thumbnail YouTube
                     </button>
-                  )}
+                  </div>
+                )}
+            </div>
+
+            {/* 2. Foto Sampul / Thumbnail Video */}
+            <div className="space-y-3 pt-4 border-t border-border/60">
+              <div className="flex items-center justify-between border-b border-border/40 pb-2">
+                <div>
+                  <h3 className="text-xs font-bold text-foreground uppercase tracking-wider">
+                    2. Foto Sampul / Thumbnail Kartu Video
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground">
+                    Gambar latar yang tampil di kartu sebelum pengunjung menekan tombol putar video.
+                  </p>
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Badge Durasi Video</label>
-                <input
-                  type="text"
-                  value={whyEsm.videoDuration}
-                  onChange={(e) => setWhyEsm({ ...whyEsm, videoDuration: e.target.value })}
-                  placeholder="03:45 • Profil ESM"
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
+              <MediaUploader
+                label="Foto Sampul Thumbnail (16:9 Lanskap)"
+                value={whyEsm.videoThumbnail}
+                onChange={(url) => setWhyEsm({ ...whyEsm, videoThumbnail: url })}
+                folder="hero"
+                accept="image"
+                helperText="Format disarankan: Foto 16:9 lanskap (1920x1080px). Anda bisa mengunggah foto baru dari laptop atau menempel link gambar."
+              />
             </div>
 
-            {/* Thumbnail Upload */}
-            <MediaUploader
-              label="Foto Sampul / Thumbnail Pemutar Video"
-              value={whyEsm.videoThumbnail}
-              onChange={(url) => setWhyEsm({ ...whyEsm, videoThumbnail: url })}
-              folder="hero"
-              accept="image"
-              helperText="Format disarankan: Foto 16:9 lanskap (1920x1080px). Anda bisa klik 'Ganti Foto / Upload Baru' untuk memilih foto dari laptop, atau klik 'Ambil Thumbnail Otomatis dari YouTube' di atas."
-            />
+            {/* 3. Durasi Video */}
+            <div className="pt-3 border-t border-border/60">
+              <label className="text-xs font-bold text-foreground block mb-1">Badge Durasi Video</label>
+              <input
+                type="text"
+                value={whyEsm.videoDuration}
+                onChange={(e) => setWhyEsm({ ...whyEsm, videoDuration: e.target.value })}
+                placeholder="03:45 • Profil ESM"
+                className="w-full max-w-sm px-3 py-2 text-xs rounded-xl border border-border bg-background"
+              />
+            </div>
 
             {/* Badge & Title Video */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
