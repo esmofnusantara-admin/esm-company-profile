@@ -24,9 +24,19 @@ import {
   Trash2,
   Edit2,
   Check,
+  MessageSquareQuote,
+  User,
 } from "lucide-react";
+import Image from "next/image";
 import { getFAQs, createFAQ, updateFAQ, deleteFAQ, FAQInput } from "@/actions/faq";
 import { FAQPage } from "@prisma/client";
+import {
+  getTestimonies,
+  createTestimony,
+  updateTestimony,
+  deleteTestimony,
+} from "@/actions/testimony";
+import { type TestimonyInput } from "@/lib/testimonyData";
 
 // ==========================================
 // INTERFACES UNTUK HOMEPAGE CMS
@@ -244,7 +254,9 @@ const defaultCtaCard: CtaCardData = {
 };
 
 export default function AdminBerandaCMS() {
-  const [activeTab, setActiveTab] = useState<"hero" | "stats" | "whyEsm" | "communities" | "cta" | "faq">("whyEsm");
+  const [activeTab, setActiveTab] = useState<
+    "hero" | "stats" | "whyEsm" | "communities" | "cta" | "faq" | "testimoni"
+  >("whyEsm");
 
   const [hero, setHero] = useState<HeroData>(defaultHero);
   const [stats, setStats] = useState<StatItem[]>(defaultStats);
@@ -267,6 +279,21 @@ export default function AdminBerandaCMS() {
     page: FAQPage.GENERAL,
   });
 
+  // Testimony state for Beranda (Section 7)
+  const [testimonies, setTestimonies] = useState<any[]>([]);
+  const [isTestimonyModalOpen, setIsTestimonyModalOpen] = useState(false);
+  const [editingTestimony, setEditingTestimony] = useState<any | null>(null);
+  const [isTestimonySaving, setIsTestimonySaving] = useState(false);
+  const [testimonyForm, setTestimonyForm] = useState<TestimonyInput>({
+    name: "",
+    role: "",
+    quote: "",
+    quoteEn: "",
+    photo: "",
+    sortOrder: 1,
+    isActive: true,
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -280,17 +307,35 @@ export default function AdminBerandaCMS() {
     }
   };
 
+  const loadTestimoniesData = async () => {
+    try {
+      const items = await getTestimonies();
+      setTestimonies(items || []);
+    } catch (e) {
+      console.error("Gagal memuat testimoni beranda:", e);
+    }
+  };
+
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [savedHero, savedStats, savedWhyEsm, savedCommunities, savedCta, loadedFaqs] = await Promise.all([
+        const [
+          savedHero,
+          savedStats,
+          savedWhyEsm,
+          savedCommunities,
+          savedCta,
+          loadedFaqs,
+          loadedTst,
+        ] = await Promise.all([
           getSiteConfig<HeroData>("home_hero", defaultHero),
           getSiteConfig<StatItem[]>("home_stats", defaultStats),
           getSiteConfig<WhyEsmData>("home_why_esm", defaultWhyEsm),
           getSiteConfig<CommunitiesData>("home_communities", defaultCommunities),
           getSiteConfig<CtaCardData>("home_cta", defaultCtaCard),
           getFAQs(FAQPage.GENERAL),
+          getTestimonies(),
         ]);
         if (savedHero) setHero(savedHero);
         if (savedStats) setStats(savedStats);
@@ -298,6 +343,7 @@ export default function AdminBerandaCMS() {
         if (savedCommunities) setCommunities(savedCommunities);
         if (savedCta) setCtaCard(savedCta);
         if (loadedFaqs) setFaqs(loadedFaqs);
+        if (loadedTst) setTestimonies(loadedTst);
       } catch (err) {
         console.error("Gagal memuat konfigurasi beranda:", err);
       } finally {
@@ -346,6 +392,57 @@ export default function AdminBerandaCMS() {
       await loadFaqs();
     } catch {
       alert("Gagal menghapus FAQ.");
+    }
+  };
+
+  const handleTestimonySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!testimonyForm.name || !testimonyForm.quote) {
+      alert("Nama dan kutipan testimoni wajib diisi.");
+      return;
+    }
+    setIsTestimonySaving(true);
+    try {
+      let res;
+      if (editingTestimony) {
+        res = await updateTestimony(editingTestimony.id, testimonyForm);
+      } else {
+        res = await createTestimony(testimonyForm);
+      }
+      if (res && !res.success) {
+        alert(res.error || "Gagal menyimpan testimoni.");
+        return;
+      }
+      setIsTestimonyModalOpen(false);
+      setEditingTestimony(null);
+      setTestimonyForm({
+        name: "",
+        role: "",
+        quote: "",
+        quoteEn: "",
+        photo: "",
+        sortOrder: testimonies.length + 1,
+        isActive: true,
+      });
+      await loadTestimoniesData();
+    } catch {
+      alert("Gagal menyimpan testimoni.");
+    } finally {
+      setIsTestimonySaving(false);
+    }
+  };
+
+  const handleTestimonyDelete = async (id: string) => {
+    if (!confirm("Hapus testimoni ini dari Beranda?")) return;
+    try {
+      const res = await deleteTestimony(id);
+      if (res && !res.success) {
+        alert(res.error || "Gagal menghapus testimoni.");
+        return;
+      }
+      await loadTestimoniesData();
+    } catch {
+      alert("Gagal menghapus testimoni.");
     }
   };
 
@@ -511,7 +608,7 @@ export default function AdminBerandaCMS() {
         <button
           type="button"
           onClick={() => setActiveTab("faq")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "faq"
               ? "bg-primary text-white shadow-xs"
               : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
@@ -521,6 +618,22 @@ export default function AdminBerandaCMS() {
           <span>6. Tanya Jawab (FAQ)</span>
           <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-bold">
             {faqs.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("testimoni")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === "testimoni"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <MessageSquareQuote className="size-3.5" />
+          <span>7. Testimoni Murid</span>
+          <span className="text-[10px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full font-bold">
+            {testimonies.length}
           </span>
         </button>
       </div>
@@ -1617,6 +1730,145 @@ export default function AdminBerandaCMS() {
       )}
 
       {/* ========================================================
+          TAB 7: TESTIMONI MURID (SECTION 7 BERANDA)
+          ======================================================== */}
+      {activeTab === "testimoni" && (
+        <div className="space-y-6">
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-900 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <Info className="size-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="font-bold">Testimoni & Refleksi Murid (Section 7 di Beranda):</p>
+                <p className="text-stone-600 mt-0.5">
+                  Testimoni yang diaktifkan di sini otomatis tersinkronisasi langsung ke database PostgreSQL dan ditampilkan pada slider Section 7 di Beranda publik lengkap dengan foto, nama, status, dan kutipan (ID & EN).
+                </p>
+              </div>
+            </div>
+            <a
+              href="/admin/konten/testimoni"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-amber-400 bg-amber-50 text-amber-900 font-bold text-xs shrink-0 hover:bg-amber-100 transition-colors"
+            >
+              <span>Buka Menu Testimoni Lengkap</span>
+              <ExternalLink className="size-3" />
+            </a>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div>
+              <h3 className="text-sm font-bold text-foreground">Daftar Testimoni Beranda ({testimonies.length})</h3>
+              <p className="text-xs text-muted-foreground">Testimoni aktif akan dapat digeser (slider) oleh pengunjung website.</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEditingTestimony(null);
+                setTestimonyForm({
+                  name: "",
+                  role: "",
+                  quote: "",
+                  quoteEn: "",
+                  photo: "",
+                  sortOrder: testimonies.length + 1,
+                  isActive: true,
+                });
+                setIsTestimonyModalOpen(true);
+              }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-xs hover:bg-primary/90 transition-all cursor-pointer"
+            >
+              <Plus className="size-4" />
+              <span>Tambah Testimoni Baru</span>
+            </button>
+          </div>
+
+          {testimonies.length === 0 ? (
+            <div className="text-center py-12 border border-dashed border-border rounded-2xl bg-card">
+              <MessageSquareQuote className="size-8 mx-auto text-muted-foreground/50 mb-2" />
+              <p className="text-xs text-muted-foreground font-medium">Belum ada data testimoni di database.</p>
+              <p className="text-[11px] text-muted-foreground mt-1">Klik tombol &ldquo;Tambah Testimoni Baru&rdquo; untuk membuat testimoni pertama.</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {testimonies.map((item) => (
+                <div
+                  key={item.id}
+                  className="p-5 rounded-2xl border border-border bg-card shadow-warm-xs flex flex-col justify-between space-y-4"
+                >
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-3">
+                      <div className="size-12 rounded-full bg-muted border border-border relative overflow-hidden shrink-0">
+                        {item.photo ? (
+                          <Image src={item.photo} alt={item.name} fill className="object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center font-bold text-xs text-primary">
+                            {item.name ? item.name.charAt(0) : "M"}
+                          </div>
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <h4 className="text-xs font-bold text-foreground truncate">{item.name}</h4>
+                        <p className="text-[11px] text-primary truncate">{item.role || "Alumni / Mahasiswa"}</p>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-foreground italic border-l-2 border-primary/40 pl-3 py-1">
+                      &ldquo;{item.quote}&rdquo;
+                    </p>
+
+                    {item.quoteEn && (
+                      <p className="text-[11px] text-muted-foreground italic border-l-2 border-border pl-3 py-0.5">
+                        &ldquo;{item.quoteEn}&rdquo;
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-border/60 text-xs">
+                    <span
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                        item.isActive ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      {item.isActive ? "Tayang Aktif di Beranda" : "Draft / Non-aktif"}
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setEditingTestimony(item);
+                          setTestimonyForm({
+                            name: item.name,
+                            role: item.role || "",
+                            quote: item.quote,
+                            quoteEn: item.quoteEn || "",
+                            photo: item.photo || "",
+                            sortOrder: item.sortOrder ?? 1,
+                            isActive: item.isActive,
+                          });
+                          setIsTestimonyModalOpen(true);
+                        }}
+                        className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg cursor-pointer"
+                        title="Sunting testimoni"
+                      >
+                        <Edit2 className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleTestimonyDelete(item.id)}
+                        className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
+                        title="Hapus testimoni"
+                      >
+                        <Trash2 className="size-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ========================================================
           MODAL TAMBAH / SUNTING FAQ BERANDA
           ======================================================== */}
       {isFaqModalOpen && (
@@ -1735,6 +1987,142 @@ export default function AdminBerandaCMS() {
                 >
                   {isFaqSaving && <Loader2 className="size-3.5 animate-spin" />}
                   <span>Simpan FAQ</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODAL TAMBAH / SUNTING TESTIMONI BERANDA
+          ======================================================== */}
+      {isTestimonyModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-card rounded-2xl border border-border w-full max-w-lg p-6 space-y-4 shadow-warm-lg my-8 animate-in fade-in-50">
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <MessageSquareQuote className="size-4 text-primary" />
+                <h3 className="font-bold text-sm text-foreground">
+                  {editingTestimony ? "Sunting Testimoni Beranda" : "Tambah Testimoni Beranda"}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsTestimonyModalOpen(false)}
+                className="text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
+              >
+                Batal
+              </button>
+            </div>
+
+            <form onSubmit={handleTestimonySubmit} className="space-y-4">
+              <MediaUploader
+                label="Foto Narasumber / Siswa / Alumni"
+                value={testimonyForm.photo || ""}
+                onChange={(url) => setTestimonyForm({ ...testimonyForm, photo: url })}
+                folder="testimonies"
+                accept="image"
+              />
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Nama Lengkap</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Jonathan Pratama"
+                    value={testimonyForm.name}
+                    onChange={(e) => setTestimonyForm({ ...testimonyForm, name: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Status / Asal Komunitas</label>
+                  <input
+                    type="text"
+                    placeholder="Contoh: Alumni Mahasiswa Untirta"
+                    value={testimonyForm.role || ""}
+                    onChange={(e) => setTestimonyForm({ ...testimonyForm, role: e.target.value })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">Kutipan Testimoni (ID)</label>
+                <textarea
+                  rows={3}
+                  required
+                  placeholder="Tuliskan pengalaman refleksi murid di ESM..."
+                  value={testimonyForm.quote}
+                  onChange={(e) => setTestimonyForm({ ...testimonyForm, quote: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-bold text-foreground">Testimony Quote (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={testimonyForm.quote}
+                    onTranslated={(txt) => setTestimonyForm({ ...testimonyForm, quoteEn: txt })}
+                  />
+                </div>
+                <textarea
+                  rows={3}
+                  placeholder="Translate quote into English..."
+                  value={testimonyForm.quoteEn || ""}
+                  onChange={(e) => setTestimonyForm({ ...testimonyForm, quoteEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 items-center">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Urutan Slider</label>
+                  <input
+                    type="number"
+                    value={testimonyForm.sortOrder}
+                    onChange={(e) =>
+                      setTestimonyForm({
+                        ...testimonyForm,
+                        sortOrder: parseInt(e.target.value, 10) || 1,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                </div>
+                <div className="pt-5">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={testimonyForm.isActive}
+                      onChange={(e) =>
+                        setTestimonyForm({ ...testimonyForm, isActive: e.target.checked })
+                      }
+                      className="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span>Tayangkan di Beranda</span>
+                  </label>
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-border">
+                <button
+                  type="button"
+                  onClick={() => setIsTestimonyModalOpen(false)}
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:bg-muted cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  type="submit"
+                  disabled={isTestimonySaving}
+                  className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-50 flex items-center gap-1.5 cursor-pointer shadow-warm-xs"
+                >
+                  {isTestimonySaving && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>Simpan Testimoni</span>
                 </button>
               </div>
             </form>

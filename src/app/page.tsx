@@ -196,16 +196,18 @@ export default function HomePage() {
   interface TestimonyItem {
     name: string;
     role: string;
-    theme: string;
+    theme?: string;
     quote: string;
+    photo?: string | null;
   }
 
   const activeTestimonies: TestimonyItem[] = (homeContent?.testimonies && Array.isArray(homeContent.testimonies) && homeContent.testimonies.length > 0)
     ? homeContent.testimonies.map((tm: any) => ({
-      name: tm.authorName,
-      role: tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
-      theme: tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
-      quote: locale === "en" && tm.contentEn ? tm.contentEn : tm.content,
+      name: tm.name || tm.authorName || "Alumni ESM",
+      role: tm.role || tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
+      theme: tm.theme || tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
+      quote: (locale === "en" && (tm.quoteEn || tm.contentEn)) ? (tm.quoteEn || tm.contentEn) : (tm.quote || tm.content || ""),
+      photo: tm.photo || tm.avatar || null,
     }))
     : defaultTestimonies;
 
@@ -1237,9 +1239,25 @@ export default function HomePage() {
               <p className="font-serif italic text-lg sm:text-xl text-foreground/90 leading-relaxed font-normal max-w-2xl mx-auto -mt-3">
                 {currentTestimony.quote}
               </p>
-              <div className="space-y-0.5 pt-2">
-                <p className="font-sans font-bold text-sm text-foreground">{currentTestimony.name}</p>
-                <p className="text-xs text-stone-500">{currentTestimony.role}</p>
+              <div className="pt-3 flex flex-col items-center justify-center gap-2">
+                {currentTestimony.photo ? (
+                  <div className="size-14 rounded-full overflow-hidden border-2 border-primary/20 relative shadow-warm-xs">
+                    <Image
+                      src={currentTestimony.photo}
+                      alt={currentTestimony.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="size-12 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center font-bold text-sm text-primary shadow-2xs">
+                    {currentTestimony.name ? currentTestimony.name.charAt(0) : "M"}
+                  </div>
+                )}
+                <div className="space-y-0.5">
+                  <p className="font-sans font-bold text-sm text-foreground">{currentTestimony.name}</p>
+                  <p className="text-xs text-stone-500">{currentTestimony.role}</p>
+                </div>
               </div>
 
               {/* Prev / Next Pagination Controls if Multiple Testimonies from Master */}

@@ -6,8 +6,8 @@ import {
   createTestimony,
   updateTestimony,
   deleteTestimony,
-  TestimonyInput,
 } from "@/actions/testimony";
+import { type TestimonyInput } from "@/lib/testimonyData";
 import { MediaUploader } from "@/components/admin/MediaUploader";
 import { AutoTranslateButton } from "@/components/admin/AutoTranslateButton";
 import {
@@ -26,6 +26,7 @@ export default function AdminTestimoniCMS() {
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<any | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState<TestimonyInput>({
     name: "",
     role: "",
@@ -39,7 +40,7 @@ export default function AdminTestimoniCMS() {
     setIsLoading(true);
     try {
       const items = await getTestimonies();
-      setTestimonies(items);
+      setTestimonies(items || []);
     } catch (err) {
       console.error(err);
     } finally {
@@ -58,25 +59,40 @@ export default function AdminTestimoniCMS() {
       return;
     }
 
+    setIsSubmitting(true);
     try {
+      let res;
       if (editingItem) {
-        await updateTestimony(editingItem.id, form);
+        res = await updateTestimony(editingItem.id, form);
       } else {
-        await createTestimony(form);
+        res = await createTestimony(form);
       }
+
+      if (res && !res.success) {
+        alert(res.error || "Gagal menyimpan testimoni.");
+        return;
+      }
+
       setIsModalOpen(false);
       setEditingItem(null);
       setForm({ name: "", role: "", quote: "", quoteEn: "", photo: "", isActive: true });
       await loadData();
     } catch (err) {
+      console.error(err);
       alert("Gagal menyimpan testimoni.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm("Hapus testimoni ini?")) return;
     try {
-      await deleteTestimony(id);
+      const res = await deleteTestimony(id);
+      if (res && !res.success) {
+        alert(res.error || "Gagal menghapus testimoni.");
+        return;
+      }
       await loadData();
     } catch (err) {
       alert("Gagal menghapus testimoni.");
@@ -295,9 +311,11 @@ export default function AdminTestimoniCMS() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 disabled:opacity-50 cursor-pointer shadow-warm-xs"
                 >
-                  Simpan Testimoni
+                  {isSubmitting && <Loader2 className="size-3.5 animate-spin" />}
+                  <span>{isSubmitting ? "Menyimpan..." : "Simpan Testimoni"}</span>
                 </button>
               </div>
             </form>

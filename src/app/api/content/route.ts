@@ -211,12 +211,19 @@ const fallbackTestimonies = [
   {
     id: "tst-1",
     name: "Jonathan Pratama",
+    authorName: "Jonathan Pratama",
     role: "Alumni Mahasiswa Untirta Serang",
+    authorRole: "Alumni Mahasiswa Untirta Serang",
     roleEn: "Untirta Serang Campus Graduate",
+    quote:
+      "Di kelompok pemuridan ESM, saya tidak hanya belajar Alkitab secara teoritis, tetapi diajarkan bagaimana membagikan iman dan memuridkan adik-adik tingkat di kampus.",
     content:
       "Di kelompok pemuridan ESM, saya tidak hanya belajar Alkitab secara teoritis, tetapi diajarkan bagaimana membagikan iman dan memuridkan adik-adik tingkat di kampus.",
+    quoteEn:
+      "In the ESM discipleship group, I didn't just study theology theoretically, but learned how to share my faith and disciple younger students on campus.",
     contentEn:
       "In the ESM discipleship group, I didn't just study theology theoretically, but learned how to share my faith and disciple younger students on campus.",
+    photo: "/images/avatar-1.jpg",
     avatar: "/images/avatar-1.jpg",
     sortOrder: 1,
     isActive: true,
@@ -224,12 +231,19 @@ const fallbackTestimonies = [
   {
     id: "tst-2",
     name: "Ruth H. Tomasoa",
+    authorName: "Ruth H. Tomasoa",
     role: "Mahasiswi di Ternate, Maluku Utara",
+    authorRole: "Mahasiswi di Ternate, Maluku Utara",
     roleEn: "University Student in Ternate, North Maluku",
+    quote:
+      "Asrama binaan ESM di Ternate menjadi rumah kedua bagi saya. Di sini kami belajar berdoa bersama dan dipersiapkan menjadi saksi Kristus di tengah masyarakat.",
     content:
       "Asrama binaan ESM di Ternate menjadi rumah kedua bagi saya. Di sini kami belajar berdoa bersama dan dipersiapkan menjadi saksi Kristus di tengah masyarakat.",
+    quoteEn:
+      "The ESM residential hub in Ternate became my second home. Here we learn to pray together and are prepared to be witnesses of Christ in society.",
     contentEn:
       "The ESM residential hub in Ternate became my second home. Here we learn to pray together and are prepared to be witnesses of Christ in society.",
+    photo: "/images/avatar-2.jpg",
     avatar: "/images/avatar-2.jpg",
     sortOrder: 2,
     isActive: true,
