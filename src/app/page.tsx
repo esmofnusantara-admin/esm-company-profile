@@ -619,7 +619,7 @@ export default function HomePage() {
                       : "Menemani perjalanan iman dari bangku sekolah, ruang kuliah kampus, hingga dunia kerja dan keluarga."}
                 </p>
               </div>
-              <Button asChild variant="outline" size="sm" className="rounded-full px-5 font-bold border-stone-300 bg-white shadow-xs shrink-0 hover:bg-stone-50">
+              <Button asChild size="sm" className="rounded-xl px-5 font-bold bg-primary text-white hover:bg-primary-700 shadow-warm-xs shrink-0">
                 <Link href="/pelayanan" className="flex items-center gap-1.5">
                   <span>Lihat Seluruh Komunitas</span>
                   <ArrowRight className="size-3.5" />
@@ -1079,7 +1079,7 @@ export default function HomePage() {
                   Kisah Misi & Pokok Doa
                 </h2>
               </div>
-              <Button asChild variant="outline" size="sm" className="rounded-full px-5 text-xs font-bold border-stone-300 bg-white shadow-xs">
+              <Button asChild size="sm" className="rounded-xl px-5 text-xs font-bold bg-primary text-white hover:bg-primary-700 shadow-warm-xs">
                 <Link href="/artikel">
                   <span>Lihat Semua Artikel</span>
                   <ArrowRight className="size-3 ml-1" />
@@ -1203,7 +1203,7 @@ export default function HomePage() {
                       <p className="text-[11px] text-stone-500">Unduh materi pembinaan untuk kelompokmu</p>
                     </div>
                   </div>
-                  <Button asChild variant="outline" size="sm" className="rounded-full text-xs font-bold border-stone-300 shrink-0">
+                  <Button asChild size="sm" className="rounded-xl text-xs font-bold bg-primary text-white hover:bg-primary-700 shadow-warm-xs shrink-0">
                     <Link href="/sumber-daya">
                       <span>Buka Modul</span>
                     </Link>
@@ -1350,14 +1350,13 @@ export default function HomePage() {
                       : "Panggilan Misi dan Pemuridan bagi Generasi Muda di Banten & Ternate"}
                   </p>
                 </div>
-                <Button
+                <button
+                  type="button"
                   onClick={() => setVideoModalOpen(false)}
-                  variant="outline"
-                  size="sm"
-                  className="border-white/20 text-white hover:bg-white/10 rounded-full text-xs"
+                  className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-700 text-white text-xs font-bold transition-all shadow-warm-xs cursor-pointer"
                 >
-                  Tutup
-                </Button>
+                  Tutup Pemutar
+                </button>
               </div>
             </div>
           </div>

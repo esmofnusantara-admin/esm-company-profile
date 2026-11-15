@@ -167,10 +167,10 @@ export default function JoinGroupPage() {
                   </p>
                 </div>
                 <div className="pt-4 flex flex-wrap items-center justify-center gap-3">
-                  <Button asChild className="rounded-full px-6 font-bold">
+                  <Button asChild className="rounded-xl px-6 font-bold bg-primary hover:bg-primary-700 text-white shadow-warm-xs">
                     <Link href="/">Kembali ke Beranda</Link>
                   </Button>
-                  <Button asChild variant="outline" className="rounded-full px-6 font-bold">
+                  <Button asChild className="rounded-xl px-6 font-bold border-2 border-primary/30 text-primary hover:bg-primary/5 bg-transparent shadow-xs">
                     <Link href="/doa">Lihat Pokok Doa</Link>
                   </Button>
                 </div>

@@ -526,7 +526,7 @@ export default function KemitraanPage() {
                 className="rounded-full px-7 py-3 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white text-sm"
                 label="WhatsApp Bendahara"
               />
-              <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-stone-300 bg-white">
+              <Button asChild size="lg" className="rounded-xl px-7 font-bold border-2 border-primary/30 text-primary hover:bg-primary/5 bg-transparent shadow-xs">
                 <a href={`mailto:${settings?.email || "halo@esm.or.id"}`} className="flex items-center gap-2">
                   <Mail className="size-4" />
                   <span>{settings?.email || "halo@esm.or.id"}</span>

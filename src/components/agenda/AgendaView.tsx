@@ -861,16 +861,15 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                           <Button
                             onClick={() => handleOpenRsvp(event)}
                             size="sm"
-                            className="rounded-full px-5 text-xs font-bold shadow-xs hover:scale-105 transition-all bg-[#2D060B] hover:bg-[#450A12] text-white"
+                            className="rounded-xl px-5 text-xs font-bold shadow-xs hover:scale-105 transition-all bg-primary hover:bg-primary-700 text-white"
                           >
                             <span>Daftar / Reservasi Kursi</span>
                             <ArrowRight className="size-3.5 ml-1.5" />
                           </Button>
                           <Button
                             onClick={() => handleWhatsAppDirect(event)}
-                            variant="outline"
                             size="sm"
-                            className="rounded-full px-3.5 text-xs font-bold border-stone-300 text-stone-700 hover:bg-stone-50"
+                            className="rounded-xl px-3.5 text-xs font-bold border border-primary/30 text-primary hover:bg-primary/5 bg-transparent"
                             title="Tanya Panitia via WhatsApp"
                           >
                             <MessageCircle className="size-3.5 mr-1 text-emerald-600" />
@@ -1146,7 +1145,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
               </div>
 
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white">
+                <Button asChild size="lg" className="rounded-xl px-7 font-bold shadow-warm-xs bg-primary hover:bg-primary-700 text-white">
                   <Link href="/kemitraan" className="flex items-center gap-2">
                     <span>Undang Tim Pembina ESM</span>
                     <ArrowRight className="size-4" />
@@ -1156,7 +1155,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                   phone="6281296106611"
                   text="Shalom ESM Indonesia, kami dari persekutuan sekolah/kampus/gereja ingin berkonsultasi mengenai kerja sama penyelenggaraan kegiatan pembinaan."
                   variant="button"
-                  className="rounded-full px-7 py-3 font-bold border border-stone-300 text-stone-700 bg-white hover:bg-stone-50 shadow-xs text-sm"
+                  className="rounded-xl px-7 py-3 font-bold border-2 border-primary/30 text-primary hover:bg-primary/5 bg-transparent shadow-xs text-sm"
                   label="Konsultasi Cepat WA"
                 />
               </div>

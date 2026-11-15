@@ -1027,13 +1027,13 @@ export default function ResourcesPage() {
               </div>
 
               <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-                <Button asChild size="lg" className="rounded-full px-7 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white">
+                <Button asChild size="lg" className="rounded-xl px-7 font-bold shadow-warm-xs bg-primary hover:bg-primary-700 text-white">
                   <Link href="/kemitraan" className="flex items-center gap-2">
                     <span>Hubungi Tim Kurikulum ESM</span>
                     <ArrowRight className="size-4" />
                   </Link>
                 </Button>
-                <Button asChild variant="outline" size="lg" className="rounded-full px-7 font-bold border-stone-300 text-stone-700 hover:bg-stone-100">
+                <Button asChild size="lg" className="rounded-xl px-7 font-bold border-2 border-primary/30 text-primary hover:bg-primary/5 bg-transparent shadow-xs">
                   <Link href="/gabung">Gabung Kelompok KTB</Link>
                 </Button>
               </div>
