@@ -749,14 +749,14 @@ export default function RenunganPage() {
               </div>
 
               <div className="shrink-0 flex flex-col items-center gap-3">
-                <Link
+                <a
                   href="/documents/modul-saat-teduh-esm.pdf"
-                  download
+                  download="modul-saat-teduh-esm.pdf"
                   className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-primary text-primary-foreground font-bold text-sm shadow-warm-md hover:bg-primary/90 transition-all active:scale-95"
                 >
                   <Download className="size-4" />
                   <span>Unduh Jurnal (PDF)</span>
-                </Link>
+                </a>
 
                 <Link
                   href="/sumber-daya"

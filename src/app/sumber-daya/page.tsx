@@ -131,7 +131,7 @@ const initialResources: ResourceItem[] = [
     sessions: "30 Hari Refleksi",
     description:
       "Jurnal perenungan pribadi harian dari Kitab Mazmur dan Injil untuk menumbuhkan keintiman doa, kedisiplinan membaca firman, dan ketenangan jiwa di awal hari.",
-    downloadUrl: "/documents/mission-of-faith-esm.pdf",
+    downloadUrl: "/documents/modul-saat-teduh-esm.pdf",
     coverImage: "/uploads/books/saat_teduh.jpg",
   },
   {
@@ -222,15 +222,21 @@ export default function ResourcesPage() {
   const handleDownload = (id: string, title: string, url?: string) => {
     setDownloadedIds((prev) => ({ ...prev, [id]: true }));
     const targetUrl = url && url !== "#" ? url : "/documents/panduan-pemimpin-ktb.pdf";
+    const filename = (targetUrl.split("/").pop() || "modul-esm.pdf").replace(/[?#].*$/, "");
+    const cleanFilename = filename.toLowerCase().endsWith(".pdf") ? filename : `${filename}.pdf`;
+
     const a = document.createElement("a");
     a.href = targetUrl;
-    a.download = "";
+    a.download = cleanFilename;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+
     toast({
       title: "Mengunduh Modul",
-      description: `Modul "${title}" berhasil diunduh. Kiranya bahan ini memberkati pemuridan Anda.`,
+      description: `Modul "${title}" berhasil diunduh (${cleanFilename}).`,
       type: "success",
     });
   };
@@ -402,7 +408,7 @@ export default function ResourcesPage() {
 
                   <div className="pt-3 flex flex-wrap items-center gap-4">
                     <Button
-                      onClick={() => handleDownload(featuredResource.id, featuredResource.title)}
+                      onClick={() => handleDownload(featuredResource.id, featuredResource.title, featuredResource.downloadUrl)}
                       size="lg"
                       className="rounded-full px-7 font-bold shadow-warm-xs bg-[#2D060B] hover:bg-[#450A12] text-white"
                     >
@@ -679,7 +685,7 @@ export default function ResourcesPage() {
                       {/* Card Footer Download Action */}
                       <div className="p-5 sm:p-6 pt-0 mt-auto flex items-center justify-between border-t border-stone-100">
                         <Button
-                          onClick={() => handleDownload(res.id, res.title)}
+                          onClick={() => handleDownload(res.id, res.title, res.downloadUrl)}
                           className="rounded-full px-5 text-xs font-bold shadow-xs hover:scale-105 transition-all bg-[#2D060B] hover:bg-[#450A12] text-white"
                         >
                           <Download className="size-3.5 mr-1.5" />
@@ -830,7 +836,7 @@ export default function ResourcesPage() {
 
                           <div className="flex items-center gap-2">
                             <Button
-                              onClick={() => handleDownload(res.id, res.title)}
+                              onClick={() => handleDownload(res.id, res.title, res.downloadUrl)}
                               size="sm"
                               className="rounded-full px-4 text-xs font-bold shadow-2xs hover:scale-105 transition-all bg-[#2D060B] hover:bg-[#450A12] text-white shrink-0"
                             >
