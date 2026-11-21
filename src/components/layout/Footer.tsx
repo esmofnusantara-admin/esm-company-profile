@@ -132,49 +132,28 @@ export function Footer() {
             </h4>
             <ul className="space-y-2 text-xs text-muted-foreground">
               <li>
-                <Link href="/tentang-kami#dasar-iman" className="hover:text-primary transition-colors">
-                  {locale === "en" ? "Mission of Faith" : "Misi Iman (Mission of Faith)"}
-                </Link>
-              </li>
-              <li>
                 <Link href="/tentang-kami#sejarah" className="hover:text-primary transition-colors">
                   {t.footer.historyLink}
                 </Link>
               </li>
               <li>
-                <Link href="/renungan" className="hover:text-primary transition-colors flex items-center gap-1.5">
-                  <span>Renungan & Saat Teduh</span>
-                  <span className="size-1.5 rounded-full bg-primary" />
+                <Link href="/renungan" className="hover:text-primary transition-colors">
+                  {locale === "en" ? "Daily Devotionals & Quiet Time" : "Renungan & Saat Teduh"}
                 </Link>
               </li>
               <li>
                 <Link href="/doa" className="hover:text-primary transition-colors">
-                  Pokok Doa Bersama
-                </Link>
-              </li>
-              <li>
-                <Link href="/artikel" className="hover:text-primary transition-colors">
-                  Warta Misi Pelayanan
-                </Link>
-              </li>
-              <li>
-                <Link href="/sumber-daya" className="hover:text-primary transition-colors">
-                  Bahan Ajar & Panduan KTB
-                </Link>
-              </li>
-              <li>
-                <Link href="/gabung" className="hover:text-primary transition-colors font-semibold text-accent">
-                  Gabung Kelompok Pemuridan
-                </Link>
-              </li>
-              <li>
-                <Link href="/kemitraan" className="hover:text-primary transition-colors font-semibold text-primary">
-                  {t.footer.supportFinancial}
+                  {locale === "en" ? "Prayer Requests" : "Pokok Doa Bersama"}
                 </Link>
               </li>
               <li>
                 <Link href="/artikel" className="hover:text-primary transition-colors">
                   {t.footer.bulletinArticles}
+                </Link>
+              </li>
+              <li>
+                <Link href="/kemitraan" className="hover:text-primary transition-colors">
+                  {t.footer.supportFinancial}
                 </Link>
               </li>
             </ul>
@@ -208,7 +187,12 @@ export function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="size-3.5 shrink-0 text-primary" />
-                <span>{email}</span>
+                <a
+                  href={`mailto:${email}`}
+                  className="hover:text-primary transition-colors"
+                >
+                  {email}
+                </a>
               </li>
             </ul>
           </div>
