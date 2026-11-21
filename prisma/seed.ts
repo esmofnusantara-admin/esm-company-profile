@@ -371,6 +371,7 @@ async function main() {
         "Pray for 15 small discipleship groups across Banten high schools to stand firm in Scripture amid peer pressure.",
       category: "PELAYANAN",
       isAnswered: false,
+      prayedCount: 87,
     },
     {
       month: "November 2026",
@@ -382,6 +383,7 @@ async function main() {
         "Pray for the launch of new campus discipleship groups at Khairun University and unity with local pastoral leaders.",
       category: "MISI",
       isAnswered: false,
+      prayedCount: 76,
     },
     {
       month: "November 2026",
@@ -393,6 +395,7 @@ async function main() {
         "Praise God! The student leadership retreat was attended by 85 youth with 12 students committing to regular discipleship.",
       category: "MISI",
       isAnswered: true,
+      prayedCount: 65,
     },
   ];
 
@@ -403,7 +406,10 @@ async function main() {
     if (existing) {
       await prisma.prayerRequest.update({
         where: { id: existing.id },
-        data: p,
+        data: {
+          ...p,
+          prayedCount: existing.prayedCount > 0 ? existing.prayedCount : p.prayedCount,
+        },
       });
     } else {
       await prisma.prayerRequest.create({ data: p });

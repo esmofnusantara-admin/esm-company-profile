@@ -30,6 +30,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { submitUserPrayer } from "@/actions/userPrayer";
+import { incrementPrayerCount } from "@/actions/prayer";
 import { useToast } from "@/context/ToastContext";
 
 interface PrayerItem {
@@ -102,7 +103,8 @@ const initialPrayers: PrayerItem[] = [
 export default function PrayerWallPage() {
   const { locale } = useLanguage();
   const { toast } = useToast();
-  const [prayers, setPrayers] = React.useState<PrayerItem[]>(initialPrayers);
+  // Start with empty array so there is NO initial 5-card flash before the real DB cards load
+  const [prayers, setPrayers] = React.useState<PrayerItem[]>([]);
   const [activeCategory, setActiveCategory] = React.useState<string>("all");
   const [prayedMap, setPrayedMap] = React.useState<Record<string, boolean>>({});
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
@@ -122,10 +124,10 @@ export default function PrayerWallPage() {
     let cancelled = false;
     const fetchPrayers = async () => {
       try {
-        const res = await fetch("/api/content?section=doa");
+        const res = await fetch(`/api/content?section=doa&_t=${Date.now()}`, { cache: "no-store" });
         const json = await res.json();
         if (json.success && Array.isArray(json.data?.prayerRequests) && json.data.prayerRequests.length > 0) {
-          const mapped: PrayerItem[] = json.data.prayerRequests.map((p: any, idx: number) => {
+          const mapped: PrayerItem[] = json.data.prayerRequests.map((p: any) => {
             const cat = (p.category || "").toLowerCase();
             const validCategory: PrayerItem["category"] = 
               cat.includes("banten") ? "banten" :
@@ -140,15 +142,20 @@ export default function PrayerWallPage() {
               month: p.month || "Bulan Ini",
               description: p.description,
               urgent: !p.isAnswered,
-              prayedCount: 65 + (idx * 11) % 40,
+              prayedCount: typeof p.prayedCount === "number" ? p.prayedCount : 0,
             };
           });
           if (!cancelled) {
             setPrayers(mapped);
           }
+        } else if (json.success && Array.isArray(json.data?.prayerRequests) && json.data.prayerRequests.length === 0) {
+          if (!cancelled) setPrayers([]);
         }
       } catch (err) {
         console.warn("Using default prayers fallback:", err);
+        if (!cancelled) {
+          setPrayers(initialPrayers);
+        }
       } finally {
         if (!cancelled) setIsLoadingPrayers(false);
       }
@@ -169,8 +176,10 @@ export default function PrayerWallPage() {
     }
   }, []);
 
-  const handlePray = (id: string) => {
+  const handlePray = async (id: string) => {
     if (prayedMap[id]) return;
+
+    // 1. Optimistic update in UI & localStorage
     setPrayedMap((prev) => {
       const next = { ...prev, [id]: true };
       if (typeof window !== "undefined") {
@@ -180,9 +189,22 @@ export default function PrayerWallPage() {
       }
       return next;
     });
+
     setPrayers((prev) =>
       prev.map((p) => (p.id === id ? { ...p, prayedCount: p.prayedCount + 1 } : p))
     );
+
+    // 2. Persist increment to database & Admin CMS via Server Action
+    try {
+      const res = await incrementPrayerCount(id);
+      if (res.success && typeof res.count === "number") {
+        setPrayers((prev) =>
+          prev.map((p) => (p.id === id ? { ...p, prayedCount: res.count! } : p))
+        );
+      }
+    } catch (err) {
+      console.error("Gagal sinkron pendoa ke database:", err);
+    }
   };
 
   const handleShare = (p: PrayerItem) => {
@@ -316,7 +338,9 @@ export default function PrayerWallPage() {
                 Saring Pokok Doa Berdasarkan Ladang & Jenjang:
               </p>
               <span className="text-xs text-stone-500 font-medium">
-                Menampilkan {filteredPrayers.length} pokok doa aktif
+                {isLoadingPrayers && prayers.length === 0
+                  ? "Memuat pokok doa..."
+                  : `Menampilkan ${filteredPrayers.length} pokok doa aktif`}
               </span>
             </div>
 
@@ -454,93 +478,126 @@ export default function PrayerWallPage() {
             ============================================================ */}
         <section className="py-14 sm:py-20">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-              {filteredPrayers.map((item) => {
-                const hasPrayed = prayedMap[item.id];
-                return (
-                  <Card
-                    key={item.id}
-                    className="rounded-3xl border border-stone-200/90 bg-white p-6 sm:p-7 shadow-warm-xs hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group relative overflow-hidden"
+            {isLoadingPrayers && prayers.length === 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {[1, 2, 3].map((n) => (
+                  <div
+                    key={n}
+                    className="rounded-3xl border border-stone-200/90 bg-white p-6 sm:p-7 shadow-warm-xs flex flex-col justify-between space-y-4 animate-pulse min-h-[300px]"
                   >
-                    {/* Top Status Accent Bar */}
-                    <div
-                      className={cn(
-                        "h-1.5 w-full -mx-7 -mt-7 mb-5",
-                        item.urgent
-                          ? "bg-gradient-to-r from-red-600 via-amber-500 to-red-600 animate-pulse"
-                          : "bg-stone-200"
-                      )}
-                    />
-
                     <div className="space-y-4">
-                      {/* Badge & Region */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500">
-                          <MapPin className="size-3.5 text-primary" />
-                          <span>{item.field}</span>
-                        </div>
-                        {item.urgent && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-black uppercase tracking-wider border border-red-300">
-                            <span className="size-1.5 rounded-full bg-red-600 animate-ping" />
-                            Mendesak
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between">
+                        <div className="h-4 w-28 bg-stone-200 rounded-full" />
+                        <div className="h-4 w-16 bg-stone-100 rounded-full" />
                       </div>
-
-                      {/* Title & Narrative */}
-                      <div className="space-y-2">
-                        <h3 className="font-sans text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
-                          {item.title}
-                        </h3>
-                        <p className="text-xs text-stone-600 leading-relaxed font-normal">
-                          {item.description}
-                        </p>
+                      <div className="space-y-2.5 pt-2">
+                        <div className="h-5 w-4/5 bg-stone-200 rounded-lg" />
+                        <div className="h-3.5 w-full bg-stone-100 rounded" />
+                        <div className="h-3.5 w-5/6 bg-stone-100 rounded" />
                       </div>
                     </div>
-
-                    {/* Action & Intercession Counter */}
-                    <div className="pt-5 mt-5 border-t border-stone-100 flex items-center justify-between gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handlePray(item.id)}
+                    <div className="pt-5 border-t border-stone-100 flex items-center justify-between">
+                      <div className="h-8 w-32 bg-stone-200 rounded-full" />
+                      <div className="h-4 w-16 bg-stone-100 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : filteredPrayers.length === 0 ? (
+              <div className="text-center py-16 border border-dashed border-stone-200 rounded-3xl bg-white/60 space-y-3">
+                <Heart className="size-8 text-stone-300 mx-auto" />
+                <p className="text-sm font-semibold text-stone-600">Belum ada pokok doa untuk kategori ini.</p>
+                <p className="text-xs text-stone-400">Silakan pilih kategori lain atau bagikan pokok doa Anda di bawah.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                {filteredPrayers.map((item) => {
+                  const hasPrayed = prayedMap[item.id];
+                  return (
+                    <Card
+                      key={item.id}
+                      className="rounded-3xl border border-stone-200/90 bg-white p-6 sm:p-7 shadow-warm-xs hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group relative overflow-hidden"
+                    >
+                      {/* Top Status Accent Bar */}
+                      <div
                         className={cn(
-                          "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs",
-                          hasPrayed
-                            ? "bg-emerald-600 text-white scale-105"
-                            : "bg-[#2D060B] text-white hover:bg-[#450A12] active:scale-95"
+                          "h-1.5 w-full -mx-7 -mt-7 mb-5",
+                          item.urgent
+                            ? "bg-gradient-to-r from-red-600 via-amber-500 to-red-600 animate-pulse"
+                            : "bg-stone-200"
                         )}
-                      >
-                        <Heart
-                          className={cn(
-                            "size-3.5 transition-colors",
-                            hasPrayed ? "fill-white text-white" : "text-amber-300"
-                          )}
-                        />
-                        <span>{hasPrayed ? "Telah Didoakan ✓" : "Saya Mendoakan"}</span>
-                      </button>
+                      />
 
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] text-stone-500 font-semibold">
-                          {item.prayedCount} pendoa
-                        </span>
+                      <div className="space-y-4">
+                        {/* Badge & Region */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-1.5 text-[11px] font-bold text-stone-500">
+                            <MapPin className="size-3.5 text-primary" />
+                            <span>{item.field}</span>
+                          </div>
+                          {item.urgent && (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-red-100 text-red-800 text-[10px] font-black uppercase tracking-wider border border-red-300">
+                              <span className="size-1.5 rounded-full bg-red-600 animate-ping" />
+                              Mendesak
+                            </span>
+                          )}
+                        </div>
+
+                        {/* Title & Narrative */}
+                        <div className="space-y-2">
+                          <h3 className="font-sans text-lg font-bold text-foreground leading-snug group-hover:text-primary transition-colors">
+                            {item.title}
+                          </h3>
+                          <p className="text-xs text-stone-600 leading-relaxed font-normal">
+                            {item.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Action & Intercession Counter */}
+                      <div className="pt-5 mt-5 border-t border-stone-100 flex items-center justify-between gap-2">
                         <button
                           type="button"
-                          onClick={() => handleShare(item)}
-                          title="Salin Pokok Doa"
-                          className="size-8 rounded-full border border-stone-200 hover:border-stone-300 flex items-center justify-center text-stone-400 hover:text-stone-700 transition-colors"
-                        >
-                          {copiedId === item.id ? (
-                            <Check className="size-3.5 text-emerald-600" />
-                          ) : (
-                            <Share2 className="size-3.5" />
+                          onClick={() => handlePray(item.id)}
+                          className={cn(
+                            "inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer shadow-2xs",
+                            hasPrayed
+                              ? "bg-emerald-600 text-white scale-105"
+                              : "bg-[#2D060B] text-white hover:bg-[#450A12] active:scale-95"
                           )}
+                        >
+                          <Heart
+                            className={cn(
+                              "size-3.5 transition-colors",
+                              hasPrayed ? "fill-white text-white" : "text-amber-300"
+                            )}
+                          />
+                          <span>{hasPrayed ? "Telah Didoakan ✓" : "Saya Mendoakan"}</span>
                         </button>
+
+                        <div className="flex items-center gap-2">
+                          <span className="text-[11px] text-stone-500 font-semibold">
+                            {item.prayedCount} pendoa
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleShare(item)}
+                            title="Salin Pokok Doa"
+                            className="size-8 rounded-full border border-stone-200 hover:border-stone-300 flex items-center justify-center text-stone-400 hover:text-stone-700 transition-colors"
+                          >
+                            {copiedId === item.id ? (
+                              <Check className="size-3.5 text-emerald-600" />
+                            ) : (
+                              <Share2 className="size-3.5" />
+                            )}
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </section>
 

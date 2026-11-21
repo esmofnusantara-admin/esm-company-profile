@@ -30,6 +30,7 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
+import { incrementPrayerCount } from "@/actions/prayer";
 
 export default function HomePage() {
   const { t, locale } = useLanguage();
@@ -70,6 +71,9 @@ export default function HomePage() {
       .then((res) => {
         if (res.success && res.data) {
           setHomeContent(res.data);
+          if (typeof res.data.prayerRequest?.prayedCount === "number") {
+            setPrayerCount(res.data.prayerRequest.prayedCount);
+          }
           setThumbnailError(false);
         }
       })
@@ -1188,20 +1192,23 @@ export default function HomePage() {
                       {prayerCount} orang mendoakan
                     </span>
                     <button
-                      onClick={() => {
+                      onClick={async () => {
                         const prayerId = homeContent?.prayerRequest?.id || "default";
-                        setHasPrayed((prev) => {
-                          const next = !prev;
+                        if (!hasPrayed) {
+                          setHasPrayed(true);
                           if (typeof window !== "undefined") {
-                            if (next) {
-                              localStorage.setItem(`esm_home_prayed_${prayerId}`, "true");
-                            } else {
-                              localStorage.removeItem(`esm_home_prayed_${prayerId}`);
-                            }
+                            localStorage.setItem(`esm_home_prayed_${prayerId}`, "true");
                           }
-                          setPrayerCount((c) => (next ? c + 1 : Math.max(0, c - 1)));
-                          return next;
-                        });
+                          setPrayerCount((c) => c + 1);
+                          if (prayerId !== "default") {
+                            try {
+                              const res = await incrementPrayerCount(prayerId);
+                              if (res.success && typeof res.count === "number") {
+                                setPrayerCount(res.count);
+                              }
+                            } catch {}
+                          }
+                        }
                       }}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${hasPrayed
                           ? "bg-amber-400 text-[#180306] scale-105"

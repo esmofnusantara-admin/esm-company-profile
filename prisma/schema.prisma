@@ -204,6 +204,7 @@ model PrayerRequest {
   descriptionEn String?  @db.Text
   category      String   @default("MISI") // MISI, PELAYANAN, GENERASI, KEBUTUHAN
   isAnswered    Boolean  @default(false)
+  prayedCount   Int      @default(0)
   sortOrder     Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt

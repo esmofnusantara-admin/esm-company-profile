@@ -51,6 +51,7 @@ export default function AdminDoaCMS() {
     descriptionEn: "",
     category: "MISI",
     isAnswered: false,
+    prayedCount: 0,
   });
 
   // User Inbound Prayers
@@ -194,6 +195,7 @@ export default function AdminDoaCMS() {
                 descriptionEn: "",
                 category: "MISI",
                 isAnswered: false,
+                prayedCount: 0,
               });
               setIsModalOpen(true);
             }}
@@ -264,12 +266,16 @@ export default function AdminDoaCMS() {
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-primary/10 text-primary">
                           {item.month}
                         </span>
                         <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-muted text-muted-foreground">
                           {item.category}
+                        </span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 flex items-center gap-1 border border-emerald-200">
+                          <HeartHandshake className="size-3 text-emerald-600" />
+                          {item.prayedCount || 0} Pendoa
                         </span>
                         {item.isAnswered && (
                           <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 flex items-center gap-1">
@@ -296,6 +302,7 @@ export default function AdminDoaCMS() {
                             descriptionEn: item.descriptionEn || "",
                             category: item.category,
                             isAnswered: item.isAnswered,
+                            prayedCount: item.prayedCount || 0,
                           });
                           setIsModalOpen(true);
                         }}
@@ -539,6 +546,22 @@ export default function AdminDoaCMS() {
                   onChange={(e) => setForm({ ...form, descriptionEn: e.target.value })}
                   className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-foreground block mb-1">
+                  Jumlah Pendoa (Komitmen Syafaat Pengunjung)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  value={form.prayedCount ?? 0}
+                  onChange={(e) => setForm({ ...form, prayedCount: parseInt(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  Angka ini bertambah otomatis setiap kali pengunjung mengklik &quot;Saya Mendoakan&quot; di website.
+                </p>
               </div>
 
               <div className="flex items-center gap-2">
