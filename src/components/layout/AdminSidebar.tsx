@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   LayoutDashboard,
   Home,
@@ -21,6 +21,10 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  UserCheck,
+  Network,
+  Building2,
+  Heart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logoutAdmin } from "@/actions/auth";
@@ -46,22 +50,12 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "KONTEN HALAMAN",
+    label: "BERANDA",
     items: [
       {
-        title: "Beranda",
+        title: "Kelola Beranda",
         href: "/admin/konten/beranda",
         icon: Home,
-      },
-      {
-        title: "Tentang Kami",
-        href: "/admin/konten/tentang-kami",
-        icon: BookOpen,
-      },
-      {
-        title: "Pelayanan & 3C",
-        href: "/admin/konten/pelayanan",
-        icon: Compass,
       },
       {
         title: "Testimoni",
@@ -76,12 +70,57 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "MEDIA & PUBLIKASI",
+    label: "TENTANG KAMI",
     items: [
       {
-        title: "Artikel & Renungan",
+        title: "Profil & Visi Misi",
+        href: "/admin/konten/tentang-kami?tab=profil",
+        icon: BookOpen,
+      },
+      {
+        title: "Tim Pelayan & Staf",
+        href: "/admin/konten/tentang-kami?tab=tim",
+        icon: UserCheck,
+      },
+      {
+        title: "Bagan Struktur Gerakan",
+        href: "/admin/konten/tentang-kami?tab=pengurus",
+        icon: Network,
+      },
+      {
+        title: "Pengurus Yayasan & Legalitas",
+        href: "/admin/konten/tentang-kami?tab=yayasan",
+        icon: Building2,
+      },
+      {
+        title: "Informasi Mitra Misi",
+        href: "/admin/konten/tentang-kami?tab=mitra",
+        icon: ShieldCheck,
+      },
+    ],
+  },
+  {
+    label: "PELAYANAN (3C)",
+    items: [
+      {
+        title: "Explore, Encounter & Connect",
+        href: "/admin/konten/pelayanan",
+        icon: Compass,
+      },
+    ],
+  },
+  {
+    label: "KABAR & DOA",
+    items: [
+      {
+        title: "Artikel & Warta Misi",
         href: "/admin/artikel",
         icon: FileText,
+      },
+      {
+        title: "Pokok Doa Bulanan",
+        href: "/admin/doa",
+        icon: HeartHandshake,
       },
       {
         title: "Warta Buletin (PDF)",
@@ -96,7 +135,7 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    label: "KOMUNITAS & EVENT",
+    label: "AGENDA & KOMUNITAS",
     items: [
       {
         title: "Event & Mobilisasi",
@@ -114,24 +153,19 @@ const navGroups: NavGroup[] = [
     label: "KEMITRAAN & KEUANGAN",
     items: [
       {
-        title: "Mitra & Donasi",
+        title: "Rekening Bank & QRIS",
+        href: "/admin/rekening",
+        icon: CreditCard,
+      },
+      {
+        title: "Mitra & Komitmen Donasi",
         href: "/admin/mitra",
-        icon: Users2,
+        icon: Heart,
       },
       {
         title: "Kas & Arus Kas",
         href: "/admin/keuangan",
         icon: Wallet,
-      },
-      {
-        title: "Pokok Doa Bulanan",
-        href: "/admin/doa",
-        icon: HeartHandshake,
-      },
-      {
-        title: "Rekening Bank & QRIS",
-        href: "/admin/rekening",
-        icon: CreditCard,
       },
     ],
   },
@@ -149,12 +183,27 @@ const navGroups: NavGroup[] = [
 
 export function AdminSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const router = useRouter();
 
   const handleLogout = async () => {
     await logoutAdmin();
     router.push("/admin/login");
     router.refresh();
+  };
+
+  const isItemActive = (href: string) => {
+    if (href === "/admin") return pathname === "/admin";
+    const [basePath, queryString] = href.split("?");
+    if (queryString) {
+      const itemTab = new URLSearchParams(queryString).get("tab");
+      const currentTab = searchParams?.get("tab") || "profil";
+      return pathname === basePath && currentTab === itemTab;
+    }
+    if (pathname === "/admin/konten/tentang-kami") {
+      return false;
+    }
+    return pathname === href || (pathname.startsWith(href + "/") && !href.includes("?"));
   };
 
   return (
@@ -190,10 +239,7 @@ export function AdminSidebar() {
                 {group.label}
               </p>
               {group.items.map((item) => {
-                const isActive =
-                  item.href === "/admin"
-                    ? pathname === "/admin"
-                    : pathname === item.href || pathname?.startsWith(item.href + "/");
+                const isActive = isItemActive(item.href);
                 const Icon = item.icon;
 
                 return (
@@ -221,7 +267,7 @@ export function AdminSidebar() {
       <div className="p-4 border-t border-border bg-card shrink-0">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-xl transition-colors"
+          className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/10 rounded-xl transition-colors cursor-pointer"
         >
           <LogOut className="size-3.5" />
           <span>Keluar Portal</span>

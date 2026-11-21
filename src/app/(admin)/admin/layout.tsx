@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { AdminSidebar } from "@/components/layout/AdminSidebar";
 import { getAdminSession } from "@/actions/auth";
@@ -37,7 +37,9 @@ export default function AdminRootLayout({
 
   return (
     <div className="flex min-h-screen bg-canvas">
-      <AdminSidebar />
+      <Suspense fallback={<aside className="sticky top-0 h-screen w-64 border-r border-border bg-card shrink-0" />}>
+        <AdminSidebar />
+      </Suspense>
       <div className="flex-1 flex flex-col min-w-0">
         <header className="sticky top-0 z-20 h-16 border-b border-border bg-card/95 backdrop-blur-md px-8 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2">
