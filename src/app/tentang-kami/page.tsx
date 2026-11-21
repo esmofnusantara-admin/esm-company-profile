@@ -1097,7 +1097,7 @@ export default function TentangKamiPage() {
                           {/* Avatar Photo / Styled Gradient Initials */}
                           <div className="size-20 mx-auto rounded-full bg-gradient-to-br from-[#2D060B] via-[#4A0D15] to-[#1E0407] text-amber-200 border-2 border-primary/20 shadow-md flex items-center justify-center font-bold text-xl relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
                             {m.photo ? (
-                              <Image src={m.photo} alt={m.name} fill className="object-cover" />
+                              <Image src={m.photo} alt={m.name} fill unoptimized className="object-cover" />
                             ) : (
                               <span className="tracking-widest font-sans font-black">{initials}</span>
                             )}
