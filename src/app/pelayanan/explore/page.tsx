@@ -24,13 +24,18 @@ import {
 } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 export default function ExplorePage() {
   const { t, locale } = useLanguage();
   const e = t.explorePage;
 
   return (
-    <>
+    <PageStatusGate
+      path="/pelayanan/explore"
+      fallbackTitle="Explore (Siswa SMP-SMA)"
+      fallbackCategory="Pelayanan Siswa"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -286,6 +291,6 @@ export default function ExplorePage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

@@ -36,6 +36,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 import { DEVOTIONALS_DATA, type DevotionalItem } from "@/lib/devotionalsData";
 
 interface DailyVerse {
@@ -212,8 +213,13 @@ export default function RenunganPage() {
   });
 
   return (
-    <div className="min-h-screen bg-canvas text-foreground flex flex-col transition-colors">
-      <Navbar />
+    <PageStatusGate
+      path="/renungan"
+      fallbackTitle="Renungan & Saat Teduh"
+      fallbackCategory="Kabar & Doa"
+    >
+      <div className="min-h-screen bg-canvas text-foreground flex flex-col transition-colors">
+        <Navbar />
 
       <main className="flex-1">
         {/* Page Hero */}
@@ -771,7 +777,8 @@ export default function RenunganPage() {
         </section>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </PageStatusGate>
   );
 }

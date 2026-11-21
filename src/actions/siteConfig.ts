@@ -139,6 +139,11 @@ export async function saveSiteConfig(key: string, data: any) {
     revalidatePath("/admin/konten/tentang-kami");
     revalidatePath("/admin/konten/pelayanan");
     revalidatePath("/admin/pengaturan");
+    revalidatePath("/sumber-daya");
+    revalidatePath("/renungan");
+    revalidatePath("/doa");
+    revalidatePath("/artikel");
+    revalidatePath("/agenda");
   } catch {}
 
   return { success: true, dbSaved: true };

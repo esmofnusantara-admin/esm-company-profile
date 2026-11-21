@@ -293,26 +293,16 @@ export default function HomePage() {
               {heroSubheadline}
             </p>
 
-            {/* Centered Action Buttons */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
+            {/* Centered Single Action Button */}
+            <div className="flex items-center justify-center pt-2">
               <Button
                 asChild
                 size="lg"
-                className="rounded-full shadow-warm-lg px-8 py-6 text-sm font-bold bg-gradient-to-r from-primary to-red-600 hover:from-primary-600 hover:to-red-700 transition-all hover:scale-[1.02]"
+                className="rounded-full shadow-warm-lg px-8 py-6 text-sm sm:text-base font-bold bg-gradient-to-r from-primary to-red-600 hover:from-primary-600 hover:to-red-700 transition-all hover:scale-[1.02]"
               >
-                <Link href={primaryCtaUrl}>
-                  <span>{primaryCtaText}</span>
+                <Link href={primaryCtaUrl || "/tentang-kami"}>
+                  <span>{primaryCtaText || "Pelajari Gerakan Kami"}</span>
                   <ArrowRight className="size-4 ml-1.5" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                size="lg"
-                variant="outlineWhite"
-                className="rounded-full px-7 py-6 text-sm font-semibold border-white/30 bg-white/10 hover:bg-white/20 text-white backdrop-blur-md transition-all"
-              >
-                <Link href={secondaryCtaUrl}>
-                  <span>{secondaryCtaText}</span>
                 </Link>
               </Button>
             </div>

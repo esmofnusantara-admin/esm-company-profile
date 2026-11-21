@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 import { submitUserPrayer } from "@/actions/userPrayer";
 import { incrementPrayerCount } from "@/actions/prayer";
 import { useToast } from "@/context/ToastContext";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 interface PrayerItem {
   id: string;
@@ -272,7 +273,11 @@ export default function PrayerWallPage() {
   ];
 
   return (
-    <>
+    <PageStatusGate
+      path="/doa"
+      fallbackTitle="Pokok Doa & Mezbah Syafaat"
+      fallbackCategory="Kabar & Doa"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -719,6 +724,6 @@ export default function PrayerWallPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

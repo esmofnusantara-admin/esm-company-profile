@@ -18,11 +18,14 @@ import {
   Building2,
   ShieldCheck,
   ExternalLink,
+  Clock,
+  Layers,
 } from "lucide-react";
 import Link from "next/link";
 import { useThemeCustomizer, PRESET_PALETTES } from "@/context/ThemeCustomizerContext";
 import { useToast } from "@/context/ToastContext";
 import { AboutLegalOrg, defaultLegalOrg } from "@/lib/legalOrgConfig";
+import { DEFAULT_PAGE_STATUSES, PageStatusItem } from "@/lib/pageStatusConfig";
 
 interface SiteSettingsConfig {
   phone: string;
@@ -53,6 +56,7 @@ export default function AdminPengaturanCMS() {
   const { themePreset, customHex, setThemePreset, setCustomHex } = useThemeCustomizer();
   const [config, setConfig] = useState<SiteSettingsConfig>(defaultConfig);
   const [legalOrg, setLegalOrg] = useState<AboutLegalOrg>(defaultLegalOrg);
+  const [pageStatuses, setPageStatuses] = useState<PageStatusItem[]>(DEFAULT_PAGE_STATUSES);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
@@ -61,12 +65,14 @@ export default function AdminPengaturanCMS() {
     async function loadData() {
       setIsLoading(true);
       try {
-        const [savedSettings, savedLegal] = await Promise.all([
+        const [savedSettings, savedLegal, savedPages] = await Promise.all([
           getSiteConfig<SiteSettingsConfig>("site_settings", defaultConfig),
           getSiteConfig<AboutLegalOrg>("about_legal_org", defaultLegalOrg),
+          getSiteConfig<PageStatusItem[]>("site_page_statuses", DEFAULT_PAGE_STATUSES),
         ]);
         if (savedSettings) setConfig(savedSettings);
         if (savedLegal) setLegalOrg(savedLegal);
+        if (savedPages && Array.isArray(savedPages)) setPageStatuses(savedPages);
       } catch (err) {
         console.error(err);
       } finally {
@@ -85,11 +91,12 @@ export default function AdminPengaturanCMS() {
         saveSiteConfig("site_settings", config),
         saveSiteConfig("about_legal_org", legalOrg),
         saveSiteConfig("site_theme", { themePreset, customHex }),
+        saveSiteConfig("site_page_statuses", pageStatuses),
       ]);
       setSavedSuccess(true);
       toast({
         title: "Pengaturan Tersimpan",
-        description: "Pengaturan narahubung, legalitas yayasan, dan tema website berhasil diperbarui.",
+        description: "Pengaturan narahubung, legalitas yayasan, tema, dan status halaman berhasil diperbarui.",
         type: "success",
       });
       setTimeout(() => setSavedSuccess(false), 4000);
@@ -437,6 +444,114 @@ export default function AdminPengaturanCMS() {
                 className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
               />
             </div>
+          </div>
+        </div>
+
+        {/* ============================================================
+            STATUS HALAMAN & VISIBILITAS PUBLIK (Segera Hadir / Active)
+            ============================================================ */}
+        <div className="bg-card rounded-2xl border border-border p-6 space-y-5 shadow-warm-sm">
+          <div className="border-b border-border pb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Layers className="size-4 text-primary" />
+              <div>
+                <h2 className="text-sm font-bold text-foreground">
+                  Visibilitas & Status Halaman Publik (Coming Soon Control)
+                </h2>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  Sub-menu navigasi tetap tampil utuh di website. Jika halaman disetel ke &quot;Segera Hadir&quot;, pengunjung yang membuka menu tersebut akan melihat layar penjelas &quot;Segera Hadir&quot; yang estetik.
+                </p>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-muted text-muted-foreground shrink-0">
+              {pageStatuses.length} Halaman
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {pageStatuses.map((page, idx) => {
+              const isComingSoon = page.status === "COMING_SOON";
+              return (
+                <div
+                  key={page.path}
+                  className={`p-4 rounded-xl border transition-all ${
+                    isComingSoon
+                      ? "border-amber-300/80 bg-amber-50/30"
+                      : "border-border bg-card"
+                  }`}
+                >
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-foreground">
+                          {page.title}
+                        </span>
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                          {page.path}
+                        </span>
+                        <span className="text-[10px] font-semibold text-primary/80">
+                          ({page.category})
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Status Toggle Buttons */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...pageStatuses];
+                          updated[idx].status = "ACTIVE";
+                          setPageStatuses(updated);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          !isComingSoon
+                            ? "bg-emerald-600 text-white shadow-2xs"
+                            : "bg-muted/50 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        ✓ Aktif (Tampilkan Isi)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...pageStatuses];
+                          updated[idx].status = "COMING_SOON";
+                          setPageStatuses(updated);
+                        }}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                          isComingSoon
+                            ? "bg-amber-500 text-white shadow-2xs"
+                            : "bg-muted/50 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        ⏳ Segera Hadir
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Custom Message if COMING_SOON */}
+                  {isComingSoon && (
+                    <div className="mt-3 pt-3 border-t border-amber-200/60 space-y-1.5 animate-in fade-in-50">
+                      <label className="text-[11px] font-bold text-amber-900 block">
+                        Pesan Penjelas di Layar Segera Hadir (Opsional):
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={page.customMessage || ""}
+                        onChange={(e) => {
+                          const updated = [...pageStatuses];
+                          updated[idx].customMessage = e.target.value;
+                          setPageStatuses(updated);
+                        }}
+                        placeholder="Contoh: Modul dan bahan ajar pembuat murid sedang dipersiapkan oleh tim pelayanan kami..."
+                        className="w-full px-3 py-1.5 text-xs rounded-lg border border-amber-300 bg-white text-stone-800 focus:ring-2 focus:ring-amber-400"
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 

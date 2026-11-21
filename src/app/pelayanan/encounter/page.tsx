@@ -23,6 +23,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 const encounterSlides: CarouselSlide[] = [
   {
@@ -46,7 +47,11 @@ export default function EncounterPage() {
   const en = t.encounterPage;
 
   return (
-    <>
+    <PageStatusGate
+      path="/pelayanan/encounter"
+      fallbackTitle="Encounter (Mahasiswa Kampus)"
+      fallbackCategory="Pelayanan Mahasiswa"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -319,6 +324,6 @@ export default function EncounterPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

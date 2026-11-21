@@ -3,12 +3,14 @@ import { prisma } from "@/lib/db";
 import { defaultLegalOrg } from "@/lib/legalOrgConfig";
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
 import { initialFAQs } from "@/lib/faqData";
+import { DEFAULT_PAGE_STATUSES } from "@/lib/pageStatusConfig";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // In-memory defaults for all site configurations
 const DEFAULT_CONFIGS: Record<string, any> = {
+  site_page_statuses: DEFAULT_PAGE_STATUSES,
   site_theme: {
     presetId: "crimson",
     primaryColor: "#BA2421",
@@ -34,12 +36,12 @@ const DEFAULT_CONFIGS: Record<string, any> = {
       "Melatih siswa, mahasiswa, dan alumni untuk berakar dalam firman Tuhan, bertumbuh dalam komunitas murid, dan diutus ke tengah dunia kerja serta ladang misi.",
     subheadlineEn:
       "Training high school, university students, and alumni to be rooted in God's word, grow in disciple community, and be sent into the marketplace and mission fields.",
-    primaryCtaTextId: "Mulai Bergabung",
-    primaryCtaTextEn: "Get Involved",
-    primaryCtaUrl: "/pelayanan",
-    secondaryCtaTextId: "Dukung Pelayanan",
-    secondaryCtaTextEn: "Support Ministry",
-    secondaryCtaUrl: "/kemitraan",
+    primaryCtaTextId: "Pelajari Gerakan Kami",
+    primaryCtaTextEn: "Discover Our Movement",
+    primaryCtaUrl: "/tentang-kami",
+    secondaryCtaTextId: "",
+    secondaryCtaTextEn: "",
+    secondaryCtaUrl: "",
   },
   home_why_esm: {
     kickerId: "MENGAPA ESM HADIR?",
@@ -718,7 +720,31 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // 7. Default: Return all configs merged with defaults
+    // 8. Section 'page_status'
+    if (section === "page_status") {
+      let pageStatuses = DEFAULT_PAGE_STATUSES;
+      if (!isDbKnownOffline()) {
+        try {
+          const cfg = await prisma.siteConfig.findUnique({
+            where: { key: "site_page_statuses" },
+          });
+          if (cfg && cfg.value) {
+            try {
+              pageStatuses = JSON.parse(cfg.value);
+            } catch {}
+          }
+          markDbOnline();
+        } catch {
+          markDbOffline();
+        }
+      }
+      return NextResponse.json({
+        success: true,
+        data: pageStatuses,
+      });
+    }
+
+    // 9. Default: Return all configs merged with defaults
     const result: Record<string, any> = { ...DEFAULT_CONFIGS };
     if (!isDbKnownOffline()) {
       try {

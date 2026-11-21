@@ -142,12 +142,12 @@ const defaultHero: HeroData = {
     "Melatih siswa, mahasiswa, dan alumni untuk berakar dalam firman Tuhan, bertumbuh dalam komunitas murid, dan diutus ke tengah dunia kerja serta ladang misi.",
   subheadlineEn:
     "Training high school, university students, and alumni to be rooted in God's word, grow in disciple community, and be sent into the marketplace and mission fields.",
-  primaryCtaTextId: "Mulai Bergabung",
-  primaryCtaTextEn: "Get Involved",
-  primaryCtaUrl: "/pelayanan",
-  secondaryCtaTextId: "Dukung Pelayanan",
-  secondaryCtaTextEn: "Support Ministry",
-  secondaryCtaUrl: "/kemitraan",
+  primaryCtaTextId: "Pelajari Gerakan Kami",
+  primaryCtaTextEn: "Discover Our Movement",
+  primaryCtaUrl: "/tentang-kami",
+  secondaryCtaTextId: "",
+  secondaryCtaTextEn: "",
+  secondaryCtaUrl: "",
 };
 
 const defaultStats: StatItem[] = [
@@ -1120,58 +1120,53 @@ export default function AdminBerandaCMS() {
             </div>
           </div>
 
-          {/* CTA Buttons */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-border/60">
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-foreground block">Tombol Aksi Utama (Primary CTA)</label>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Teks ID"
-                  value={hero.primaryCtaTextId}
-                  onChange={(e) => setHero({ ...hero, primaryCtaTextId: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-                <input
-                  type="text"
-                  placeholder="Teks EN"
-                  value={hero.primaryCtaTextEn}
-                  onChange={(e) => setHero({ ...hero, primaryCtaTextEn: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-              </div>
-              <input
-                type="text"
-                placeholder="Tautan URL (contoh: /pelayanan)"
-                value={hero.primaryCtaUrl}
-                onChange={(e) => setHero({ ...hero, primaryCtaUrl: e.target.value })}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-              />
+          {/* Single CTA Button Editor */}
+          <div className="pt-2 border-t border-border/60 space-y-3">
+            <div>
+              <label className="text-xs font-bold text-foreground block">
+                Tombol Aksi Hero (Tombol Utama Tunggal)
+              </label>
+              <p className="text-[11px] text-muted-foreground mt-0.5">
+                Tombol tunggal yang tampil di tengah Hero beranda. Anda dapat mengubah teks dan halaman tujuannya kapan saja.
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-foreground block">Tombol Aksi Kedua (Secondary CTA)</label>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-semibold text-foreground block mb-1">Teks Tombol (ID)</label>
                 <input
                   type="text"
-                  placeholder="Teks ID"
-                  value={hero.secondaryCtaTextId}
-                  onChange={(e) => setHero({ ...hero, secondaryCtaTextId: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                />
-                <input
-                  type="text"
-                  placeholder="Teks EN"
-                  value={hero.secondaryCtaTextEn}
-                  onChange={(e) => setHero({ ...hero, secondaryCtaTextEn: e.target.value })}
-                  className="px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  placeholder="Contoh: Pelajari Gerakan Kami"
+                  value={hero.primaryCtaTextId}
+                  onChange={(e) => setHero({ ...hero, primaryCtaTextId: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                 />
               </div>
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-xs font-semibold text-foreground">Teks Tombol (EN)</label>
+                  <AutoTranslateButton
+                    sourceText={hero.primaryCtaTextId}
+                    onTranslated={(txt) => setHero({ ...hero, primaryCtaTextEn: txt })}
+                  />
+                </div>
+                <input
+                  type="text"
+                  placeholder="Contoh: Discover Our Movement"
+                  value={hero.primaryCtaTextEn}
+                  onChange={(e) => setHero({ ...hero, primaryCtaTextEn: e.target.value })}
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-foreground block mb-1">Tautan Halaman Tujuan (URL)</label>
               <input
                 type="text"
-                placeholder="Tautan URL (contoh: /kemitraan)"
-                value={hero.secondaryCtaUrl}
-                onChange={(e) => setHero({ ...hero, secondaryCtaUrl: e.target.value })}
+                placeholder="Contoh: /tentang-kami atau /pelayanan"
+                value={hero.primaryCtaUrl}
+                onChange={(e) => setHero({ ...hero, primaryCtaUrl: e.target.value })}
                 className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
               />
             </div>

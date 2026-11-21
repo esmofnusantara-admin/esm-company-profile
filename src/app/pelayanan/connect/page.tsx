@@ -24,6 +24,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 const connectSlides: CarouselSlide[] = [
   {
@@ -47,7 +48,11 @@ export default function ConnectPage() {
   const c = t.connectPage;
 
   return (
-    <>
+    <PageStatusGate
+      path="/pelayanan/connect"
+      fallbackTitle="Connect (Alumni & Profesional)"
+      fallbackCategory="Pelayanan Alumni"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -286,6 +291,6 @@ export default function ConnectPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

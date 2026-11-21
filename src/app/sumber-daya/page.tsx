@@ -36,6 +36,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/context/ToastContext";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 interface ResourceItem {
   id: string;
@@ -281,7 +282,11 @@ export default function ResourcesPage() {
   };
 
   return (
-    <>
+    <PageStatusGate
+      path="/sumber-daya"
+      fallbackTitle="Bahan Ajar & Panduan KTB"
+      fallbackCategory="Kabar & Doa"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -1049,6 +1054,6 @@ export default function ResourcesPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

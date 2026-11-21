@@ -32,6 +32,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { submitDonation } from "@/actions/donation";
 import { cn } from "@/lib/utils";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 export default function KemitraanPage() {
   const { t, locale } = useLanguage();
@@ -120,7 +121,11 @@ export default function KemitraanPage() {
   };
 
   return (
-    <>
+    <PageStatusGate
+      path="/kemitraan"
+      fallbackTitle="Dukungan & Kemitraan Misi"
+      fallbackCategory="Tentang & Lainnya"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -538,6 +543,6 @@ export default function KemitraanPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }

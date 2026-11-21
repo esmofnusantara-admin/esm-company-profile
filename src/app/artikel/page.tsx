@@ -28,6 +28,7 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { PageStatusGate } from "@/components/common/PageStatusGate";
 
 interface ArticleItem {
   id: string;
@@ -187,7 +188,11 @@ export default function ArtikelPage() {
   ];
 
   return (
-    <>
+    <PageStatusGate
+      path="/artikel"
+      fallbackTitle="Warta Misi & Kabar Ladang"
+      fallbackCategory="Kabar & Doa"
+    >
       <Navbar />
 
       <main className="flex-1 bg-[#FAF7F2]">
@@ -526,6 +531,6 @@ export default function ArtikelPage() {
       </main>
 
       <Footer />
-    </>
+    </PageStatusGate>
   );
 }
