@@ -3,7 +3,7 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const MAX_SIZE = 50 * 1024 * 1024;
+const MAX_SIZE = 100 * 1024 * 1024; // 100MB max
 const ALLOWED_TYPES = new Map([
   ["image/jpeg", ["jpg", "jpeg"]],
   ["image/png", ["png"]],
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "Ukuran file terlalu besar (maksimal 50MB)" },
+        { error: "Ukuran file terlalu besar (maksimal 100MB)" },
         { status: 400 }
       );
     }

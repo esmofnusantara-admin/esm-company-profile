@@ -294,7 +294,7 @@ export function MediaUploader({
                     Klik untuk memilih foto / file dari laptop
                   </span>
                   <span className="text-[11px] text-muted-foreground block mt-0.5">
-                    Format: JPG, PNG, WEBP, MP4 (Maksimal 50MB)
+                    Format: JPG, PNG, WEBP, MP4 (Maksimal 100MB)
                   </span>
                 </div>
               </>
