@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 const ADMIN_COOKIE = "esm_admin_session";
 const encoder = new TextEncoder();
@@ -46,12 +46,13 @@ async function hasValidAdminSession(request: NextRequest) {
 function isSensitiveApiRequest(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const method = request.method.toUpperCase();
+  const isSafeMethod = method === "GET" || method === "HEAD";
 
   if (pathname === "/api/upload" || pathname === "/api/transactions") return true;
-  if (pathname === "/api/donations" && method === "GET") return true;
-  if (pathname.startsWith("/api/articles") && method !== "GET") return true;
-  if (pathname === "/api/events" && method !== "GET") return true;
-  if (pathname === "/api/bulletins" && method !== "GET") return true;
+  if (pathname === "/api/donations" && isSafeMethod) return true;
+  if (pathname.startsWith("/api/articles") && !isSafeMethod) return true;
+  if (pathname === "/api/events" && !isSafeMethod) return true;
+  if (pathname === "/api/bulletins" && !isSafeMethod) return true;
   return false;
 }
 
