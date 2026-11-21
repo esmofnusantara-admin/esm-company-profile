@@ -297,6 +297,7 @@ export function SumberDayaView() {
               alt="Perpustakaan Bahan Pemuridan ESM"
               fill
               priority
+              unoptimized
               className="object-cover object-center scale-105"
             />
             {/* Cinematic Multi-stop Dark Garnet Vignette Overlay */}
@@ -355,6 +356,7 @@ export function SumberDayaView() {
                       src={featuredResource.coverImage}
                       alt={featuredResource.title}
                       fill
+                      unoptimized
                       className="object-cover"
                     />
                     <div className="absolute top-3 right-3 bg-amber-400 text-stone-900 font-black text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-md shadow-md">
@@ -632,6 +634,7 @@ export function SumberDayaView() {
                               src={res.coverImage}
                               alt={res.title}
                               fill
+                              unoptimized
                               className="object-cover"
                             />
                           </div>
@@ -790,6 +793,7 @@ export function SumberDayaView() {
                               src={res.coverImage}
                               alt={res.title}
                               fill
+                              unoptimized
                               className="object-cover"
                             />
                           </div>

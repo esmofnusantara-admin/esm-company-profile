@@ -18,6 +18,7 @@ export default function AdminFAQ() {
     answer: "",
     answerEn: "",
     page: FAQPage.GENERAL,
+    sortOrder: 1,
     isActive: true,
   });
 
@@ -44,20 +45,37 @@ export default function AdminFAQ() {
       return;
     }
 
+    const targetOrder = Number(form.sortOrder) || 1;
+    const duplicate = faqs.find(
+      (f) =>
+        (editingItem ? f.id !== editingItem.id : true) &&
+        f.page === form.page &&
+        (f.sortOrder || 0) === targetOrder
+    );
+    if (duplicate) {
+      alert(
+        `Nomor urut #${targetOrder} sudah digunakan oleh pertanyaan: "${duplicate.question}" di kategori yang sama (${form.page}). Nomor urutan harus unik dan tidak boleh kembar.`
+      );
+      return;
+    }
+
     try {
       if (editingItem) {
-        await updateFAQ(editingItem.id, form);
+        await updateFAQ(editingItem.id, { ...form, sortOrder: targetOrder });
       } else {
-        await createFAQ(form);
+        await createFAQ({ ...form, sortOrder: targetOrder });
       }
       setIsModalOpen(false);
       setEditingItem(null);
+      const catFaqs = faqs.filter((f) => f.page === form.page);
+      const nextMax = catFaqs.reduce((max, f) => Math.max(max, f.sortOrder || 0), targetOrder);
       setForm({
         question: "",
         questionEn: "",
         answer: "",
         answerEn: "",
-        page: FAQPage.GENERAL,
+        page: form.page || FAQPage.GENERAL,
+        sortOrder: nextMax + 1,
         isActive: true,
       });
       await loadData();
@@ -76,8 +94,9 @@ export default function AdminFAQ() {
     }
   };
 
-  const filteredFaqs =
-    activeTab === "ALL" ? faqs : faqs.filter((f) => f.page === activeTab);
+  const filteredFaqs = (
+    activeTab === "ALL" ? faqs : faqs.filter((f) => f.page === activeTab)
+  ).sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
 
   return (
     <div className="space-y-8 max-w-5xl pb-16">
@@ -98,18 +117,22 @@ export default function AdminFAQ() {
 
         <button
           onClick={() => {
+            const targetPage = activeTab === "ALL" ? FAQPage.GENERAL : (activeTab as FAQPage);
+            const catFaqs = faqs.filter((f) => f.page === targetPage);
+            const maxOrder = catFaqs.reduce((max, f) => Math.max(max, f.sortOrder || 0), 0);
             setEditingItem(null);
             setForm({
               question: "",
               questionEn: "",
               answer: "",
               answerEn: "",
-              page: FAQPage.GENERAL,
+              page: targetPage,
+              sortOrder: maxOrder + 1,
               isActive: true,
             });
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all cursor-pointer"
         >
           <Plus className="size-4" />
           <span>Tambah Pertanyaan FAQ</span>
@@ -154,10 +177,20 @@ export default function AdminFAQ() {
               className="p-5 rounded-2xl border border-border bg-card shadow-warm-xs space-y-3"
             >
               <div className="flex items-start justify-between gap-4">
-                <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-muted text-muted-foreground">
-                    {faq.page}
-                  </span>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                      Urutan #{faq.sortOrder ?? 1}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-muted text-muted-foreground">
+                      {faq.page}
+                    </span>
+                    {faq.isActive === false && (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-500">
+                        Nonaktif
+                      </span>
+                    )}
+                  </div>
                   <h3 className="text-sm font-bold text-foreground mt-1.5">{faq.question}</h3>
                   {faq.questionEn && (
                     <p className="text-xs text-primary font-medium italic mt-0.5">{faq.questionEn}</p>
@@ -174,17 +207,18 @@ export default function AdminFAQ() {
                         answer: faq.answer,
                         answerEn: faq.answerEn || "",
                         page: faq.page,
-                        isActive: faq.isActive,
+                        sortOrder: faq.sortOrder ?? 1,
+                        isActive: faq.isActive ?? true,
                       });
                       setIsModalOpen(true);
                     }}
-                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg"
+                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg cursor-pointer"
                   >
                     <Edit2 className="size-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(faq.id)}
-                    className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg"
+                    className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
                   >
                     <Trash2 className="size-3.5" />
                   </button>
@@ -215,24 +249,52 @@ export default function AdminFAQ() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-xs font-bold text-muted-foreground hover:text-foreground"
+                className="text-xs font-bold text-muted-foreground hover:text-foreground cursor-pointer"
               >
                 Batal
               </button>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-foreground block mb-1">Halaman Target FAQ</label>
-                <select
-                  value={form.page}
-                  onChange={(e) => setForm({ ...form, page: e.target.value as FAQPage })}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
-                >
-                  <option value={FAQPage.GENERAL}>Umum & Beranda</option>
-                  <option value={FAQPage.KEMITRAAN}>Kemitraan & Donasi</option>
-                  <option value={FAQPage.PELAYANAN}>Pelayanan & Komunitas</option>
-                </select>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">Halaman Target FAQ</label>
+                  <select
+                    value={form.page}
+                    onChange={(e) => {
+                      const newPage = e.target.value as FAQPage;
+                      // Jika menambah baru, hitung max sortOrder kategori baru
+                      if (!editingItem) {
+                        const catFaqs = faqs.filter((f) => f.page === newPage);
+                        const maxOrder = catFaqs.reduce((max, f) => Math.max(max, f.sortOrder || 0), 0);
+                        setForm({ ...form, page: newPage, sortOrder: maxOrder + 1 });
+                      } else {
+                        setForm({ ...form, page: newPage });
+                      }
+                    }}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  >
+                    <option value={FAQPage.GENERAL}>Umum & Beranda</option>
+                    <option value={FAQPage.KEMITRAAN}>Kemitraan & Donasi</option>
+                    <option value={FAQPage.PELAYANAN}>Pelayanan & Komunitas</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">
+                    Nomor Urut Tampil <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    min={1}
+                    required
+                    value={form.sortOrder}
+                    onChange={(e) => setForm({ ...form, sortOrder: parseInt(e.target.value, 10) || 1 })}
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Harus unik di kategori yang sama.
+                  </p>
+                </div>
               </div>
 
               <div>

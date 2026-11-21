@@ -6,14 +6,35 @@ const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 const MAX_SIZE = 100 * 1024 * 1024; // 100MB max
 const ALLOWED_TYPES = new Map([
   ["image/jpeg", ["jpg", "jpeg"]],
+  ["image/jpg", ["jpg", "jpeg"]],
   ["image/png", ["png"]],
   ["image/webp", ["webp"]],
   ["image/gif", ["gif"]],
+  ["image/svg+xml", ["svg"]],
   ["application/pdf", ["pdf"]],
-  ["video/mp4", ["mp4"]],
+  ["video/mp4", ["mp4", "m4v"]],
   ["video/webm", ["webm"]],
   ["video/quicktime", ["mov"]],
+  ["video/x-m4v", ["m4v", "mp4"]],
+  ["video/m4v", ["m4v", "mp4"]],
+  ["video/ogg", ["ogg", "ogv"]],
 ]);
+
+const ALLOWED_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "webp",
+  "gif",
+  "svg",
+  "pdf",
+  "mp4",
+  "webm",
+  "mov",
+  "m4v",
+  "ogg",
+]);
+
 const ALLOWED_FOLDERS = new Set([
   "articles",
   "events",
@@ -22,6 +43,9 @@ const ALLOWED_FOLDERS = new Set([
   "team",
   "home",
   "about",
+  "testimonies",
+  "videos",
+  "qris",
   "misc",
 ]);
 
@@ -44,10 +68,23 @@ export async function POST(request: NextRequest) {
     }
 
     const ext = file.name.split(".").pop()?.toLowerCase() || "";
-    const allowedExtensions = ALLOWED_TYPES.get(file.type);
-    if (!allowedExtensions || !allowedExtensions.includes(ext)) {
+    if (!ALLOWED_EXTENSIONS.has(ext)) {
       return NextResponse.json(
-        { error: "Format file tidak didukung atau ekstensi tidak sesuai dengan isinya." },
+        { error: `Ekstensi file (.${ext}) tidak didukung. Format yang diizinkan: gambar (JPG, PNG, WebP, GIF), video (MP4, WebM, MOV), atau dokumen PDF.` },
+        { status: 400 }
+      );
+    }
+
+    // Periksa kesesuaian tipe MIME jika browser menyediakannya (kecuali jika generic stream)
+    const allowedExtensionsForType = ALLOWED_TYPES.get(file.type);
+    if (
+      allowedExtensionsForType &&
+      !allowedExtensionsForType.includes(ext) &&
+      file.type !== "application/octet-stream" &&
+      file.type !== ""
+    ) {
+      return NextResponse.json(
+        { error: "Format file tidak sesuai dengan ekstensinya." },
         { status: 400 }
       );
     }

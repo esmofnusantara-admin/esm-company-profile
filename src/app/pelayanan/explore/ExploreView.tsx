@@ -85,6 +85,7 @@ export function ExploreView() {
                 alt="Persekutuan dan Kelompok Pemuridan Siswa SMA Explore"
                 fill
                 priority
+                unoptimized
                 className="object-cover object-center"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6 sm:p-8">

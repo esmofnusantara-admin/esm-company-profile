@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useParams } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -21,6 +22,7 @@ interface ArticleData {
   content: string;
   contentEn?: string | null;
   category: string;
+  coverImage?: string | null;
   createdAt: string;
   publishedAt?: string | null;
 }
@@ -157,6 +159,20 @@ export default function ArticleDetailPage() {
               {locale === "en" && article.excerptEn ? article.excerptEn : article.excerpt}
             </p>
           </header>
+
+          {/* Article Cover Image (if uploaded) */}
+          {article.coverImage && (
+            <div className="relative aspect-[16/9] w-full rounded-3xl overflow-hidden border border-border shadow-warm-xs bg-muted">
+              <Image
+                src={article.coverImage}
+                alt={displayTitle}
+                fill
+                unoptimized
+                priority
+                className="object-cover"
+              />
+            </div>
+          )}
 
           {/* Article Body Content */}
           <div className="text-foreground/90 text-sm sm:text-base leading-relaxed space-y-5 font-sans">

@@ -33,6 +33,7 @@ export default function AdminTestimoniCMS() {
     quote: "",
     quoteEn: "",
     photo: "",
+    sortOrder: 1,
     isActive: true,
   });
 
@@ -59,13 +60,24 @@ export default function AdminTestimoniCMS() {
       return;
     }
 
+    const targetOrder = Number(form.sortOrder) || 1;
+    const duplicate = testimonies.find(
+      (t) => (editingItem ? t.id !== editingItem.id : true) && (t.sortOrder || 0) === targetOrder
+    );
+    if (duplicate) {
+      alert(
+        `Nomor urut slider #${targetOrder} sudah digunakan oleh narasumber: "${duplicate.name}". Nomor urutan harus unik dan tidak boleh kembar.`
+      );
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       let res;
       if (editingItem) {
-        res = await updateTestimony(editingItem.id, form);
+        res = await updateTestimony(editingItem.id, { ...form, sortOrder: targetOrder });
       } else {
-        res = await createTestimony(form);
+        res = await createTestimony({ ...form, sortOrder: targetOrder });
       }
 
       if (res && !res.success) {
@@ -75,7 +87,16 @@ export default function AdminTestimoniCMS() {
 
       setIsModalOpen(false);
       setEditingItem(null);
-      setForm({ name: "", role: "", quote: "", quoteEn: "", photo: "", isActive: true });
+      const nextMax = testimonies.reduce((max, t) => Math.max(max, t.sortOrder || 0), targetOrder);
+      setForm({
+        name: "",
+        role: "",
+        quote: "",
+        quoteEn: "",
+        photo: "",
+        sortOrder: nextMax + 1,
+        isActive: true,
+      });
       await loadData();
     } catch (err) {
       console.error(err);
@@ -118,11 +139,20 @@ export default function AdminTestimoniCMS() {
 
         <button
           onClick={() => {
+            const maxOrder = testimonies.reduce((max, t) => Math.max(max, t.sortOrder || 0), 0);
             setEditingItem(null);
-            setForm({ name: "", role: "", quote: "", quoteEn: "", photo: "", isActive: true });
+            setForm({
+              name: "",
+              role: "",
+              quote: "",
+              quoteEn: "",
+              photo: "",
+              sortOrder: maxOrder + 1,
+              isActive: true,
+            });
             setIsModalOpen(true);
           }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all cursor-pointer"
         >
           <Plus className="size-4" />
           <span>Tambah Testimoni</span>
@@ -139,7 +169,7 @@ export default function AdminTestimoniCMS() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {testimonies.map((item) => (
+          {[...testimonies].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map((item) => (
             <div
               key={item.id}
               className="p-5 rounded-2xl border border-border bg-card shadow-warm-xs flex flex-col justify-between space-y-4"
@@ -156,7 +186,12 @@ export default function AdminTestimoniCMS() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-xs font-bold text-foreground truncate">{item.name}</h3>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        Urutan #{item.sortOrder ?? 1}
+                      </span>
+                    </div>
+                    <h3 className="text-xs font-bold text-foreground truncate mt-1">{item.name}</h3>
                     <p className="text-[11px] text-primary truncate">{item.role || "Alumni / Mahasiswa"}</p>
                   </div>
                 </div>
@@ -191,17 +226,18 @@ export default function AdminTestimoniCMS() {
                         quote: item.quote,
                         quoteEn: item.quoteEn || "",
                         photo: item.photo || "",
+                        sortOrder: item.sortOrder ?? 1,
                         isActive: item.isActive,
                       });
                       setIsModalOpen(true);
                     }}
-                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg"
+                    className="p-1.5 text-muted-foreground hover:text-foreground rounded-lg cursor-pointer"
                   >
                     <Edit2 className="size-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg"
+                    className="p-1.5 text-destructive hover:bg-destructive/10 rounded-lg cursor-pointer"
                   >
                     <Trash2 className="size-3.5" />
                   </button>
@@ -289,16 +325,39 @@ export default function AdminTestimoniCMS() {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">
+                    Urutan Slider <span className="text-red-500">*</span>
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={form.isActive}
-                    onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
-                    className="rounded border-border text-primary focus:ring-primary"
+                    type="number"
+                    min={1}
+                    required
+                    value={form.sortOrder}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        sortOrder: parseInt(e.target.value, 10) || 1,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                   />
-                  <span>Tampilkan di Beranda</span>
-                </label>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Harus unik (tidak boleh sama dengan testimoni lain).
+                  </p>
+                </div>
+                <div className="pt-4">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.isActive}
+                      onChange={(e) => setForm({ ...form, isActive: e.target.checked })}
+                      className="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span>Tampilkan di Beranda</span>
+                  </label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-border">

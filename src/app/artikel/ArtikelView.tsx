@@ -37,6 +37,7 @@ interface ArticleItem {
   excerpt: string;
   excerptEn?: string | null;
   category: string;
+  coverImage?: string | null;
   createdAt: string;
   author?: string;
   readTime?: string;
@@ -202,6 +203,7 @@ export function ArtikelView() {
               alt="Kabar Ladang dan Catatan Misi ESM"
               fill
               priority
+              unoptimized
               className="object-cover object-center scale-105"
             />
             {/* Multi-stop Deep Vignette */}
@@ -405,9 +407,20 @@ export function ArtikelView() {
                   return (
                     <Card
                       key={item.id}
-                      className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-warm-xs hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group"
+                      className="rounded-3xl border border-stone-200/90 bg-white p-6 shadow-warm-xs hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group overflow-hidden"
                     >
                       <div className="space-y-3">
+                        {item.coverImage && (
+                          <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden mb-3 bg-stone-100">
+                            <Image
+                              src={item.coverImage}
+                              alt={displayTitle}
+                              fill
+                              unoptimized
+                              className="object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        )}
                         <div className="flex items-center justify-between text-xs text-stone-500 font-medium">
                           <span className="px-2.5 py-0.5 rounded-full bg-red-50 text-primary font-bold text-[10px] uppercase tracking-wider border border-primary/20">
                             {item.category.replace(/_/g, " ")}

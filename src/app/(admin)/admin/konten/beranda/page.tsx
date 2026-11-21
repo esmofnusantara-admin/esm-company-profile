@@ -256,7 +256,7 @@ const defaultCtaCard: CtaCardData = {
 export default function AdminBerandaCMS() {
   const [activeTab, setActiveTab] = useState<
     "hero" | "stats" | "whyEsm" | "communities" | "cta" | "faq" | "testimoni"
-  >("whyEsm");
+  >("hero");
 
   const [hero, setHero] = useState<HeroData>(defaultHero);
   const [stats, setStats] = useState<StatItem[]>(defaultStats);
@@ -359,21 +359,34 @@ export default function AdminBerandaCMS() {
       alert("Pertanyaan dan jawaban FAQ wajib diisi.");
       return;
     }
+
+    const targetOrder = Number(faqForm.sortOrder) || 1;
+    const duplicate = faqs.find(
+      (f) => (editingFaq ? f.id !== editingFaq.id : true) && (f.sortOrder || 0) === targetOrder
+    );
+    if (duplicate) {
+      alert(
+        `Nomor urut #${targetOrder} sudah digunakan oleh pertanyaan: "${duplicate.question}". Nomor urutan harus unik dan tidak boleh sama.`
+      );
+      return;
+    }
+
     setIsFaqSaving(true);
     try {
       if (editingFaq) {
-        await updateFAQ(editingFaq.id, faqForm);
+        await updateFAQ(editingFaq.id, { ...faqForm, sortOrder: targetOrder });
       } else {
-        await createFAQ({ ...faqForm, page: FAQPage.GENERAL });
+        await createFAQ({ ...faqForm, sortOrder: targetOrder, page: FAQPage.GENERAL });
       }
       setIsFaqModalOpen(false);
       setEditingFaq(null);
+      const nextMax = faqs.reduce((max, f) => Math.max(max, f.sortOrder || 0), targetOrder);
       setFaqForm({
         question: "",
         questionEn: "",
         answer: "",
         answerEn: "",
-        sortOrder: faqs.length + 1,
+        sortOrder: nextMax + 1,
         isActive: true,
         page: FAQPage.GENERAL,
       });
@@ -401,13 +414,25 @@ export default function AdminBerandaCMS() {
       alert("Nama dan kutipan testimoni wajib diisi.");
       return;
     }
+
+    const targetOrder = Number(testimonyForm.sortOrder) || 1;
+    const duplicate = testimonies.find(
+      (t) => (editingTestimony ? t.id !== editingTestimony.id : true) && (t.sortOrder || 0) === targetOrder
+    );
+    if (duplicate) {
+      alert(
+        `Nomor urut slider #${targetOrder} sudah digunakan oleh narasumber: "${duplicate.name}". Nomor urutan harus unik dan tidak boleh sama.`
+      );
+      return;
+    }
+
     setIsTestimonySaving(true);
     try {
       let res;
       if (editingTestimony) {
-        res = await updateTestimony(editingTestimony.id, testimonyForm);
+        res = await updateTestimony(editingTestimony.id, { ...testimonyForm, sortOrder: targetOrder });
       } else {
-        res = await createTestimony(testimonyForm);
+        res = await createTestimony({ ...testimonyForm, sortOrder: targetOrder });
       }
       if (res && !res.success) {
         alert(res.error || "Gagal menyimpan testimoni.");
@@ -415,13 +440,14 @@ export default function AdminBerandaCMS() {
       }
       setIsTestimonyModalOpen(false);
       setEditingTestimony(null);
+      const nextMax = testimonies.reduce((max, t) => Math.max(max, t.sortOrder || 0), targetOrder);
       setTestimonyForm({
         name: "",
         role: "",
         quote: "",
         quoteEn: "",
         photo: "",
-        sortOrder: testimonies.length + 1,
+        sortOrder: nextMax + 1,
         isActive: true,
       });
       await loadTestimoniesData();
@@ -539,24 +565,8 @@ export default function AdminBerandaCMS() {
       <div className="flex flex-wrap items-center gap-2 border-b border-border pb-2">
         <button
           type="button"
-          onClick={() => setActiveTab("whyEsm")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
-            activeTab === "whyEsm"
-              ? "bg-primary text-white shadow-xs"
-              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
-          }`}
-        >
-          <Video className="size-3.5" />
-          <span>3. Mengapa ESM Hadir & Video</span>
-          <span className="text-[10px] bg-amber-400 text-stone-900 px-1.5 py-0.5 rounded-full font-black">
-            Aktif
-          </span>
-        </button>
-
-        <button
-          type="button"
           onClick={() => setActiveTab("hero")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "hero"
               ? "bg-primary text-white shadow-xs"
               : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
@@ -569,7 +579,7 @@ export default function AdminBerandaCMS() {
         <button
           type="button"
           onClick={() => setActiveTab("stats")}
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === "stats"
               ? "bg-primary text-white shadow-xs"
               : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
@@ -577,6 +587,19 @@ export default function AdminBerandaCMS() {
         >
           <BarChart3 className="size-3.5" />
           <span>2. Angka Dampak (4 Metrik)</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("whyEsm")}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            activeTab === "whyEsm"
+              ? "bg-primary text-white shadow-xs"
+              : "bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/80"
+          }`}
+        >
+          <Video className="size-3.5" />
+          <span>3. Mengapa ESM Hadir & Video</span>
         </button>
 
         <button
@@ -1627,13 +1650,14 @@ export default function AdminBerandaCMS() {
             <button
               type="button"
               onClick={() => {
+                const maxOrder = faqs.reduce((max, f) => Math.max(max, f.sortOrder || 0), 0);
                 setEditingFaq(null);
                 setFaqForm({
                   question: "",
                   questionEn: "",
                   answer: "",
                   answerEn: "",
-                  sortOrder: faqs.length + 1,
+                  sortOrder: maxOrder + 1,
                   isActive: true,
                   page: FAQPage.GENERAL,
                 });
@@ -1654,7 +1678,7 @@ export default function AdminBerandaCMS() {
             </div>
           ) : (
             <div className="space-y-3">
-              {faqs.map((faq, idx) => (
+              {[...faqs].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map((faq, idx) => (
                 <div
                   key={faq.id || idx}
                   className="p-5 rounded-2xl border border-border bg-card shadow-xs space-y-3 hover:border-primary/30 transition-colors"
@@ -1756,6 +1780,7 @@ export default function AdminBerandaCMS() {
             <button
               type="button"
               onClick={() => {
+                const maxOrder = testimonies.reduce((max, t) => Math.max(max, t.sortOrder || 0), 0);
                 setEditingTestimony(null);
                 setTestimonyForm({
                   name: "",
@@ -1763,7 +1788,7 @@ export default function AdminBerandaCMS() {
                   quote: "",
                   quoteEn: "",
                   photo: "",
-                  sortOrder: testimonies.length + 1,
+                  sortOrder: maxOrder + 1,
                   isActive: true,
                 });
                 setIsTestimonyModalOpen(true);
@@ -1783,7 +1808,7 @@ export default function AdminBerandaCMS() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {testimonies.map((item) => (
+              {[...testimonies].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map((item) => (
                 <div
                   key={item.id}
                   className="p-5 rounded-2xl border border-border bg-card shadow-warm-xs flex flex-col justify-between space-y-4"
@@ -1800,6 +1825,11 @@ export default function AdminBerandaCMS() {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                            Urutan #{item.sortOrder ?? 1}
+                          </span>
+                        </div>
                         <h4 className="text-xs font-bold text-foreground truncate">{item.name}</h4>
                         <p className="text-[11px] text-primary truncate">{item.role || "Alumni / Mahasiswa"}</p>
                       </div>

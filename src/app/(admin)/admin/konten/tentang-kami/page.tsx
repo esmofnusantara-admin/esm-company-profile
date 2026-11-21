@@ -27,6 +27,8 @@ import {
   Phone,
   ShieldCheck,
   Network,
+  Eye,
+  ExternalLink,
 } from "lucide-react";
 import Image from "next/image";
 import { Community } from "@prisma/client";
@@ -123,6 +125,7 @@ export default function AdminTentangKamiCMS() {
     bio: "",
     bioEn: "",
     whatsapp: "",
+    sortOrder: 1,
     isActive: true,
   });
 
@@ -166,7 +169,7 @@ export default function AdminTentangKamiCMS() {
         saveSiteConfig("about_legal_org", legalOrg),
       ]);
       setSavedSuccess(true);
-      setTimeout(() => setSavedSuccess(false), 4000);
+      setTimeout(() => setSavedSuccess(false), 3000);
     } catch (err) {
       alert("Gagal menyimpan data Tentang Kami.");
     } finally {
@@ -181,14 +184,26 @@ export default function AdminTentangKamiCMS() {
       return;
     }
 
+    const targetOrder = Number(teamForm.sortOrder) || 1;
+    const duplicate = teamMembers.find(
+      (m) => (editingMember ? m.id !== editingMember.id : true) && (m.sortOrder || 0) === targetOrder
+    );
+    if (duplicate) {
+      alert(
+        `Nomor urut #${targetOrder} sudah digunakan oleh anggota tim: "${duplicate.name}". Nomor urutan harus unik dan tidak boleh kembar.`
+      );
+      return;
+    }
+
     try {
       if (editingMember) {
-        await updateTeamMember(editingMember.id, teamForm);
+        await updateTeamMember(editingMember.id, { ...teamForm, sortOrder: targetOrder });
       } else {
-        await createTeamMember(teamForm);
+        await createTeamMember({ ...teamForm, sortOrder: targetOrder });
       }
       setIsTeamModalOpen(false);
       setEditingMember(null);
+      const nextMax = teamMembers.reduce((max, m) => Math.max(max, m.sortOrder || 0), targetOrder);
       setTeamForm({
         name: "",
         role: "",
@@ -198,6 +213,7 @@ export default function AdminTentangKamiCMS() {
         bio: "",
         bioEn: "",
         whatsapp: "",
+        sortOrder: nextMax + 1,
         isActive: true,
       });
       const updated = await getTeamMembers();
@@ -243,28 +259,41 @@ export default function AdminTentangKamiCMS() {
           </p>
         </div>
 
-        <button
-          onClick={handleSavePageConfig}
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              <span>Menyimpan...</span>
-            </>
-          ) : savedSuccess ? (
-            <>
-              <CheckCircle2 className="size-4 text-emerald-300" />
-              <span>Tersimpan!</span>
-            </>
-          ) : (
-            <>
-              <Save className="size-4" />
-              <span>Simpan Perubahan</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/tentang-kami"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-semibold text-foreground hover:bg-muted/30 transition-all shadow-xs"
+          >
+            <Eye className="size-3.5 text-muted-foreground" />
+            <span>Pratinjau Web</span>
+            <ExternalLink className="size-3 text-muted-foreground" />
+          </a>
+
+          <button
+            onClick={handleSavePageConfig}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : savedSuccess ? (
+              <>
+                <CheckCircle2 className="size-4 text-emerald-300" />
+                <span>Tersimpan!</span>
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                <span>Simpan Perubahan</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {savedSuccess && (
@@ -1039,6 +1068,7 @@ export default function AdminTentangKamiCMS() {
           <button
             type="button"
             onClick={() => {
+              const maxOrder = teamMembers.reduce((max, m) => Math.max(max, m.sortOrder || 0), 0);
               setEditingMember(null);
               setTeamForm({
                 name: "",
@@ -1049,11 +1079,12 @@ export default function AdminTentangKamiCMS() {
                 bio: "",
                 bioEn: "",
                 whatsapp: "",
+                sortOrder: maxOrder + 1,
                 isActive: true,
               });
               setIsTeamModalOpen(true);
             }}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-primary text-white text-xs font-bold hover:bg-primary/90 transition-colors shadow-xs cursor-pointer"
           >
             <Plus className="size-3.5" /> Tambah Anggota Tim
           </button>
@@ -1065,7 +1096,7 @@ export default function AdminTentangKamiCMS() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {teamMembers.map((member) => (
+            {[...teamMembers].sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0)).map((member) => (
               <div
                 key={member.id}
                 className="p-4 rounded-xl border border-border bg-muted/20 flex flex-col justify-between space-y-3"
@@ -1081,7 +1112,12 @@ export default function AdminTentangKamiCMS() {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h4 className="text-xs font-bold text-foreground truncate">{member.name}</h4>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                        Urutan #{member.sortOrder ?? 1}
+                      </span>
+                    </div>
+                    <h4 className="text-xs font-bold text-foreground truncate mt-1">{member.name}</h4>
                     <p className="text-[11px] text-primary font-medium truncate">{member.role}</p>
                     {member.roleEn && (
                       <p className="text-[10px] text-muted-foreground italic truncate">{member.roleEn}</p>
@@ -1111,18 +1147,19 @@ export default function AdminTentangKamiCMS() {
                           bio: member.bio || "",
                           bioEn: member.bioEn || "",
                           whatsapp: member.whatsapp || "",
+                          sortOrder: member.sortOrder ?? 1,
                           isActive: member.isActive ?? true,
                         });
                         setIsTeamModalOpen(true);
                       }}
-                      className="p-1 text-muted-foreground hover:text-foreground"
+                      className="p-1 text-muted-foreground hover:text-foreground cursor-pointer"
                     >
                       <Edit2 className="size-3.5" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDeleteMember(member.id)}
-                      className="p-1 text-destructive hover:bg-destructive/10 rounded"
+                      className="p-1 text-destructive hover:bg-destructive/10 rounded cursor-pointer"
                     >
                       <Trash2 className="size-3.5" />
                     </button>
@@ -1240,16 +1277,39 @@ export default function AdminTentangKamiCMS() {
                 />
               </div>
 
-              <div className="flex items-center gap-2">
-                <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+                <div>
+                  <label className="text-xs font-bold text-foreground block mb-1">
+                    Nomor Urut Tampil <span className="text-red-500">*</span>
+                  </label>
                   <input
-                    type="checkbox"
-                    checked={teamForm.isActive}
-                    onChange={(e) => setTeamForm({ ...teamForm, isActive: e.target.checked })}
-                    className="rounded border-border text-primary focus:ring-primary"
+                    type="number"
+                    min={1}
+                    required
+                    value={teamForm.sortOrder}
+                    onChange={(e) =>
+                      setTeamForm({
+                        ...teamForm,
+                        sortOrder: parseInt(e.target.value, 10) || 1,
+                      })
+                    }
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-border bg-background"
                   />
-                  <span>Tampilkan di Halaman Publik</span>
-                </label>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                    Harus unik (tidak boleh sama dengan pengurus lain).
+                  </p>
+                </div>
+                <div className="pt-4">
+                  <label className="flex items-center gap-2 text-xs font-medium cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={teamForm.isActive}
+                      onChange={(e) => setTeamForm({ ...teamForm, isActive: e.target.checked })}
+                      className="rounded border-border text-primary focus:ring-primary"
+                    />
+                    <span>Tampilkan di Halaman Publik</span>
+                  </label>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-border">

@@ -429,11 +429,28 @@ export default function TentangKamiPage() {
             </div>
 
             {history?.mediaUrl && (
-              <div className="rounded-2xl overflow-hidden border border-border shadow-warm-sm aspect-video relative mt-6">
-                {history.mediaUrl.endsWith(".mp4") ? (
-                  <video src={history.mediaUrl} controls className="w-full h-full object-cover" />
+              <div className="rounded-2xl overflow-hidden border border-border shadow-warm-sm aspect-video relative mt-6 bg-black">
+                {history.mediaUrl.toLowerCase().endsWith(".mp4") ||
+                history.mediaUrl.toLowerCase().endsWith(".webm") ||
+                history.mediaUrl.toLowerCase().endsWith(".mov") ||
+                history.mediaUrl.toLowerCase().endsWith(".m4v") ||
+                history.mediaUrl.startsWith("/uploads/videos/") ? (
+                  <video src={history.mediaUrl} controls playsInline className="w-full h-full object-cover" />
+                ) : history.mediaUrl.includes("youtube.com") || history.mediaUrl.includes("youtu.be") ? (
+                  <iframe
+                    src={
+                      history.mediaUrl.includes("/embed/")
+                        ? history.mediaUrl
+                        : `https://www.youtube.com/embed/${
+                            history.mediaUrl.match(/(?:watch\?v=|v\/|shorts\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1] || ""
+                          }`
+                    }
+                    className="w-full h-full border-0"
+                    allowFullScreen
+                    title="Video Dokumentasi Sejarah ESM"
+                  />
                 ) : (
-                  <Image src={history.mediaUrl} alt="Dokumentasi Sejarah" fill className="object-cover" />
+                  <Image src={history.mediaUrl} alt="Dokumentasi Sejarah" fill unoptimized className="object-cover" />
                 )}
               </div>
             )}
@@ -765,7 +782,7 @@ export default function TentangKamiPage() {
                 </div>
                 {regions?.bantenImageUrl && (
                   <div className="rounded-xl overflow-hidden border border-border aspect-video relative">
-                    <Image src={regions.bantenImageUrl} alt="Wilayah Banten" fill className="object-cover" />
+                    <Image src={regions.bantenImageUrl} alt="Wilayah Banten" fill unoptimized className="object-cover" />
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground leading-relaxed">
@@ -786,7 +803,7 @@ export default function TentangKamiPage() {
                 </div>
                 {regions?.ternateImageUrl && (
                   <div className="rounded-xl overflow-hidden border border-border aspect-video relative">
-                    <Image src={regions.ternateImageUrl} alt="Wilayah Maluku Utara" fill className="object-cover" />
+                    <Image src={regions.ternateImageUrl} alt="Wilayah Maluku Utara" fill unoptimized className="object-cover" />
                   </div>
                 )}
                 <p className="text-xs text-muted-foreground leading-relaxed">

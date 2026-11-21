@@ -32,6 +32,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { submitDonation } from "@/actions/donation";
 import { cn } from "@/lib/utils";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { DynamicBankQR } from "@/components/common/DynamicBankQR";
 
 export function KemitraanView() {
   const { t, locale } = useLanguage();
@@ -135,6 +136,7 @@ export function KemitraanView() {
               alt="Dukungan Misi dan Kemitraan Pemuridan ESM"
               fill
               priority
+              unoptimized
               className="object-cover object-center scale-105"
             />
             {/* Multi-stop Deep Vignette */}
@@ -472,21 +474,13 @@ export function KemitraanView() {
                     </span>
                   </div>
 
-                  {/* QRIS Display */}
-                  <div className="rounded-2xl border border-stone-200 bg-white p-5 space-y-3 text-center">
-                    {qrisUrl ? (
-                      <div className="size-48 mx-auto rounded-xl border border-stone-200 bg-white flex items-center justify-center p-2 relative overflow-hidden">
-                        <Image src={qrisUrl} alt="Barcode QRIS ESM" fill className="object-contain p-1" />
-                      </div>
-                    ) : (
-                      <div className="size-28 mx-auto rounded-xl border border-stone-200 bg-stone-50 flex items-center justify-center p-2">
-                        <QrCode className="size-20 text-stone-600" />
-                      </div>
-                    )}
-                    <p className="text-[11px] text-stone-500 font-medium">
-                      Scan via GoPay, OVO, Dana, BCA Mobile, atau aplikasi perbankan apa pun
-                    </p>
-                  </div>
+                  {/* Dynamic Real-Time Anti-Tamper QR Component */}
+                  <DynamicBankQR
+                    bankName={bankName}
+                    bankAccount={bankAccount}
+                    accountHolder={accountName}
+                    qrisImageUrl={qrisUrl}
+                  />
 
                   <div className="flex items-center gap-2 text-xs text-stone-500 font-medium pt-1">
                     <ShieldCheck className="size-4 text-emerald-600 shrink-0" />

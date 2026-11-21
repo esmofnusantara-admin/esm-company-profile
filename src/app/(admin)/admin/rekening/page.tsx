@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { getSiteConfig, saveSiteConfig } from "@/actions/siteConfig";
 import { MediaUploader } from "@/components/admin/MediaUploader";
-import { CreditCard, Save, CheckCircle2, Loader2, QrCode } from "lucide-react";
+import { CreditCard, Save, CheckCircle2, Loader2, QrCode, Eye, ExternalLink } from "lucide-react";
 
 interface BankAccountConfig {
   bankName: string;
@@ -84,28 +84,41 @@ export default function AdminRekeningCMS() {
           </p>
         </div>
 
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50"
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="size-4 animate-spin" />
-              <span>Menyimpan...</span>
-            </>
-          ) : savedSuccess ? (
-            <>
-              <CheckCircle2 className="size-4 text-emerald-300" />
-              <span>Tersimpan!</span>
-            </>
-          ) : (
-            <>
-              <Save className="size-4" />
-              <span>Simpan Rekening</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <a
+            href="/kemitraan"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border border-border bg-background text-xs font-semibold text-foreground hover:bg-muted/30 transition-all shadow-xs"
+          >
+            <Eye className="size-3.5 text-muted-foreground" />
+            <span>Pratinjau Web</span>
+            <ExternalLink className="size-3 text-muted-foreground" />
+          </a>
+
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-white text-xs font-bold shadow-warm-sm hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer"
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="size-4 animate-spin" />
+                <span>Menyimpan...</span>
+              </>
+            ) : savedSuccess ? (
+              <>
+                <CheckCircle2 className="size-4 text-emerald-300" />
+                <span>Tersimpan!</span>
+              </>
+            ) : (
+              <>
+                <Save className="size-4" />
+                <span>Simpan Rekening</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {savedSuccess && (

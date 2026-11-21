@@ -287,6 +287,7 @@ export function DoaView() {
               alt="Mezbah Doa dan Syafaat ESM"
               fill
               priority
+              unoptimized
               className="object-cover object-center scale-105"
             />
             {/* Multi-stop Deep Garnet Vignette */}

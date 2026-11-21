@@ -653,6 +653,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
               alt="Suasana Temu Gerakan & Pemuridan ESM"
               fill
               priority
+              unoptimized
               className="object-cover object-center scale-105"
             />
             {/* Cinematic Garnet Vignette Overlay */}
@@ -914,6 +915,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                         src={event.coverImage}
                         alt={event.title}
                         fill
+                        unoptimized
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent lg:bg-gradient-to-r lg:from-transparent lg:via-black/20 lg:to-black/40" />
@@ -1075,6 +1077,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                         src={photo.image}
                         alt={photo.title}
                         fill
+                        unoptimized
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-black/20" />
@@ -1493,6 +1496,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                 src={lightboxPhoto.image}
                 alt={lightboxPhoto.title}
                 fill
+                unoptimized
                 className="object-contain"
               />
             </div>

@@ -27,6 +27,14 @@ const DEFAULT_CONFIGS: Record<string, any> = {
     youtube: "https://youtube.com/@esmnusantara",
   },
   about_legal_org: defaultLegalOrg,
+  bank_config: {
+    bankName: "Bank Central Asia (BCA)",
+    accountNumber: "8420-991-888",
+    accountHolder: "Yayasan Evangelical Student Movement",
+    branch: "KCU Serang",
+    qrisUrl: "",
+    waConfirmNumber: "6281296106611",
+  },
   home_hero: {
     kickerId: "GERAKAN PEMURIDAN MISIONAL BAGI GENERASI MUDA",
     kickerEn: "MISSIONAL DISCIPLESHIP MOVEMENT FOR THE NEXT GENERATION",
@@ -200,12 +208,6 @@ const DEFAULT_CONFIGS: Record<string, any> = {
         desc: "Wadah para sarjana dan pekerja untuk menjadi saksi Kristus di dunia kerja.",
       },
     ],
-  },
-  bank_config: {
-    bankName: "BCA (Bank Central Asia)",
-    accountNumber: "869-123-4567",
-    accountHolder: "Yayasan Murid Muda Bermisi",
-    qrisImageUrl: "/images/qris-esm.png",
   },
 };
 

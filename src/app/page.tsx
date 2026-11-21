@@ -122,10 +122,11 @@ export default function HomePage() {
 
   const isDirectVideo = Boolean(
     whyEsm?.videoUrl &&
-    (whyEsm.videoUrl.endsWith(".mp4") ||
-      whyEsm.videoUrl.endsWith(".webm") ||
-      whyEsm.videoUrl.endsWith(".mov") ||
-      whyEsm.videoUrl.startsWith("/uploads/"))
+    (whyEsm.videoUrl.toLowerCase().endsWith(".mp4") ||
+      whyEsm.videoUrl.toLowerCase().endsWith(".webm") ||
+      whyEsm.videoUrl.toLowerCase().endsWith(".mov") ||
+      whyEsm.videoUrl.toLowerCase().endsWith(".m4v") ||
+      whyEsm.videoUrl.toLowerCase().startsWith("/uploads/"))
   );
 
   const getYouTubeThumbnail = (url?: string) => {
@@ -217,10 +218,12 @@ export default function HomePage() {
   ];
 
   const activeFaqs: { q: string; a: string }[] = (homeContent?.faqs && Array.isArray(homeContent.faqs) && homeContent.faqs.length > 0)
-    ? homeContent.faqs.map((f: any) => ({
-      q: (locale === "en" && f.questionEn ? f.questionEn : (f.question || f.q)) || "",
-      a: (locale === "en" && f.answerEn ? f.answerEn : (f.answer || f.a)) || "",
-    }))
+    ? [...homeContent.faqs]
+        .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map((f: any) => ({
+          q: (locale === "en" && f.questionEn ? f.questionEn : (f.question || f.q)) || "",
+          a: (locale === "en" && f.answerEn ? f.answerEn : (f.answer || f.a)) || "",
+        }))
     : defaultFaqItems;
 
   const defaultTestimonies = [
@@ -242,13 +245,15 @@ export default function HomePage() {
   }
 
   const activeTestimonies: TestimonyItem[] = (homeContent?.testimonies && Array.isArray(homeContent.testimonies) && homeContent.testimonies.length > 0)
-    ? homeContent.testimonies.map((tm: any) => ({
-      name: tm.name || tm.authorName || "Alumni ESM",
-      role: tm.role || tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
-      theme: tm.theme || tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
-      quote: (locale === "en" && (tm.quoteEn || tm.contentEn)) ? (tm.quoteEn || tm.contentEn) : (tm.quote || tm.content || ""),
-      photo: tm.photo || tm.avatar || null,
-    }))
+    ? [...homeContent.testimonies]
+        .sort((a: any, b: any) => (a.sortOrder || 0) - (b.sortOrder || 0))
+        .map((tm: any) => ({
+          name: tm.name || tm.authorName || "Alumni ESM",
+          role: tm.role || tm.authorRole || (locale === "en" ? "Student • ESM Community" : "Murid • Komunitas ESM"),
+          theme: tm.theme || tm.title || (locale === "en" ? "Student Reflection" : "Refleksi Pemuridan"),
+          quote: (locale === "en" && (tm.quoteEn || tm.contentEn)) ? (tm.quoteEn || tm.contentEn) : (tm.quote || tm.content || ""),
+          photo: tm.photo || tm.avatar || null,
+        }))
     : defaultTestimonies;
 
   const [activeTestimonyIndex, setActiveTestimonyIndex] = React.useState(0);
@@ -518,7 +523,7 @@ export default function HomePage() {
                     {/* Background fallback gradient in case image is missing or loading */}
                     <div className="absolute inset-0 bg-gradient-to-br from-stone-900 via-primary/30 to-amber-950/40" />
 
-                    {videoThumbnailSrc && !thumbnailError && (
+                    {videoThumbnailSrc && !thumbnailError ? (
                       <Image
                         src={videoThumbnailSrc}
                         alt={
@@ -534,7 +539,15 @@ export default function HomePage() {
                         onError={() => setThumbnailError(true)}
                         className="object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-90"
                       />
-                    )}
+                    ) : isDirectVideo && whyEsm?.videoUrl ? (
+                      <video
+                        src={`${whyEsm.videoUrl}#t=0.5`}
+                        preload="metadata"
+                        muted
+                        playsInline
+                        className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+                      />
+                    ) : null}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
 
                     {/* Play Button Overlay */}

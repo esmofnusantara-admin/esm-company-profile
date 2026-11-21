@@ -276,6 +276,7 @@ export default function DevotionalDetailPage() {
               alt={devotional.title}
               fill
               priority
+              unoptimized
               className="object-cover object-center brightness-95 contrast-105"
             />
 
@@ -323,6 +324,7 @@ export default function DevotionalDetailPage() {
                       src={devotional.authorAvatar || devotional.coverImage}
                       alt={devotional.author}
                       fill
+                      unoptimized
                       className="object-cover"
                     />
                   </div>
@@ -642,6 +644,7 @@ export default function DevotionalDetailPage() {
                       src={devotional.relatedResource.image}
                       alt={devotional.relatedResource.title}
                       fill
+                      unoptimized
                       className="object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
