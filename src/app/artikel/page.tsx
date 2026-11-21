@@ -49,7 +49,6 @@ export default function ArtikelPage() {
 
   const [articles, setArticles] = React.useState<ArticleItem[]>([]);
   const [dbBulletins, setDbBulletins] = React.useState<any[]>([]);
-  const [galleryItems, setGalleryItems] = React.useState<any[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [activeCategory, setActiveCategory] = React.useState<string>("all");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
@@ -115,9 +114,6 @@ export default function ArtikelPage() {
         if (mediaRes.success && mediaRes.data) {
           if (Array.isArray(mediaRes.data.bulletins) && mediaRes.data.bulletins.length > 0) {
             setDbBulletins(mediaRes.data.bulletins);
-          }
-          if (Array.isArray(mediaRes.data.mediaItems) && mediaRes.data.mediaItems.length > 0) {
-            setGalleryItems(mediaRes.data.mediaItems);
           }
         }
       } catch (err) {

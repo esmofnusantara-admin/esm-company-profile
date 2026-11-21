@@ -77,7 +77,10 @@ export async function submitEventRegistration(input: EventRegistrationInput) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function getEventRegistrations() {
+  await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
   try {
     return await prisma.eventRegistration.findMany({
       orderBy: { createdAt: "desc" },
@@ -90,6 +93,7 @@ export async function getEventRegistrations() {
 
 export async function updateEventRegistrationStatus(id: string, status: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.eventRegistration.update({
         where: { id },
@@ -103,6 +107,9 @@ export async function updateEventRegistrationStatus(id: string, status: string) 
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal update status:", error);
     return { success: false, error: "Gagal mengupdate status pendaftar." };
   }
@@ -110,6 +117,7 @@ export async function updateEventRegistrationStatus(id: string, status: string) 
 
 export async function deleteEventRegistration(id: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.eventRegistration.delete({
         where: { id },
@@ -121,6 +129,9 @@ export async function deleteEventRegistration(id: string) {
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal menghapus registrasi:", error);
     return { success: false, error: "Gagal menghapus data pendaftar." };
   }

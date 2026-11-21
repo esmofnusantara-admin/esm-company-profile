@@ -90,8 +90,10 @@ export async function submitUserPrayer(input: UserPrayerInput) {
 }
 
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
+import { requireAdminSession } from "@/lib/adminSession";
 
 export async function getUserPrayers() {
+  await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
   if (isDbKnownOffline()) {
     return inMemoryUserPrayers;
   }
@@ -130,6 +132,7 @@ export async function getApprovedPublicPrayers() {
 
 export async function updateUserPrayerStatus(id: string, status: "PENDING" | "APPROVED" | "REJECTED") {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.userPrayer.update({
         where: { id },
@@ -144,6 +147,9 @@ export async function updateUserPrayerStatus(id: string, status: "PENDING" | "AP
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal mengubah status doa:", error);
     return { success: false, error: "Gagal memperbarui status doa." };
   }
@@ -151,6 +157,7 @@ export async function updateUserPrayerStatus(id: string, status: "PENDING" | "AP
 
 export async function deleteUserPrayer(id: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.userPrayer.delete({
         where: { id },
@@ -163,6 +170,9 @@ export async function deleteUserPrayer(id: string) {
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal menghapus doa:", error);
     return { success: false, error: "Gagal menghapus data permohonan doa." };
   }

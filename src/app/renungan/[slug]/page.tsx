@@ -43,13 +43,58 @@ export default function DevotionalDetailPage() {
   const { locale } = useLanguage();
   const { success: showSuccessToast } = useToast();
 
-  const currentIndex = DEVOTIONALS_DATA.findIndex((d) => d.slug === slug);
-  const devotional: DevotionalItem | undefined = DEVOTIONALS_DATA[currentIndex];
+  const staticIndex = DEVOTIONALS_DATA.findIndex((d) => d.slug === slug);
+  const staticDevotional = staticIndex !== -1 ? DEVOTIONALS_DATA[staticIndex] : null;
 
-  if (!devotional) {
-    notFound();
-  }
+  const [devotional, setDevotional] = React.useState<DevotionalItem | null>(staticDevotional);
+  const [loading, setLoading] = React.useState(!staticDevotional);
 
+  React.useEffect(() => {
+    if (!staticDevotional && slug) {
+      fetch(`/api/articles/${slug}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && data.data) {
+            const art = data.data;
+            const paragraphs = art.content
+              ? art.content.split("\n\n").filter(Boolean)
+              : [art.excerpt || art.title];
+            const mapped: DevotionalItem = {
+              id: art.id,
+              slug: art.slug,
+              title: art.title,
+              titleEn: art.titleEn || art.title,
+              date: new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date(art.publishedAt || art.createdAt)),
+              category: "MISI",
+              categoryLabel: "Panggilan & Misi",
+              readTime: "4 menit baca",
+              scriptureRef: art.excerpt?.slice(0, 30) || "Alkitab",
+              goldenVerse: art.excerpt || art.title,
+              excerpt: art.excerpt || art.content.slice(0, 150),
+              reflectionParagraphs: paragraphs,
+              author: "Tim Redaksi ESM",
+              authorRole: "Pelayanan Firman & Doa",
+              coverImage: art.coverImage || "/uploads/agenda/agenda_hero.jpg",
+              yearlyReading: { ot: "Perjanjian Lama", nt: "Perjanjian Baru" },
+              scripturePassage: [{ verseNumber: 1, text: art.excerpt || art.title }],
+              reflectionQuestions: ["Bagaimana firman ini berbicara dalam hidupmu hari ini?"],
+              audioDuration: "03:45",
+              audioDurationSeconds: 225,
+              closingPrayer: "Bapa sorgawi, pimpinlah langkah hidupku hari ini seturut kehendak-Mu. Amin.",
+              insight: {
+                title: "Sorotan Misi",
+                content: art.excerpt || art.title,
+              },
+            };
+            setDevotional(mapped);
+          }
+        })
+        .catch(() => {})
+        .finally(() => setLoading(false));
+    }
+  }, [slug, staticDevotional]);
+
+  const currentIndex = staticIndex !== -1 ? staticIndex : 0;
   const prevDevotional =
     currentIndex > 0 ? DEVOTIONALS_DATA[currentIndex - 1] : null;
   const nextDevotional =
@@ -61,7 +106,7 @@ export default function DevotionalDetailPage() {
   const [isPlaying, setIsPlaying] = React.useState(false);
   const [currentSeconds, setCurrentSeconds] = React.useState(0);
   const [isMuted, setIsMuted] = React.useState(false);
-  const totalDuration = devotional.audioDurationSeconds || 240;
+  const totalDuration = devotional?.audioDurationSeconds || 240;
 
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -92,11 +137,33 @@ export default function DevotionalDetailPage() {
   // Bookmark state
   const [isBookmarked, setIsBookmarked] = React.useState(false);
   React.useEffect(() => {
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && devotional?.slug) {
       const saved = localStorage.getItem(`bookmark_renungan_${devotional.slug}`);
       if (saved === "true") setIsBookmarked(true);
     }
-  }, [devotional.slug]);
+  }, [devotional?.slug]);
+
+  // Scripture collapse state
+  const [showFullScripture, setShowFullScripture] = React.useState(true);
+
+  // Copy Link State
+  const [hasCopied, setHasCopied] = React.useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-canvas text-foreground flex flex-col">
+        <Navbar />
+        <main className="flex-1 flex items-center justify-center p-8">
+          <p className="text-sm font-semibold text-stone-500">Memuat renungan...</p>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!devotional) {
+    notFound();
+  }
 
   const handleToggleBookmark = () => {
     const nextState = !isBookmarked;
@@ -112,11 +179,6 @@ export default function DevotionalDetailPage() {
     );
   };
 
-  // Scripture collapse state
-  const [showFullScripture, setShowFullScripture] = React.useState(true);
-
-  // Copy Link State
-  const [hasCopied, setHasCopied] = React.useState(false);
   const handleCopyLink = () => {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
@@ -388,12 +450,15 @@ export default function DevotionalDetailPage() {
             <div className="flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <Volume2 className="size-4 text-primary animate-pulse" />
-                <span className="font-bold text-stone-900">
-                  Dengar Audio Renungan Hari Ini
+                <span className="font-bold text-stone-900 flex items-center gap-1.5">
+                  Dengar Audio Renungan
+                  <span className="text-[10px] text-amber-700 bg-amber-100 font-semibold px-2 py-0.5 rounded-full">
+                    Simulasi Narasi
+                  </span>
                 </span>
               </div>
               <span className="text-stone-500 font-mono text-[11px]">
-                {formatAudioTime(currentSeconds)} / {devotional.audioDuration}
+                {formatAudioTime(currentSeconds)} / {devotional?.audioDuration || "04:00"}
               </span>
             </div>
 

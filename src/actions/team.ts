@@ -89,126 +89,95 @@ export async function getTeamMembers() {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createTeamMember(input: TeamMemberInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.name || !input.role) {
       return { success: false, error: "Nama dan jabatan wajib diisi." };
     }
 
-    const memoryList = getMemoryTeam();
-    const newMember = {
-      id: "tm-" + Date.now(),
-      name: input.name,
-      role: input.role,
-      roleEn: input.roleEn || null,
-      community: input.community || Community.ALL,
-      photo: input.photo || null,
-      bio: input.bio || null,
-      bioEn: input.bioEn || null,
-      whatsapp: input.whatsapp || null,
-      sortOrder: input.sortOrder ?? 0,
-      isActive: input.isActive ?? true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const member = await prisma.teamMember.create({
+      data: {
+        name: input.name,
+        role: input.role,
+        roleEn: input.roleEn || null,
+        community: input.community || Community.ALL,
+        photo: input.photo || null,
+        bio: input.bio || null,
+        bioEn: input.bioEn || null,
+        whatsapp: input.whatsapp || null,
+        sortOrder: input.sortOrder ?? 0,
+        isActive: input.isActive ?? true,
+      },
+    });
 
-    memoryList.push(newMember);
-
-    if (!isDbKnownOffline()) {
-      try {
-        const member = await prisma.teamMember.create({
-          data: {
-            name: input.name,
-            role: input.role,
-            roleEn: input.roleEn || null,
-            community: input.community || Community.ALL,
-            photo: input.photo || null,
-            bio: input.bio || null,
-            bioEn: input.bioEn || null,
-            whatsapp: input.whatsapp || null,
-            sortOrder: input.sortOrder ?? 0,
-            isActive: input.isActive ?? true,
-          },
-        });
-        newMember.id = member.id;
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
-
+    markDbOnline();
     revalidatePath("/tentang-kami");
     revalidatePath("/admin/konten/tentang-kami");
-    return { success: true, id: newMember.id };
+    return { success: true, id: member.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menambah anggota tim:", error);
-    return { success: false, error: "Gagal menyimpan data pengurus." };
+    return { success: false, error: "Gagal menyimpan data pengurus ke database." };
   }
 }
 
 export async function updateTeamMember(id: string, input: Partial<TeamMemberInput>) {
   try {
-    const memoryList = getMemoryTeam();
-    const idx = memoryList.findIndex((m) => m.id === id);
-    if (idx !== -1) {
-      memoryList[idx] = { ...memoryList[idx], ...input, updatedAt: new Date() };
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        const member = await prisma.teamMember.update({
-          where: { id },
-          data: {
-            ...(input.name !== undefined && { name: input.name }),
-            ...(input.role !== undefined && { role: input.role }),
-            ...(input.roleEn !== undefined && { roleEn: input.roleEn }),
-            ...(input.community !== undefined && { community: input.community }),
-            ...(input.photo !== undefined && { photo: input.photo }),
-            ...(input.bio !== undefined && { bio: input.bio }),
-            ...(input.bioEn !== undefined && { bioEn: input.bioEn }),
-            ...(input.whatsapp !== undefined && { whatsapp: input.whatsapp }),
-            ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-            ...(input.isActive !== undefined && { isActive: input.isActive }),
-          },
-        });
-        markDbOnline();
-        return { success: true, id: member.id };
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    const member = await prisma.teamMember.update({
+      where: { id },
+      data: {
+        ...(input.name !== undefined && { name: input.name }),
+        ...(input.role !== undefined && { role: input.role }),
+        ...(input.roleEn !== undefined && { roleEn: input.roleEn }),
+        ...(input.community !== undefined && { community: input.community }),
+        ...(input.photo !== undefined && { photo: input.photo }),
+        ...(input.bio !== undefined && { bio: input.bio }),
+        ...(input.bioEn !== undefined && { bioEn: input.bioEn }),
+        ...(input.whatsapp !== undefined && { whatsapp: input.whatsapp }),
+        ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+        ...(input.isActive !== undefined && { isActive: input.isActive }),
+      },
+    });
 
+    markDbOnline();
     revalidatePath("/tentang-kami");
     revalidatePath("/admin/konten/tentang-kami");
-    return { success: true, id };
+    return { success: true, id: member.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal memperbarui anggota tim:", error);
-    return { success: false, error: "Gagal memperbarui data pengurus." };
+    return { success: false, error: "Gagal memperbarui data pengurus di database." };
   }
 }
 
 export async function deleteTeamMember(id: string) {
   try {
-    const memoryList = getMemoryTeam();
-    const idx = memoryList.findIndex((m) => m.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        await prisma.teamMember.delete({ where: { id } });
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    await prisma.teamMember.delete({ where: { id } });
+    markDbOnline();
 
     revalidatePath("/tentang-kami");
     revalidatePath("/admin/konten/tentang-kami");
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus anggota tim:", error);
-    return { success: false, error: "Gagal menghapus anggota." };
+    return { success: false, error: "Gagal menghapus anggota dari database." };
   }
 }

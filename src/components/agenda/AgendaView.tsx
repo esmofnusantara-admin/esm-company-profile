@@ -67,6 +67,68 @@ interface AgendaEvent {
   featured?: boolean;
 }
 
+type ApiEvent = {
+  id: string;
+  title: string;
+  titleEn?: string | null;
+  description?: string | null;
+  descriptionEn?: string | null;
+  community?: string | null;
+  location?: string | null;
+  locationEn?: string | null;
+  locationUrl?: string | null;
+  startDate: string;
+  endDate?: string | null;
+  coverImage?: string | null;
+};
+
+function mapApiEvent(event: ApiEvent, index: number): AgendaEvent {
+  const start = new Date(event.startDate);
+  const end = event.endDate ? new Date(event.endDate) : null;
+  const supportedCommunity = ["EXPLORE", "ENCOUNTER", "CONNECT"].includes(event.community || "")
+    ? (event.community as "EXPLORE" | "ENCOUNTER" | "CONNECT")
+    : "ALL";
+  const communityLabels: Record<AgendaEvent["community"], string> = {
+    EXPLORE: "Siswa SMA (Explore)",
+    ENCOUNTER: "Mahasiswa (Encounter)",
+    CONNECT: "Alumni & Profesi (Connect)",
+    DOA: "Doa & Mitra Gerakan",
+    ALL: "Agenda ESM",
+  };
+  const formatDate = (date: Date) => new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit", month: "long", year: "numeric", timeZone: "Asia/Jakarta",
+  }).format(date);
+  const formatTime = (date: Date) => new Intl.DateTimeFormat("id-ID", {
+    weekday: "long", hour: "2-digit", minute: "2-digit", timeZone: "Asia/Jakarta",
+  }).format(date).replace(".", ":");
+  const dateLabel = end && end.toDateString() !== start.toDateString()
+    ? `${formatDate(start)} – ${formatDate(end)}`
+    : formatDate(start);
+
+  return {
+    id: event.id,
+    title: event.title,
+    subtitle: event.community ? `Agenda ${event.community.toLowerCase()} ESM` : "Temu dan pembinaan gerakan ESM",
+    community: supportedCommunity,
+    communityLabel: communityLabels[supportedCommunity],
+    startDate: event.startDate,
+    endDate: event.endDate || undefined,
+    displayDate: dateLabel,
+    displayTime: end ? `${formatTime(start)} s/d ${formatTime(end)}` : formatTime(start),
+    dayNumber: start.toLocaleDateString("id-ID", { day: "2-digit", timeZone: "Asia/Jakarta" }),
+    monthAbbr: start.toLocaleDateString("id-ID", { month: "short", timeZone: "Asia/Jakarta" }).replace(".", "").toUpperCase(),
+    year: start.toLocaleDateString("id-ID", { year: "numeric", timeZone: "Asia/Jakarta" }),
+    location: event.location || "Lokasi akan diinformasikan panitia",
+    locationType: event.locationUrl ? "hybrid" : "onsite",
+    coverImage: event.coverImage || "/uploads/agenda/agenda_hero.jpg",
+    speakers: "Tim Pelayanan ESM",
+    quotaStatus: "Pendaftaran Dibuka",
+    description: event.description || "Bersama bertumbuh dan berkolaborasi dalam gerakan pemuridan ESM.",
+    rundown: [],
+    featured: index === 0,
+  };
+}
+
 interface ActivityPhoto {
   id: string;
   title: string;
@@ -388,15 +450,74 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
 
   // Lightbox photo preview
   const [lightboxPhoto, setLightboxPhoto] = React.useState<ActivityPhoto | null>(null);
+  const [agendaEvents, setAgendaEvents] = React.useState<AgendaEvent[]>([]);
+  const [isLoadingEvents, setIsLoadingEvents] = React.useState(true);
+  const [eventLoadError, setEventLoadError] = React.useState<string | null>(null);
 
-  // Live Countdown to Explore Camp (Sept 18, 2026)
-  const targetCampDate = React.useMemo(() => new Date("2026-09-18T08:00:00Z").getTime(), []);
-  const [timeLeft, setTimeLeft] = React.useState({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  });
+  React.useEffect(() => {
+    let cancelled = false;
+    const loadEvents = async () => {
+      setIsLoadingEvents(true);
+      setEventLoadError(null);
+      try {
+        const response = await fetch("/api/events?status=PUBLISHED", { cache: "no-store" });
+        const payload = await response.json();
+        if (!response.ok || !payload.success || payload.isFallback) {
+          throw new Error("Data agenda dari database belum tersedia.");
+        }
+        if (!cancelled) {
+          setAgendaEvents((payload.data || []).map((event: ApiEvent, index: number) => mapApiEvent(event, index)));
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAgendaEvents([]);
+          setEventLoadError(error instanceof Error ? error.message : "Agenda gagal dimuat.");
+        }
+      } finally {
+        if (!cancelled) setIsLoadingEvents(false);
+      }
+    };
+    loadEvents();
+    return () => { cancelled = true; };
+  }, []);
+
+  const [dynamicPhotos, setDynamicPhotos] = React.useState<ActivityPhoto[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/content?section=media")
+      .then((r) => r.json())
+      .then((res) => {
+        if (!cancelled && res.success && Array.isArray(res.data?.mediaItems) && res.data.mediaItems.length > 0) {
+          const mapped: ActivityPhoto[] = res.data.mediaItems.map((m: any, idx: number) => ({
+            id: m.id || `photo-${idx}`,
+            title: m.title,
+            category: m.category || "Dokumentasi Pelayanan",
+            location: "Pos Pelayanan ESM",
+            date: new Intl.DateTimeFormat("id-ID", { month: "long", year: "numeric" }).format(new Date(m.createdAt || Date.now())),
+            attendees: "Generasi Murid",
+            image: m.url,
+            highlight: m.description || m.title,
+            quote: m.description || "Bersama menjadi saksi Kristus di tengah generasi muda.",
+            quoteAuthor: "Keluarga Besar ESM",
+          }));
+          setDynamicPhotos(mapped);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const displayPhotos = React.useMemo(() => (
+    dynamicPhotos.length > 0 ? dynamicPhotos : pastActivityPhotos
+  ), [dynamicPhotos]);
+
+  // Live countdown to the nearest published database event
+  const targetCampDate = React.useMemo(
+    () => (agendaEvents[0] ? new Date(agendaEvents[0].startDate).getTime() : 0),
+    [agendaEvents]
+  );
+  const [timeLeft, setTimeLeft] = React.useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   React.useEffect(() => {
     const updateCountdown = () => {
@@ -433,20 +554,19 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
   }, []);
 
   const filteredAgendas = React.useMemo(() => {
-    return upcomingAgendas.filter((event) => {
-      const matchesFilter =
-        activeFilter === "ALL" || event.community === activeFilter;
-      const matchesSearch =
-        searchQuery.trim() === "" ||
-        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.subtitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        event.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return agendaEvents.filter((event) => {
+      const matchesFilter = activeFilter === "ALL" || event.community === activeFilter;
+      const query = searchQuery.toLowerCase();
+      const matchesSearch = searchQuery.trim() === "" ||
+        event.title.toLowerCase().includes(query) ||
+        event.subtitle.toLowerCase().includes(query) ||
+        event.location.toLowerCase().includes(query) ||
+        event.description.toLowerCase().includes(query);
       return matchesFilter && matchesSearch;
     });
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, agendaEvents, searchQuery]);
 
-  const featuredAgenda = upcomingAgendas.find((ev) => ev.featured) || upcomingAgendas[0];
+  const featuredAgenda = agendaEvents[0];
 
   const handleOpenRsvp = (event: AgendaEvent) => {
     setSelectedEventForRsvp(event);
@@ -566,16 +686,16 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                     Agenda Terdekat Berikutnya:
                   </span>
                   <span className="text-stone-300 font-semibold">
-                    18 – 20 September 2026
+                    {featuredAgenda?.displayDate || (isLoadingEvents ? "Memuat agenda..." : "Belum ada agenda terbit")}
                   </span>
                 </div>
 
                 <div className="text-left">
                   <h3 className="font-sans text-base sm:text-lg font-black text-white">
-                    Explore Youth Leadership Camp 2026
+                    {featuredAgenda?.title || "Agenda ESM Indonesia"}
                   </h3>
                   <p className="text-xs text-stone-300">
-                    Kemah Rohani & Pembinaan Karakter Siswa SMP & SMA se-Banten • Serang
+                    {featuredAgenda ? `${featuredAgenda.subtitle} • ${featuredAgenda.location}` : "Informasi kegiatan terbaru akan tampil setelah diterbitkan admin."}
                   </p>
                 </div>
 
@@ -618,12 +738,13 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                 <div className="pt-1 flex flex-wrap items-center justify-between gap-3">
                   <span className="text-xs text-amber-200/90 font-medium flex items-center gap-1.5">
                     <CheckCircle2 className="size-3.5 text-emerald-400" />
-                    Tersisa 24 Kuota Peserta Siswa
+                    {featuredAgenda?.quotaStatus || "Menunggu agenda terbaru"}
                   </span>
                   <Button
-                    onClick={() => handleOpenRsvp(featuredAgenda)}
+                    onClick={() => featuredAgenda && handleOpenRsvp(featuredAgenda)}
+                    disabled={!featuredAgenda || isLoadingEvents}
                     size="sm"
-                    className="rounded-full px-5 text-xs font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-stone-950 font-sans"
+                    className="rounded-full px-5 text-xs font-bold shadow-warm-xs bg-amber-400 hover:bg-amber-300 text-stone-950 font-sans disabled:opacity-50"
                   >
                     Daftar Sekarang
                     <ArrowRight className="size-3.5 ml-1.5" />
@@ -650,7 +771,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                   <Calendar className="size-4 text-amber-300" />
                   <span>Agenda Mendatang</span>
                   <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-white/20 text-white">
-                    {upcomingAgendas.length}
+                    {agendaEvents.length}
                   </span>
                 </button>
 
@@ -662,7 +783,7 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
                   <Camera className="size-4 text-amber-500" />
                   <span>Dokumentasi & Foto Kegiatan</span>
                   <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-600">
-                    {pastActivityPhotos.length}
+                    {displayPhotos.length}
                   </span>
                 </button>
 
@@ -757,6 +878,30 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
 
             {/* Event Cards Grid */}
             <div className="space-y-6">
+              {isLoadingEvents && (
+                <div className="flex items-center justify-center gap-3 rounded-2xl border border-stone-200 bg-white p-8 text-sm font-semibold text-stone-600">
+                  <Loader2 className="size-5 animate-spin text-primary" />
+                  Memuat agenda terbaru dari database...
+                </div>
+              )}
+              {!isLoadingEvents && eventLoadError && (
+                <div role="alert" className="rounded-2xl border border-amber-300 bg-amber-50 p-6 text-center">
+                  <p className="font-bold text-amber-900">Agenda belum dapat dimuat</p>
+                  <p className="mt-1 text-sm text-amber-800">{eventLoadError} Silakan muat ulang halaman beberapa saat lagi.</p>
+                </div>
+              )}
+              {!isLoadingEvents && !eventLoadError && agendaEvents.length === 0 && (
+                <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center">
+                  <CalendarDays className="mx-auto size-8 text-stone-400" />
+                  <p className="mt-3 font-bold text-stone-800">Belum ada agenda yang diterbitkan</p>
+                  <p className="mt-1 text-sm text-stone-500">Agenda baru dari admin akan tampil otomatis di bagian ini.</p>
+                </div>
+              )}
+              {!isLoadingEvents && !eventLoadError && agendaEvents.length > 0 && filteredAgendas.length === 0 && (
+                <div className="rounded-2xl border border-stone-200 bg-white p-8 text-center text-sm text-stone-600">
+                  Tidak ada agenda yang sesuai dengan filter atau pencarian Anda.
+                </div>
+              )}
               {filteredAgendas.map((event) => (
                 <Card
                   key={event.id}
@@ -911,13 +1056,13 @@ export function AgendaView({ defaultFilter = "ALL", defaultTab }: AgendaViewProp
               </div>
 
               <span className="text-xs font-bold text-stone-500 bg-white px-3 py-1.5 rounded-full border border-stone-200 shrink-0">
-                Menampilkan 6 Kegiatan Pilihan
+                Menampilkan {displayPhotos.length} Kegiatan Pilihan
               </span>
             </div>
 
             {/* Photo Cards Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
-              {pastActivityPhotos.map((photo) => (
+              {displayPhotos.map((photo) => (
                 <Card
                   key={photo.id}
                   className="rounded-3xl border border-stone-200/90 bg-white overflow-hidden shadow-warm-xs hover:shadow-warm-md hover:border-primary/40 transition-all flex flex-col justify-between group cursor-pointer"

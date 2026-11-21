@@ -229,7 +229,7 @@ export function Navbar() {
         </div>
 
         {/* Mobile Hamburger Toggle */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           {/* Mobile Language Switcher */}
           <div className="flex items-center rounded-full border border-border bg-card p-0.5 text-xs font-medium mr-1">
             <button
@@ -267,7 +267,7 @@ export function Navbar() {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="border-b border-border bg-card p-4 md:hidden animate-in slide-in-from-top-4 duration-200">
+        <div className="border-b border-border bg-card p-4 lg:hidden animate-in slide-in-from-top-4 duration-200">
           <div className="flex flex-col space-y-2">
             {navigationItems.map((item) => (
               <div key={item.title} className="flex flex-col">

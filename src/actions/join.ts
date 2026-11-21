@@ -76,7 +76,10 @@ export async function submitJoinForm(input: JoinSubmissionInput) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function getJoinSubmissions() {
+  await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
   try {
     return await prisma.joinSubmission.findMany({
       orderBy: { createdAt: "desc" },
@@ -89,6 +92,7 @@ export async function getJoinSubmissions() {
 
 export async function updateJoinSubmissionStatus(id: string, status: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.joinSubmission.update({
         where: { id },
@@ -102,6 +106,9 @@ export async function updateJoinSubmissionStatus(id: string, status: string) {
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal mengupdate status:", error);
     return { success: false, error: "Gagal mengupdate status pendaftaran." };
   }
@@ -109,6 +116,7 @@ export async function updateJoinSubmissionStatus(id: string, status: string) {
 
 export async function deleteJoinSubmission(id: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
     try {
       await prisma.joinSubmission.delete({
         where: { id },
@@ -120,6 +128,9 @@ export async function deleteJoinSubmission(id: string) {
       return { success: true };
     }
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal menghapus pendaftaran:", error);
     return { success: false, error: "Gagal menghapus data." };
   }

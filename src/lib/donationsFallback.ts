@@ -46,7 +46,7 @@ export const initialDonations: FallbackDonation[] = [
   },
 ];
 
-let globalDonations: FallbackDonation[] =
+const globalDonations: FallbackDonation[] =
   ((globalThis as any).__esmDonationsFallback as FallbackDonation[]) ||
   [...initialDonations];
 

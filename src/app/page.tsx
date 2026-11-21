@@ -41,6 +41,13 @@ export default function HomePage() {
   const [hasPrayed, setHasPrayed] = React.useState(false);
   const [prayerCount, setPrayerCount] = React.useState(86);
 
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prayerId = homeContent?.prayerRequest?.id || "default";
+    const prayed = localStorage.getItem(`esm_home_prayed_${prayerId}`) === "true";
+    setHasPrayed(prayed);
+  }, [homeContent?.prayerRequest?.id]);
+
   // FAQ Accordion State (0 is open by default)
   const [openFaq, setOpenFaq] = React.useState<number | null>(0);
 
@@ -1098,7 +1105,7 @@ export default function HomePage() {
                     const displayExcerpt = locale === "en" && art.excerptEn ? art.excerptEn : art.excerpt;
 
                     return (
-                      <Link href="/artikel" key={art.id} className="block group">
+                      <Link href={`/artikel/${art.slug}`} key={art.id} className="block group">
                         <div className="rounded-2xl bg-white p-6 shadow-warm-xs hover:shadow-warm-sm border border-stone-200/90 hover:border-primary/40 transition-all flex gap-4 items-start">
                           <div className="size-12 rounded-xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
                             <Flame className="size-6" />
@@ -1162,15 +1169,17 @@ export default function HomePage() {
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200">
-                        Mezbah Doa Bulan Ini
+                        {homeContent?.prayerRequest?.month || "Mezbah Doa Bulan Ini"}
                       </span>
-                      <span className="text-[11px] text-white/60">Banten & Ternate</span>
+                      <span className="text-[11px] text-white/60">
+                        {homeContent?.prayerRequest?.category || "Banten & Ternate"}
+                      </span>
                     </div>
                     <h4 className="text-base font-bold text-white leading-snug">
-                      Perintisan Kelompok Siswa & Asrama Mahasiswa
+                      {homeContent?.prayerRequest?.title || "Perintisan Kelompok Siswa & Asrama Mahasiswa"}
                     </h4>
                     <p className="text-xs text-white/75 leading-relaxed">
-                      Mari dukung dalam doa bagi adik-adik pengurus siswa di Banten dan mahasiswa perantauan di Ternate agar setia berakar dalam firman Tuhan.
+                      {homeContent?.prayerRequest?.description || "Mari dukung dalam doa bagi adik-adik pengurus siswa di Banten dan mahasiswa perantauan di Ternate agar setia berakar dalam firman Tuhan."}
                     </p>
                   </div>
 
@@ -1180,8 +1189,19 @@ export default function HomePage() {
                     </span>
                     <button
                       onClick={() => {
-                        setHasPrayed((prev) => !prev);
-                        setPrayerCount((c) => (hasPrayed ? c - 1 : c + 1));
+                        const prayerId = homeContent?.prayerRequest?.id || "default";
+                        setHasPrayed((prev) => {
+                          const next = !prev;
+                          if (typeof window !== "undefined") {
+                            if (next) {
+                              localStorage.setItem(`esm_home_prayed_${prayerId}`, "true");
+                            } else {
+                              localStorage.removeItem(`esm_home_prayed_${prayerId}`);
+                            }
+                          }
+                          setPrayerCount((c) => (next ? c + 1 : Math.max(0, c - 1)));
+                          return next;
+                        });
                       }}
                       className={`inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition-all ${hasPrayed
                           ? "bg-amber-400 text-[#180306] scale-105"

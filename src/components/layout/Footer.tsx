@@ -69,6 +69,7 @@ export function Footer() {
                     href={settings.instagram}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label="Instagram ESM Nusantara"
                     className="p-1.5 rounded-lg bg-muted hover:text-primary transition-colors"
                   >
                     <Instagram className="size-4" />
@@ -79,6 +80,7 @@ export function Footer() {
                     href={settings.youtube}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label="YouTube ESM Nusantara"
                     className="p-1.5 rounded-lg bg-muted hover:text-primary transition-colors"
                   >
                     <Youtube className="size-4" />
@@ -89,6 +91,7 @@ export function Footer() {
                     href={settings.facebook}
                     target="_blank"
                     rel="noreferrer"
+                    aria-label="Facebook ESM Nusantara"
                     className="p-1.5 rounded-lg bg-muted hover:text-primary transition-colors"
                   >
                     <Facebook className="size-4" />

@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { saveMemoryDonation, updateMemoryDonationStatus } from "@/lib/donationsFallback";
+import { requireAdminSession } from "@/lib/adminSession";
 
 export interface DonationInput {
   donorName: string;
@@ -63,30 +64,37 @@ export async function submitDonation(input: DonationInput) {
 // 2. Konfirmasi Donasi dari Admin Panel (/admin/mitra)
 export async function confirmDonation(id: string) {
   try {
+    const session = await requireAdminSession(["SUPER_ADMIN", "FINANCE_ADMIN"]);
     try {
-      const donation = await prisma.donationRecord.update({
-        where: { id },
-        data: {
-          status: "CONFIRMED",
-          confirmedAt: new Date(),
-        },
-      });
+      await prisma.$transaction(async (tx) => {
+        const current = await tx.donationRecord.findUnique({ where: { id } });
+        if (!current) throw new Error("DONATION_NOT_FOUND");
+        if (current.status === "CONFIRMED") return;
 
-      // Otomatis catat sebagai Kas Pemasukan
-      await prisma.financialTransaction.create({
-        data: {
-          type: "PEMASUKAN",
-          amount: donation.amount,
-          description: `Donasi Mitra: ${donation.donorName || "Hamba Allah"} (${
-            donation.type === "MITRA_BULANAN" ? "Bulanan" : "Sekali Beri"
-          })`,
-          category: "Donasi Mitra",
-          recordedBy: "admin",
-        },
+        const donation = await tx.donationRecord.update({
+          where: { id },
+          data: {
+            status: "CONFIRMED",
+            confirmedAt: new Date(),
+            confirmedBy: session.id,
+          },
+        });
+
+        await tx.financialTransaction.create({
+          data: {
+            type: "PEMASUKAN",
+            amount: donation.amount,
+            description: `Donasi Mitra: ${donation.donorName || "Hamba Allah"} (${
+              donation.type === "MITRA_BULANAN" ? "Bulanan" : "Sekali Beri"
+            })`,
+            category: "Donasi Mitra",
+            recordedBy: session.id,
+          },
+        });
       });
     } catch (dbErr) {
-      console.warn("DB offline, confirming in memory fallback:", dbErr);
-      updateMemoryDonationStatus(id, "CONFIRMED");
+      console.error("Gagal mengonfirmasi donasi di database:", dbErr);
+      return { success: false, error: "Konfirmasi gagal disimpan ke database." };
     }
 
     revalidatePath("/admin/mitra");
@@ -103,6 +111,7 @@ export async function confirmDonation(id: string) {
 // 3. Batalkan Donasi dari Admin Panel
 export async function cancelDonation(id: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "FINANCE_ADMIN"]);
     try {
       await prisma.donationRecord.update({
         where: { id },

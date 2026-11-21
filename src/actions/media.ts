@@ -76,120 +76,94 @@ export async function getMediaItems(category?: string) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createMediaItem(input: MediaItemInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.title || !input.url) {
       return { success: false, error: "Judul dan URL media (foto/video) wajib diisi." };
     }
 
-    const memoryList = getMemoryMedia();
-    const newItem = {
-      id: "med-" + Date.now(),
-      title: input.title,
-      titleEn: input.titleEn || null,
-      type: input.type || MediaType.IMAGE,
-      url: input.url,
-      thumbnail: input.thumbnail || null,
-      category: input.category || "GENERAL",
-      description: input.description || null,
-      sortOrder: input.sortOrder ?? 0,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const item = await prisma.mediaItem.create({
+      data: {
+        title: input.title,
+        titleEn: input.titleEn || null,
+        type: input.type || MediaType.IMAGE,
+        url: input.url,
+        thumbnail: input.thumbnail || null,
+        category: input.category || "GENERAL",
+        description: input.description || null,
+        sortOrder: input.sortOrder ?? 0,
+      },
+    });
 
-    memoryList.push(newItem);
-
-    if (!isDbKnownOffline()) {
-      try {
-        const item = await prisma.mediaItem.create({
-          data: {
-            title: input.title,
-            titleEn: input.titleEn || null,
-            type: input.type || MediaType.IMAGE,
-            url: input.url,
-            thumbnail: input.thumbnail || null,
-            category: input.category || "GENERAL",
-            description: input.description || null,
-            sortOrder: input.sortOrder ?? 0,
-          },
-        });
-        newItem.id = item.id;
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
-
+    markDbOnline();
     revalidatePath("/");
+    revalidatePath("/agenda");
     revalidatePath("/admin/galeri");
-    return { success: true, id: newItem.id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal membuat media item:", error);
-    return { success: false, error: "Gagal menyimpan item galeri." };
+    return { success: false, error: "Gagal menyimpan item galeri ke database." };
   }
 }
 
 export async function updateMediaItem(id: string, input: Partial<MediaItemInput>) {
   try {
-    const memoryList = getMemoryMedia();
-    const idx = memoryList.findIndex((m) => m.id === id);
-    if (idx !== -1) {
-      memoryList[idx] = { ...memoryList[idx], ...input, updatedAt: new Date() };
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        const item = await prisma.mediaItem.update({
-          where: { id },
-          data: {
-            ...(input.title !== undefined && { title: input.title }),
-            ...(input.titleEn !== undefined && { titleEn: input.titleEn }),
-            ...(input.type !== undefined && { type: input.type }),
-            ...(input.url !== undefined && { url: input.url }),
-            ...(input.thumbnail !== undefined && { thumbnail: input.thumbnail }),
-            ...(input.category !== undefined && { category: input.category }),
-            ...(input.description !== undefined && { description: input.description }),
-            ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-          },
-        });
-        markDbOnline();
-        return { success: true, id: item.id };
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    const item = await prisma.mediaItem.update({
+      where: { id },
+      data: {
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.titleEn !== undefined && { titleEn: input.titleEn }),
+        ...(input.type !== undefined && { type: input.type }),
+        ...(input.url !== undefined && { url: input.url }),
+        ...(input.thumbnail !== undefined && { thumbnail: input.thumbnail }),
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+      },
+    });
 
+    markDbOnline();
     revalidatePath("/");
+    revalidatePath("/agenda");
     revalidatePath("/admin/galeri");
-    return { success: true, id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal memperbarui media item:", error);
-    return { success: false, error: "Gagal memperbarui item galeri." };
+    return { success: false, error: "Gagal memperbarui item galeri di database." };
   }
 }
 
 export async function deleteMediaItem(id: string) {
   try {
-    const memoryList = getMemoryMedia();
-    const idx = memoryList.findIndex((m) => m.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        await prisma.mediaItem.delete({ where: { id } });
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    await prisma.mediaItem.delete({ where: { id } });
+    markDbOnline();
 
     revalidatePath("/");
+    revalidatePath("/agenda");
     revalidatePath("/admin/galeri");
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus media item:", error);
-    return { success: false, error: "Gagal menghapus media." };
+    return { success: false, error: "Gagal menghapus media dari database." };
   }
 }

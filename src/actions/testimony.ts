@@ -61,120 +61,91 @@ export async function getTestimonies() {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createTestimony(input: TestimonyInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.name || !input.quote) {
       return { success: false, error: "Nama dan kutipan testimoni wajib diisi." };
     }
 
-    const memoryList = getMemoryTestimonies();
-    const newItem = {
-      id: "tst-" + Date.now(),
-      name: input.name,
-      role: input.role || null,
-      quote: input.quote,
-      quoteEn: input.quoteEn || null,
-      photo: input.photo || null,
-      sortOrder: input.sortOrder ?? 0,
-      isActive: input.isActive ?? true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    memoryList.push(newItem);
-
-    try {
-      const item = await prisma.testimony.create({
-        data: {
-          name: input.name,
-          role: input.role || null,
-          quote: input.quote,
-          quoteEn: input.quoteEn || null,
-          photo: input.photo || null,
-          sortOrder: input.sortOrder ?? 0,
-          isActive: input.isActive ?? true,
-        },
-      });
-      newItem.id = item.id;
-      markDbOnline();
-    } catch (dbError) {
-      console.error("[actions/testimony] create error in db:", dbError);
-      markDbOffline();
-    }
+    const item = await prisma.testimony.create({
+      data: {
+        name: input.name,
+        role: input.role || null,
+        quote: input.quote,
+        quoteEn: input.quoteEn || null,
+        photo: input.photo || null,
+        sortOrder: input.sortOrder ?? 0,
+        isActive: input.isActive ?? true,
+      },
+    });
+    markDbOnline();
 
     revalidatePath("/");
     revalidatePath("/admin/konten/testimoni");
     revalidatePath("/admin/konten/beranda");
-    return { success: true, id: newItem.id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menambah testimoni:", error);
-    return { success: false, error: "Gagal menyimpan testimoni." };
+    return { success: false, error: "Gagal menyimpan testimoni ke database." };
   }
 }
 
 export async function updateTestimony(id: string, input: Partial<TestimonyInput>) {
   try {
-    const memoryList = getMemoryTestimonies();
-    const idx = memoryList.findIndex((t) => t.id === id);
-    if (idx !== -1) {
-      memoryList[idx] = { ...memoryList[idx], ...input, updatedAt: new Date() };
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    try {
-      const item = await prisma.testimony.update({
-        where: { id },
-        data: {
-          ...(input.name !== undefined && { name: input.name }),
-          ...(input.role !== undefined && { role: input.role }),
-          ...(input.quote !== undefined && { quote: input.quote }),
-          ...(input.quoteEn !== undefined && { quoteEn: input.quoteEn }),
-          ...(input.photo !== undefined && { photo: input.photo }),
-          ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-          ...(input.isActive !== undefined && { isActive: input.isActive }),
-        },
-      });
-      markDbOnline();
-      revalidatePath("/");
-      revalidatePath("/admin/konten/testimoni");
-      revalidatePath("/admin/konten/beranda");
-      return { success: true, id: item.id };
-    } catch (dbError) {
-      console.error("[actions/testimony] update error in db:", dbError);
-      markDbOffline();
-    }
-
+    const item = await prisma.testimony.update({
+      where: { id },
+      data: {
+        ...(input.name !== undefined && { name: input.name }),
+        ...(input.role !== undefined && { role: input.role }),
+        ...(input.quote !== undefined && { quote: input.quote }),
+        ...(input.quoteEn !== undefined && { quoteEn: input.quoteEn }),
+        ...(input.photo !== undefined && { photo: input.photo }),
+        ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+        ...(input.isActive !== undefined && { isActive: input.isActive }),
+      },
+    });
+    markDbOnline();
     revalidatePath("/");
     revalidatePath("/admin/konten/testimoni");
     revalidatePath("/admin/konten/beranda");
-    return { success: true, id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal memperbarui testimoni:", error);
-    return { success: false, error: "Gagal memperbarui data testimoni." };
+    return { success: false, error: "Gagal memperbarui data testimoni di database." };
   }
 }
 
 export async function deleteTestimony(id: string) {
   try {
-    const memoryList = getMemoryTestimonies();
-    const idx = memoryList.findIndex((t) => t.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    try {
-      await prisma.testimony.delete({ where: { id } });
-      markDbOnline();
-    } catch (dbError) {
-      console.error("[actions/testimony] delete error in db:", dbError);
-      markDbOffline();
-    }
+    await prisma.testimony.delete({ where: { id } });
+    markDbOnline();
 
     revalidatePath("/");
     revalidatePath("/admin/konten/testimoni");
     revalidatePath("/admin/konten/beranda");
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus testimoni:", error);
-    return { success: false, error: "Gagal menghapus data testimoni." };
+    return { success: false, error: "Gagal menghapus data testimoni dari database." };
   }
 }

@@ -59,17 +59,16 @@ export async function GET(request: NextRequest) {
       data: events,
     });
   } catch (error) {
-    console.warn("Prisma offline or timeout in /api/events, using fallbackEvents:", error);
-    let filtered = fallbackEvents;
-    if (status !== "ALL") filtered = filtered.filter((e) => e.status === status);
-    if (community && community !== "ALL") filtered = filtered.filter((e) => e.community === community);
-
-    return NextResponse.json({
-      success: true,
-      total: filtered.length,
-      data: filtered,
-      isFallback: true,
-    });
+    console.error("API Events GET error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        total: 0,
+        data: [],
+        error: "Agenda belum dapat dimuat dari database.",
+      },
+      { status: 503 }
+    );
   }
 }
 

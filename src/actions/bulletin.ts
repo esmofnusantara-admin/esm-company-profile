@@ -43,75 +43,58 @@ export async function getBulletins() {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createBulletin(input: BulletinInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.title || !input.fileUrl) {
       return { success: false, error: "Judul dan file buletin PDF wajib diunggah." };
     }
 
-    const newItem = {
-      id: "blt-" + Date.now(),
-      title: input.title,
-      titleEn: input.titleEn || null,
-      edition: input.edition || "Edisi Terbaru",
-      description: input.description || null,
-      fileUrl: input.fileUrl,
-      status: input.status || PublishStatus.PUBLISHED,
-      publishedAt: new Date(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    const item = await prisma.bulletin.create({
+      data: {
+        title: input.title,
+        titleEn: input.titleEn || null,
+        edition: input.edition || null,
+        description: input.description || null,
+        fileUrl: input.fileUrl,
+        status: input.status || PublishStatus.PUBLISHED,
+        publishedAt: new Date(),
+      },
+    });
 
-    saveMemoryBulletin(newItem);
-
-    if (!isDbKnownOffline()) {
-      try {
-        const item = await prisma.bulletin.create({
-          data: {
-            title: input.title,
-            titleEn: input.titleEn || null,
-            edition: input.edition || null,
-            description: input.description || null,
-            fileUrl: input.fileUrl,
-            status: input.status || PublishStatus.PUBLISHED,
-            publishedAt: new Date(),
-          },
-        });
-        newItem.id = item.id;
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-        console.warn("[WARN] PostgreSQL offline, buletin tersimpan di in-memory cache.");
-      }
-    }
-
+    markDbOnline();
     revalidatePath("/artikel");
     revalidatePath("/admin/buletin");
-    return { success: true, id: newItem.id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal membuat buletin:", error);
-    return { success: false, error: "Gagal menyimpan buletin." };
+    return { success: false, error: "Gagal menyimpan buletin ke database." };
   }
 }
 
 export async function deleteBulletin(id: string) {
   try {
-    deleteMemoryBulletin(id);
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        await prisma.bulletin.delete({ where: { id } });
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    await prisma.bulletin.delete({ where: { id } });
+    markDbOnline();
 
     revalidatePath("/artikel");
     revalidatePath("/admin/buletin");
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus buletin:", error);
-    return { success: false, error: "Gagal menghapus buletin." };
+    return { success: false, error: "Gagal menghapus buletin dari database." };
   }
 }

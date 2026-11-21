@@ -3,6 +3,12 @@
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 import { cookies } from "next/headers";
+import {
+  ADMIN_SESSION_COOKIE,
+  ADMIN_SESSION_MAX_AGE,
+  createAdminSessionToken,
+  getVerifiedAdminSession,
+} from "@/lib/adminSession";
 
 export async function loginAdmin(formData: FormData) {
   const email = formData.get("email") as string;
@@ -26,19 +32,20 @@ export async function loginAdmin(formData: FormData) {
       return { success: false, error: "Email atau kata sandi tidak sesuai." };
     }
 
-    // Set secure session cookie
+    // Set signed, HTTP-only session cookie.
     const cookieStore = await cookies();
-    cookieStore.set("esm_admin_session", JSON.stringify({
+    const sessionToken = createAdminSessionToken({
       id: user.id,
       email: user.email,
       name: user.name,
       role: user.role,
-    }), {
+    });
+    cookieStore.set(ADMIN_SESSION_COOKIE, sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 hari
+      maxAge: ADMIN_SESSION_MAX_AGE,
     });
 
     return {
@@ -58,17 +65,10 @@ export async function loginAdmin(formData: FormData) {
 
 export async function logoutAdmin() {
   const cookieStore = await cookies();
-  cookieStore.delete("esm_admin_session");
+  cookieStore.delete(ADMIN_SESSION_COOKIE);
   return { success: true };
 }
 
 export async function getAdminSession() {
-  const cookieStore = await cookies();
-  const sessionCookie = cookieStore.get("esm_admin_session");
-  if (!sessionCookie) return null;
-  try {
-    return JSON.parse(sessionCookie.value);
-  } catch {
-    return null;
-  }
+  return getVerifiedAdminSession();
 }

@@ -338,9 +338,10 @@ export async function GET(request: NextRequest) {
       let configs: any[] = [];
       let testimonies: any[] = [];
       let faqs: any[] = [];
+      let latestPrayer: any = null;
 
       try {
-        const [cfg, tst, fq] = await Promise.all([
+        const [cfg, tst, fq, pry] = await Promise.all([
           prisma.siteConfig
             .findMany({
               where: {
@@ -375,9 +376,16 @@ export async function GET(request: NextRequest) {
               orderBy: [{ sortOrder: "asc" }, { createdAt: "asc" }],
             })
             .catch(() => []),
+          prisma.prayerRequest
+            .findFirst({
+              where: { isAnswered: false },
+              orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+            })
+            .catch(() => null),
         ]);
         configs = cfg;
         testimonies = tst;
+        latestPrayer = pry;
         if (fq && fq.length > 0) {
           faqs = fq;
         } else {
@@ -432,6 +440,7 @@ export async function GET(request: NextRequest) {
             settings: configMap["site_settings"] || DEFAULT_CONFIGS["site_settings"],
             testimonies: testimonies.length > 0 ? testimonies : fallbackTestimonies,
             faqs,
+            prayerRequest: latestPrayer,
           },
         },
         {
@@ -668,6 +677,43 @@ export async function GET(request: NextRequest) {
           settings: configMap["site_settings"] || DEFAULT_CONFIGS["site_settings"],
           prayers,
           faqs,
+        },
+      });
+    }
+
+    // 7. Section 'doa'
+    if (section === "doa") {
+      let prayerRequests: any[] = [];
+      let userPrayers: any[] = [];
+
+      if (!isDbKnownOffline()) {
+        try {
+          const [prs, ups] = await Promise.all([
+            prisma.prayerRequest
+              .findMany({
+                orderBy: [{ sortOrder: "asc" }, { createdAt: "desc" }],
+              })
+              .catch(() => []),
+            prisma.userPrayer
+              .findMany({
+                where: { status: "APPROVED", isPrivate: false },
+                orderBy: { createdAt: "desc" },
+              })
+              .catch(() => []),
+          ]);
+          prayerRequests = prs;
+          userPrayers = ups;
+          markDbOnline();
+        } catch {
+          markDbOffline();
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        data: {
+          prayerRequests,
+          userPrayers,
         },
       });
     }

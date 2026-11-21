@@ -108,6 +108,7 @@ export default function PrayerWallPage() {
   const [copiedId, setCopiedId] = React.useState<string | null>(null);
   const [submittedMessage, setSubmittedMessage] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isLoadingPrayers, setIsLoadingPrayers] = React.useState(true);
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -116,9 +117,69 @@ export default function PrayerWallPage() {
     isPrivate: false,
   });
 
+  // Load prayers from database
+  React.useEffect(() => {
+    let cancelled = false;
+    const fetchPrayers = async () => {
+      try {
+        const res = await fetch("/api/content?section=doa");
+        const json = await res.json();
+        if (json.success && Array.isArray(json.data?.prayerRequests) && json.data.prayerRequests.length > 0) {
+          const mapped: PrayerItem[] = json.data.prayerRequests.map((p: any, idx: number) => {
+            const cat = (p.category || "").toLowerCase();
+            const validCategory: PrayerItem["category"] = 
+              cat.includes("banten") ? "banten" :
+              cat.includes("ternate") ? "ternate" :
+              cat.includes("siswa") ? "siswa" :
+              cat.includes("kampus") || cat.includes("mahasiswa") ? "kampus" : "misi";
+            return {
+              id: p.id,
+              category: validCategory,
+              title: p.title,
+              field: p.category === "BANTEN" ? "Tanah Jawara (Banten)" : p.category === "TERNATE" ? "Kota Rempah (Ternate)" : "Wilayah Misi ESM",
+              month: p.month || "Bulan Ini",
+              description: p.description,
+              urgent: !p.isAnswered,
+              prayedCount: 65 + (idx * 11) % 40,
+            };
+          });
+          if (!cancelled) {
+            setPrayers(mapped);
+          }
+        }
+      } catch (err) {
+        console.warn("Using default prayers fallback:", err);
+      } finally {
+        if (!cancelled) setIsLoadingPrayers(false);
+      }
+    };
+    fetchPrayers();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Sync prayedMap with localStorage
+  React.useEffect(() => {
+    if (typeof window !== "undefined") {
+      try {
+        const saved = localStorage.getItem("esm_prayed_map");
+        if (saved) {
+          setPrayedMap(JSON.parse(saved));
+        }
+      } catch {}
+    }
+  }, []);
+
   const handlePray = (id: string) => {
     if (prayedMap[id]) return;
-    setPrayedMap((prev) => ({ ...prev, [id]: true }));
+    setPrayedMap((prev) => {
+      const next = { ...prev, [id]: true };
+      if (typeof window !== "undefined") {
+        try {
+          localStorage.setItem("esm_prayed_map", JSON.stringify(next));
+        } catch {}
+      }
+      return next;
+    });
     setPrayers((prev) =>
       prev.map((p) => (p.id === id ? { ...p, prayedCount: p.prayedCount + 1 } : p))
     );

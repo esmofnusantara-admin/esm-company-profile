@@ -75,119 +75,100 @@ export async function getPrayerRequests(month?: string) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createPrayerRequest(input: PrayerRequestInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.title || !input.description || !input.month) {
       return { success: false, error: "Bulan, judul, dan penjelasan pokok doa wajib diisi." };
     }
 
-    const memoryList = getMemoryPrayers();
-    const newItem = {
-      id: "pry-" + Date.now(),
-      month: input.month,
-      title: input.title,
-      titleEn: input.titleEn || null,
-      description: input.description,
-      descriptionEn: input.descriptionEn || null,
-      category: input.category || "MISI",
-      isAnswered: input.isAnswered ?? false,
-      sortOrder: input.sortOrder ?? 0,
-      createdAt: new Date(),
-    };
+    const item = await prisma.prayerRequest.create({
+      data: {
+        month: input.month,
+        title: input.title,
+        titleEn: input.titleEn || null,
+        description: input.description,
+        descriptionEn: input.descriptionEn || null,
+        category: input.category || "MISI",
+        isAnswered: input.isAnswered ?? false,
+        sortOrder: input.sortOrder ?? 0,
+      },
+    });
 
-    memoryList.push(newItem);
-
-    if (!isDbKnownOffline()) {
-      try {
-        const item = await prisma.prayerRequest.create({
-          data: {
-            month: input.month,
-            title: input.title,
-            titleEn: input.titleEn || null,
-            description: input.description,
-            descriptionEn: input.descriptionEn || null,
-            category: input.category || "MISI",
-            isAnswered: input.isAnswered ?? false,
-            sortOrder: input.sortOrder ?? 0,
-          },
-        });
-        newItem.id = item.id;
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
-
+    markDbOnline();
+    revalidatePath("/doa");
     revalidatePath("/kemitraan");
     revalidatePath("/admin/doa");
-    return { success: true, id: newItem.id };
+    revalidatePath("/");
+
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menambah pokok doa:", error);
-    return { success: false, error: "Gagal menyimpan pokok doa." };
+    return { success: false, error: "Gagal menyimpan pokok doa ke database." };
   }
 }
 
 export async function updatePrayerRequest(id: string, input: Partial<PrayerRequestInput>) {
   try {
-    const memoryList = getMemoryPrayers();
-    const idx = memoryList.findIndex((p) => p.id === id);
-    if (idx !== -1) {
-      memoryList[idx] = { ...memoryList[idx], ...input };
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        const item = await prisma.prayerRequest.update({
-          where: { id },
-          data: {
-            ...(input.month !== undefined && { month: input.month }),
-            ...(input.title !== undefined && { title: input.title }),
-            ...(input.titleEn !== undefined && { titleEn: input.titleEn }),
-            ...(input.description !== undefined && { description: input.description }),
-            ...(input.descriptionEn !== undefined && { descriptionEn: input.descriptionEn }),
-            ...(input.category !== undefined && { category: input.category }),
-            ...(input.isAnswered !== undefined && { isAnswered: input.isAnswered }),
-            ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-          },
-        });
-        markDbOnline();
-        return { success: true, id: item.id };
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    const item = await prisma.prayerRequest.update({
+      where: { id },
+      data: {
+        ...(input.month !== undefined && { month: input.month }),
+        ...(input.title !== undefined && { title: input.title }),
+        ...(input.titleEn !== undefined && { titleEn: input.titleEn }),
+        ...(input.description !== undefined && { description: input.description }),
+        ...(input.descriptionEn !== undefined && { descriptionEn: input.descriptionEn }),
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.isAnswered !== undefined && { isAnswered: input.isAnswered }),
+        ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+      },
+    });
 
+    markDbOnline();
+    revalidatePath("/doa");
     revalidatePath("/kemitraan");
     revalidatePath("/admin/doa");
-    return { success: true, id };
+    revalidatePath("/");
+
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal memperbarui pokok doa:", error);
-    return { success: false, error: "Gagal memperbarui pokok doa." };
+    return { success: false, error: "Gagal memperbarui pokok doa di database." };
   }
 }
 
 export async function deletePrayerRequest(id: string) {
   try {
-    const memoryList = getMemoryPrayers();
-    const idx = memoryList.findIndex((p) => p.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        await prisma.prayerRequest.delete({ where: { id } });
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    await prisma.prayerRequest.delete({ where: { id } });
 
+    markDbOnline();
+    revalidatePath("/doa");
     revalidatePath("/kemitraan");
     revalidatePath("/admin/doa");
+    revalidatePath("/");
+
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus pokok doa:", error);
-    return { success: false, error: "Gagal menghapus pokok doa." };
+    return { success: false, error: "Gagal menghapus pokok doa dari database." };
   }
 }

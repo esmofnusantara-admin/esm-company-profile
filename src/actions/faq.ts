@@ -68,114 +68,85 @@ export async function getFAQs(page?: FAQPage) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 export async function createFAQ(input: FAQInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.question || !input.answer) {
       return { success: false, error: "Pertanyaan dan jawaban wajib diisi." };
     }
 
-    const memoryList = getMemoryFAQs();
-    const newItem = {
-      id: "faq-" + Date.now(),
-      question: input.question,
-      questionEn: input.questionEn || null,
-      answer: input.answer,
-      answerEn: input.answerEn || null,
-      page: input.page || FAQPage.GENERAL,
-      sortOrder: input.sortOrder ?? 0,
-      isActive: input.isActive ?? true,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-
-    memoryList.push(newItem);
-
-    try {
-      const item = await prisma.fAQ.create({
-        data: {
-          question: input.question,
-          questionEn: input.questionEn || null,
-          answer: input.answer,
-          answerEn: input.answerEn || null,
-          page: input.page || FAQPage.GENERAL,
-          sortOrder: input.sortOrder ?? 0,
-          isActive: input.isActive ?? true,
-        },
-      });
-      newItem.id = item.id;
-      markDbOnline();
-    } catch (dbError) {
-      console.warn("[actions/faq] Failed to create in DB, preserved in memory:", dbError);
-      markDbOffline();
-    }
+    const item = await prisma.fAQ.create({
+      data: {
+        question: input.question,
+        questionEn: input.questionEn || null,
+        answer: input.answer,
+        answerEn: input.answerEn || null,
+        page: input.page || FAQPage.GENERAL,
+        sortOrder: input.sortOrder ?? 0,
+        isActive: input.isActive ?? true,
+      },
+    });
+    markDbOnline();
 
     revalidatePath("/");
     revalidatePath("/kemitraan");
     revalidatePath("/pelayanan");
     revalidatePath("/admin/konten/faq");
     revalidatePath("/admin/konten/beranda");
-    return { success: true, id: newItem.id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menambah FAQ:", error);
-    return { success: false, error: "Gagal menyimpan FAQ." };
+    return { success: false, error: "Gagal menyimpan FAQ ke database." };
   }
 }
 
 export async function updateFAQ(id: string, input: Partial<FAQInput>) {
   try {
-    const memoryList = getMemoryFAQs();
-    const idx = memoryList.findIndex((f) => f.id === id);
-    if (idx !== -1) {
-      memoryList[idx] = { ...memoryList[idx], ...input, updatedAt: new Date() };
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    try {
-      const item = await prisma.fAQ.update({
-        where: { id },
-        data: {
-          ...(input.question !== undefined && { question: input.question }),
-          ...(input.questionEn !== undefined && { questionEn: input.questionEn }),
-          ...(input.answer !== undefined && { answer: input.answer }),
-          ...(input.answerEn !== undefined && { answerEn: input.answerEn }),
-          ...(input.page !== undefined && { page: input.page }),
-          ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-          ...(input.isActive !== undefined && { isActive: input.isActive }),
-        },
-      });
-      markDbOnline();
-      id = item.id;
-    } catch (dbError) {
-      console.warn("[actions/faq] Failed to update in DB, preserved in memory:", dbError);
-      markDbOffline();
-    }
+    const item = await prisma.fAQ.update({
+      where: { id },
+      data: {
+        ...(input.question !== undefined && { question: input.question }),
+        ...(input.questionEn !== undefined && { questionEn: input.questionEn }),
+        ...(input.answer !== undefined && { answer: input.answer }),
+        ...(input.answerEn !== undefined && { answerEn: input.answerEn }),
+        ...(input.page !== undefined && { page: input.page }),
+        ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+        ...(input.isActive !== undefined && { isActive: input.isActive }),
+      },
+    });
+    markDbOnline();
 
     revalidatePath("/");
     revalidatePath("/kemitraan");
     revalidatePath("/pelayanan");
     revalidatePath("/admin/konten/faq");
     revalidatePath("/admin/konten/beranda");
-    return { success: true, id };
+    return { success: true, id: item.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal memperbarui FAQ:", error);
-    return { success: false, error: "Gagal memperbarui FAQ." };
+    return { success: false, error: "Gagal memperbarui FAQ di database." };
   }
 }
 
 export async function deleteFAQ(id: string) {
   try {
-    const memoryList = getMemoryFAQs();
-    const idx = memoryList.findIndex((f) => f.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    try {
-      await prisma.fAQ.delete({ where: { id } });
-      markDbOnline();
-    } catch (dbError) {
-      console.warn("[actions/faq] Failed to delete in DB, removed from memory:", dbError);
-      markDbOffline();
-    }
+    await prisma.fAQ.delete({ where: { id } });
+    markDbOnline();
 
     revalidatePath("/");
     revalidatePath("/kemitraan");
@@ -184,7 +155,11 @@ export async function deleteFAQ(id: string) {
     revalidatePath("/admin/konten/beranda");
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus FAQ:", error);
-    return { success: false, error: "Gagal menghapus FAQ." };
+    return { success: false, error: "Gagal menghapus FAQ dari database." };
   }
 }

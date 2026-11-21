@@ -258,7 +258,27 @@ async function main() {
   }
   console.log("✅ Agenda acara terdaftar");
 
-  // 5. Sample Team Members
+  // Check if --clean flag is passed to reset/clean before seeding
+  const shouldClean = process.argv.includes("--clean");
+  if (shouldClean) {
+    console.log("🧹 Membersihkan data lama sebelum seeding ulang...");
+    await prisma.testimony.deleteMany();
+    await prisma.teamMember.deleteMany();
+    await prisma.prayerRequest.deleteMany();
+    await prisma.fAQ.deleteMany();
+    await prisma.eventRegistration.deleteMany();
+    await prisma.event.deleteMany();
+    await prisma.article.deleteMany();
+    await prisma.bulletin.deleteMany();
+    await prisma.mediaItem.deleteMany();
+    await prisma.userPrayer.deleteMany();
+    await prisma.financialTransaction.deleteMany();
+    await prisma.donationRecord.deleteMany();
+    await prisma.joinSubmission.deleteMany();
+    console.log("✨ Data lama berhasil dibersihkan.");
+  }
+
+  // 5. Sample Team Members (Idempotent: update if name matches, else create)
   const teamMembers = [
     {
       name: "Pdt. Daniel S. Th., M.Min.",
@@ -296,11 +316,21 @@ async function main() {
   ];
 
   for (const member of teamMembers) {
-    await prisma.teamMember.create({ data: member });
+    const existing = await prisma.teamMember.findFirst({
+      where: { name: member.name },
+    });
+    if (existing) {
+      await prisma.teamMember.update({
+        where: { id: existing.id },
+        data: member,
+      });
+    } else {
+      await prisma.teamMember.create({ data: member });
+    }
   }
-  console.log("✅ Tim pengurus terdaftar");
+  console.log("✅ Tim pengurus terdaftar (idempotent)");
 
-  // 6. Sample Testimonies
+  // 6. Sample Testimonies (Idempotent: update if name matches, else create)
   const testimonies = [
     {
       name: "Andreas Pratama",
@@ -315,11 +345,21 @@ async function main() {
   ];
 
   for (const t of testimonies) {
-    await prisma.testimony.create({ data: t });
+    const existing = await prisma.testimony.findFirst({
+      where: { name: t.name },
+    });
+    if (existing) {
+      await prisma.testimony.update({
+        where: { id: existing.id },
+        data: t,
+      });
+    } else {
+      await prisma.testimony.create({ data: t });
+    }
   }
-  console.log("✅ Testimoni terdaftar");
+  console.log("✅ Testimoni terdaftar (idempotent)");
 
-  // 7. Sample Monthly Prayer Requests
+  // 7. Sample Monthly Prayer Requests (Idempotent: update if title matches, else create)
   const prayers = [
     {
       month: "November 2026",
@@ -357,11 +397,21 @@ async function main() {
   ];
 
   for (const p of prayers) {
-    await prisma.prayerRequest.create({ data: p });
+    const existing = await prisma.prayerRequest.findFirst({
+      where: { title: p.title },
+    });
+    if (existing) {
+      await prisma.prayerRequest.update({
+        where: { id: existing.id },
+        data: p,
+      });
+    } else {
+      await prisma.prayerRequest.create({ data: p });
+    }
   }
-  console.log("✅ Pokok doa bulanan terdaftar");
+  console.log("✅ Pokok doa bulanan terdaftar (idempotent)");
 
-  // 8. Sample FAQs
+  // 8. Sample FAQs (Idempotent: update if question matches, else create)
   const sampleFaqs = [
     {
       question: "Apakah ESM berada di bawah satu sinode gereja tertentu?",
@@ -386,9 +436,19 @@ async function main() {
   ];
 
   for (const f of sampleFaqs) {
-    await prisma.fAQ.create({ data: f });
+    const existing = await prisma.fAQ.findFirst({
+      where: { question: f.question },
+    });
+    if (existing) {
+      await prisma.fAQ.update({
+        where: { id: existing.id },
+        data: f,
+      });
+    } else {
+      await prisma.fAQ.create({ data: f });
+    }
   }
-  console.log("✅ FAQ contoh terdaftar");
+  console.log("✅ FAQ contoh terdaftar (idempotent)");
 
   console.log("🎉 Seeding database ESM selesai dengan sukses!");
 }

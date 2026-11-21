@@ -151,7 +151,58 @@ export default function RenunganPage() {
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
 
-  const filteredArticles = DEVOTIONALS_DATA.filter((item) => {
+  const [dbDevotionals, setDbDevotionals] = React.useState<DevotionalItem[]>([]);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    fetch("/api/articles?category=DEVOTIONAL&status=PUBLISHED")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!cancelled && data.success && Array.isArray(data.data)) {
+          const mapped: DevotionalItem[] = data.data
+            .filter((art: any) => !DEVOTIONALS_DATA.some((d) => d.slug === art.slug))
+            .map((art: any) => {
+              const paragraphs = art.content
+                ? art.content.split("\n\n").filter(Boolean)
+                : [art.excerpt || art.title];
+              return {
+                id: art.id,
+                slug: art.slug,
+                title: art.title,
+                titleEn: art.titleEn || art.title,
+                date: new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "long", year: "numeric" }).format(new Date(art.publishedAt || art.createdAt)),
+                category: "MISI" as const,
+                categoryLabel: "Panggilan & Misi",
+                readTime: "4 menit baca",
+                scriptureRef: art.excerpt?.slice(0, 30) || "Alkitab",
+                goldenVerse: art.excerpt || art.title,
+                excerpt: art.excerpt || art.content.slice(0, 150),
+                reflectionParagraphs: paragraphs,
+                author: "Tim Redaksi ESM",
+                authorRole: "Pelayanan Firman & Doa",
+                coverImage: art.coverImage || "/uploads/agenda/agenda_hero.jpg",
+                yearlyReading: { ot: "Perjanjian Lama", nt: "Perjanjian Baru" },
+                scripturePassage: [{ verseNumber: 1, text: art.excerpt || art.title }],
+                reflectionQuestions: ["Bagaimana firman ini berbicara dalam hidupmu hari ini?"],
+                audioDuration: "03:45",
+                audioDurationSeconds: 225,
+                closingPrayer: "Bapa sorgawi, pimpinlah langkah hidupku hari ini seturut kehendak-Mu. Amin.",
+                insight: {
+                  title: "Sorotan Misi",
+                  content: art.excerpt || art.title,
+                },
+              };
+            });
+          setDbDevotionals(mapped);
+        }
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
+
+  const allDevotionals = React.useMemo(() => [...dbDevotionals, ...DEVOTIONALS_DATA], [dbDevotionals]);
+
+  const filteredArticles = allDevotionals.filter((item) => {
     const matchesCat = selectedCategory === "ALL" || item.category === selectedCategory;
     const matchesSearch =
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||

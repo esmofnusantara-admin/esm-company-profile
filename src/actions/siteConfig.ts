@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
+import { requireAdminSession } from "@/lib/adminSession";
 
 // Global fallback cache if PostgreSQL is offline
 const memoryConfigCache = ((globalThis as any).__esmConfigCache =
@@ -103,21 +104,25 @@ export async function getMultiSiteConfig(keys: string[]): Promise<Record<string,
  * Menyimpan / memperbarui konfigurasi situs
  */
 export async function saveSiteConfig(key: string, data: any) {
+  await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
   const value = JSON.stringify(data);
-  memoryConfigCache.set(key, value);
 
-  let dbSaved = false;
   try {
     await prisma.siteConfig.upsert({
       where: { key },
       update: { value },
       create: { key, value },
     });
-    dbSaved = true;
+    memoryConfigCache.set(key, value);
     markDbOnline();
   } catch (error) {
     markDbOffline();
-    console.warn(`[WARN] PostgreSQL save error for [${key}], kept in memory cache:`, error);
+    console.error(`[ERROR] PostgreSQL save error for [${key}]:`, error);
+    return {
+      success: false,
+      dbSaved: false,
+      error: "Perubahan tidak tersimpan karena database tidak tersedia.",
+    };
   }
 
   // Revalidate paths affected
@@ -136,5 +141,5 @@ export async function saveSiteConfig(key: string, data: any) {
     revalidatePath("/admin/pengaturan");
   } catch {}
 
-  return { success: true, dbSaved };
+  return { success: true, dbSaved: true };
 }

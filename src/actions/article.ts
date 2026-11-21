@@ -16,9 +16,13 @@ export interface ArticleInput {
   status: "DRAFT" | "PUBLISHED";
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 // 1. Buat Artikel Baru (Bilingual ID & EN)
 export async function createArticle(input: ArticleInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.title || !input.content) {
       return { success: false, error: "Judul dan isi artikel wajib diisi." };
     }
@@ -49,6 +53,9 @@ export async function createArticle(input: ArticleInput) {
 
     return { success: true, id: article.id, slug: article.slug };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal membuat artikel:", error);
     return { success: false, error: "Terjadi kesalahan saat menyimpan artikel." };
   }
@@ -57,6 +64,8 @@ export async function createArticle(input: ArticleInput) {
 // 2. Hapus Artikel
 export async function deleteArticle(id: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     await prisma.article.delete({
       where: { id },
     });
@@ -68,6 +77,9 @@ export async function deleteArticle(id: string) {
 
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal menghapus artikel:", error);
     return { success: false, error: "Gagal menghapus artikel." };
   }
@@ -76,6 +88,8 @@ export async function deleteArticle(id: string) {
 // 3. Tambah Buletin Warta (PDF)
 export async function createBulletin(title: string, fileUrl: string, edition?: string) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!title || !fileUrl) {
       return { success: false, error: "Judul dan file buletin wajib diunggah." };
     }
@@ -95,6 +109,9 @@ export async function createBulletin(title: string, fileUrl: string, edition?: s
 
     return { success: true, id: bulletin.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
     console.error("Gagal membuat buletin:", error);
     return { success: false, error: "Gagal menyimpan buletin." };
   }

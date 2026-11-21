@@ -3,24 +3,34 @@ import { writeFile, mkdir } from "fs/promises";
 import path from "path";
 
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
-const MAX_SIZE = 50 * 1024 * 1024; // 50MB (mendukung video pendek & dokumen)
-const ALLOWED_TYPES = [
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/svg+xml",
-  "image/gif",
-  "application/pdf",
-  "video/mp4",
-  "video/webm",
-  "video/quicktime",
-];
+const MAX_SIZE = 50 * 1024 * 1024;
+const ALLOWED_TYPES = new Map([
+  ["image/jpeg", ["jpg", "jpeg"]],
+  ["image/png", ["png"]],
+  ["image/webp", ["webp"]],
+  ["image/gif", ["gif"]],
+  ["application/pdf", ["pdf"]],
+  ["video/mp4", ["mp4"]],
+  ["video/webm", ["webm"]],
+  ["video/quicktime", ["mov"]],
+]);
+const ALLOWED_FOLDERS = new Set([
+  "articles",
+  "events",
+  "bulletins",
+  "gallery",
+  "team",
+  "home",
+  "about",
+  "misc",
+]);
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
-    const folder = (formData.get("folder") as string) || "misc"; // articles, events, bulletins, misc
+    const requestedFolder = (formData.get("folder") as string) || "misc";
+    const folder = ALLOWED_FOLDERS.has(requestedFolder) ? requestedFolder : "misc";
 
     if (!file) {
       return NextResponse.json({ error: "Tidak ada file yang diunggah" }, { status: 400 });
@@ -28,20 +38,21 @@ export async function POST(request: NextRequest) {
 
     if (file.size > MAX_SIZE) {
       return NextResponse.json(
-        { error: "Ukuran file terlalu besar (maksimal 10MB)" },
+        { error: "Ukuran file terlalu besar (maksimal 50MB)" },
         { status: 400 }
       );
     }
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "";
+    const allowedExtensions = ALLOWED_TYPES.get(file.type);
+    if (!allowedExtensions || !allowedExtensions.includes(ext)) {
       return NextResponse.json(
-        { error: "Format file tidak didukung. Gunakan JPG, PNG, WEBP, SVG, atau PDF." },
+        { error: "Format file tidak didukung atau ekstensi tidak sesuai dengan isinya." },
         { status: 400 }
       );
     }
 
     // Buat nama file unik
-    const ext = file.name.split(".").pop();
     const cleanName = file.name
       .split(".")[0]
       .replace(/[^a-zA-Z0-9]/g, "-")

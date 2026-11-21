@@ -76,9 +76,13 @@ export async function getEvents(community?: string) {
   }
 }
 
+import { requireAdminSession } from "@/lib/adminSession";
+
 // 1. Tambah Event Baru
 export async function createEvent(input: EventInput) {
   try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
     if (!input.title || !input.startDate) {
       return { success: false, error: "Judul dan tanggal acara wajib diisi." };
     }
@@ -86,83 +90,59 @@ export async function createEvent(input: EventInput) {
     const baseSlug = generateSlug(input.title);
     const uniqueSlug = `${baseSlug}-${Date.now().toString().slice(-4)}`;
 
-    const memoryList = getMemoryEvents();
-    const newEvent = {
-      id: "evt-" + Date.now(),
-      title: input.title,
-      slug: uniqueSlug,
-      description: input.description || "",
-      community: input.community || "ALL",
-      location: input.location || null,
-      startDate: new Date(input.startDate),
-      endDate: input.endDate ? new Date(input.endDate) : null,
-      coverImage: input.coverImage || null,
-      status: input.status,
-      createdAt: new Date(),
-    };
+    const event = await prisma.event.create({
+      data: {
+        title: input.title,
+        slug: uniqueSlug,
+        description: input.description || "",
+        community: (input.community as any) || "ALL",
+        location: input.location || null,
+        startDate: new Date(input.startDate),
+        endDate: input.endDate ? new Date(input.endDate) : null,
+        coverImage: input.coverImage || null,
+        status: input.status as any,
+      },
+    });
 
-    memoryList.push(newEvent);
-
-    if (!isDbKnownOffline()) {
-      try {
-        const event = await prisma.event.create({
-          data: {
-            title: input.title,
-            slug: uniqueSlug,
-            description: input.description || "",
-            community: (input.community as any) || "ALL",
-            location: input.location || null,
-            startDate: new Date(input.startDate),
-            endDate: input.endDate ? new Date(input.endDate) : null,
-            coverImage: input.coverImage || null,
-            status: input.status as any,
-          },
-        });
-        newEvent.id = event.id;
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
-
+    markDbOnline();
+    revalidatePath("/agenda");
     revalidatePath("/mobilisasi");
     revalidatePath("/admin/event");
     revalidatePath("/");
 
-    return { success: true, id: newEvent.id };
+    return { success: true, id: event.id };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal membuat event:", error);
-    return { success: false, error: "Gagal menyimpan agenda acara." };
+    return { success: false, error: "Gagal menyimpan agenda acara ke database." };
   }
 }
 
 // 2. Hapus Event
 export async function deleteEvent(id: string) {
   try {
-    const memoryList = getMemoryEvents();
-    const idx = memoryList.findIndex((e) => e.id === id);
-    if (idx !== -1) {
-      memoryList.splice(idx, 1);
-    }
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
 
-    if (!isDbKnownOffline()) {
-      try {
-        await prisma.event.delete({
-          where: { id },
-        });
-        markDbOnline();
-      } catch (dbError) {
-        markDbOffline();
-      }
-    }
+    await prisma.event.delete({
+      where: { id },
+    });
 
+    markDbOnline();
+    revalidatePath("/agenda");
     revalidatePath("/mobilisasi");
     revalidatePath("/admin/event");
     revalidatePath("/");
 
     return { success: true };
   } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
     console.error("Gagal menghapus event:", error);
-    return { success: false, error: "Gagal menghapus agenda." };
+    return { success: false, error: "Gagal menghapus agenda dari database." };
   }
 }

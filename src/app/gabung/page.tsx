@@ -231,8 +231,9 @@ export default function JoinGroupPage() {
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">Nama Lengkap</label>
+                      <label htmlFor="join-fullname" className="text-xs font-bold text-foreground">Nama Lengkap</label>
                       <input
+                        id="join-fullname"
                         type="text"
                         required
                         value={formData.fullName}
@@ -243,8 +244,9 @@ export default function JoinGroupPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">Nomor WhatsApp Aktif</label>
+                      <label htmlFor="join-phone" className="text-xs font-bold text-foreground">Nomor WhatsApp Aktif</label>
                       <input
+                        id="join-phone"
                         type="tel"
                         required
                         value={formData.phone}
@@ -257,8 +259,9 @@ export default function JoinGroupPage() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">Asal Sekolah / Kampus / Kantor</label>
+                      <label htmlFor="join-school" className="text-xs font-bold text-foreground">Asal Sekolah / Kampus / Kantor</label>
                       <input
+                        id="join-school"
                         type="text"
                         required
                         value={formData.schoolOrCampus}
@@ -269,8 +272,9 @@ export default function JoinGroupPage() {
                     </div>
 
                     <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-foreground">Wilayah Domisili</label>
+                      <label htmlFor="join-region" className="text-xs font-bold text-foreground">Wilayah Domisili</label>
                       <select
+                        id="join-region"
                         value={selectedRegion}
                         onChange={(e) => setSelectedRegion(e.target.value)}
                         className="w-full rounded-xl border border-border bg-canvas px-3.5 py-2.5 text-xs text-foreground focus:border-primary focus:outline-none"
@@ -284,10 +288,11 @@ export default function JoinGroupPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-bold text-foreground">
+                    <label htmlFor="join-notes" className="text-xs font-bold text-foreground">
                       Kerinduan / Catatan Khusus (Opsional)
                     </label>
                     <textarea
+                      id="join-notes"
                       rows={3}
                       value={formData.notes}
                       onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
