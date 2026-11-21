@@ -23,8 +23,9 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
+import { CommunityDetail } from "@/lib/communityConfig";
 
-const encounterSlides: CarouselSlide[] = [
+const defaultEncounterSlides: CarouselSlide[] = [
   {
     src: "/uploads/pelayanan/encounter_1.jpg",
     alt: "Diskusi Alkitab dan Worldview Mahasiswa Kampus",
@@ -41,9 +42,51 @@ const encounterSlides: CarouselSlide[] = [
   },
 ];
 
-export function EncounterView() {
+interface EncounterViewProps {
+  initialData?: CommunityDetail | null;
+}
+
+export function EncounterView({ initialData }: EncounterViewProps) {
   const { t, locale } = useLanguage();
   const en = t.encounterPage;
+
+  // Build dynamic carousel slides
+  const slides: CarouselSlide[] = React.useMemo(() => {
+    if (Array.isArray(initialData?.slides) && initialData.slides.length > 0) {
+      return initialData.slides.map((s: any, idx: number) => ({
+        src: s.src || s.mediaUrl,
+        alt: s.alt || s.title || `Dokumentasi Encounter ${idx + 1}`,
+        badge: s.badge || "Encounter Mahasiswa",
+        title: s.title || "Persekutuan Mahasiswa Kampus",
+        caption: s.caption || "",
+      }));
+    }
+
+    const uploadedImgs: string[] = [];
+    if (initialData?.mediaUrl?.trim()) uploadedImgs.push(initialData.mediaUrl.trim());
+    if (Array.isArray(initialData?.galleryImages)) {
+      for (const g of initialData.galleryImages) {
+        if (g?.trim() && !uploadedImgs.includes(g.trim())) {
+          uploadedImgs.push(g.trim());
+        }
+      }
+    }
+
+    if (uploadedImgs.length > 0) {
+      return uploadedImgs.map((src, idx) => {
+        const fallback = defaultEncounterSlides[idx] || defaultEncounterSlides[0];
+        return {
+          src,
+          alt: `Dokumentasi Mahasiswa Encounter ${idx + 1}`,
+          badge: idx === 0 && initialData?.heroTitle ? initialData.heroTitle : fallback.badge,
+          title: idx === 0 && initialData?.titleId ? initialData.titleId : fallback.title,
+          caption: idx === 0 && initialData?.heroCaption ? initialData.heroCaption : fallback.caption,
+        };
+      });
+    }
+
+    return defaultEncounterSlides;
+  }, [initialData]);
 
   return (
     <>
@@ -110,7 +153,7 @@ export function EncounterView() {
                   {/* Subtle decorative glow ring */}
                   <div className="absolute -inset-2 rounded-3xl bg-gradient-to-r from-amber-500/20 to-red-500/20 blur-xl opacity-75" />
                   <SwipeableCarousel
-                    slides={encounterSlides}
+                    slides={slides}
                     aspectRatio="aspect-[4/3] sm:aspect-[16/10]"
                     className="border-white/20 shadow-2xl"
                   />

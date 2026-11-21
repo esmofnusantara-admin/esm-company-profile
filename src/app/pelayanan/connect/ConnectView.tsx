@@ -25,7 +25,9 @@ import { useLanguage } from "@/context/LanguageContext";
 import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
-const connectSlides: CarouselSlide[] = [
+import { CommunityDetail } from "@/lib/communityConfig";
+
+const defaultConnectSlides: CarouselSlide[] = [
   {
     src: "/uploads/pelayanan/connect_1.jpg",
     alt: "Forum Profesional dan Diskusi Integritas Kerja",
@@ -42,9 +44,51 @@ const connectSlides: CarouselSlide[] = [
   },
 ];
 
-export function ConnectView() {
+interface ConnectViewProps {
+  initialData?: CommunityDetail | null;
+}
+
+export function ConnectView({ initialData }: ConnectViewProps) {
   const { t, locale } = useLanguage();
   const c = t.connectPage;
+
+  // Build dynamic carousel slides
+  const slides: CarouselSlide[] = React.useMemo(() => {
+    if (Array.isArray(initialData?.slides) && initialData.slides.length > 0) {
+      return initialData.slides.map((s: any, idx: number) => ({
+        src: s.src || s.mediaUrl,
+        alt: s.alt || s.title || `Dokumentasi Connect ${idx + 1}`,
+        badge: s.badge || "Connect Marketplace & Alumni",
+        title: s.title || "Komunitas Alumni & Profesional",
+        caption: s.caption || "",
+      }));
+    }
+
+    const uploadedImgs: string[] = [];
+    if (initialData?.mediaUrl?.trim()) uploadedImgs.push(initialData.mediaUrl.trim());
+    if (Array.isArray(initialData?.galleryImages)) {
+      for (const g of initialData.galleryImages) {
+        if (g?.trim() && !uploadedImgs.includes(g.trim())) {
+          uploadedImgs.push(g.trim());
+        }
+      }
+    }
+
+    if (uploadedImgs.length > 0) {
+      return uploadedImgs.map((src, idx) => {
+        const fallback = defaultConnectSlides[idx] || defaultConnectSlides[0];
+        return {
+          src,
+          alt: `Dokumentasi Alumni Connect ${idx + 1}`,
+          badge: idx === 0 && initialData?.heroTitle ? initialData.heroTitle : fallback.badge,
+          title: idx === 0 && initialData?.titleId ? initialData.titleId : fallback.title,
+          caption: idx === 0 && initialData?.heroCaption ? initialData.heroCaption : fallback.caption,
+        };
+      });
+    }
+
+    return defaultConnectSlides;
+  }, [initialData]);
 
   return (
     <>
@@ -149,7 +193,7 @@ export function ConnectView() {
 
             <div className="relative">
               <SwipeableCarousel
-                slides={connectSlides}
+                slides={slides}
                 aspectRatio="aspect-[16/9]"
                 className="max-w-4xl mx-auto shadow-2xl border-white"
               />

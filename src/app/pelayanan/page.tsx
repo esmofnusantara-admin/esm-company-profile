@@ -1,6 +1,7 @@
 "use client";
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,10 @@ export default function PelayananPage() {
   const exploreDesc = exploreComm ? (locale === "en" ? exploreComm.descEn || exploreComm.descId : exploreComm.descId) : c.exploreDesc;
   const encounterDesc = encounterComm ? (locale === "en" ? encounterComm.descEn || encounterComm.descId : encounterComm.descId) : c.encounterDesc;
   const connectDesc = connectComm ? (locale === "en" ? connectComm.descEn || connectComm.descId : connectComm.descId) : c.connectDesc;
+
+  const exploreImage = exploreComm?.mediaUrl?.trim() || "/uploads/pelayanan/explore_hero.jpg";
+  const encounterImage = encounterComm?.mediaUrl?.trim() || "/uploads/pelayanan/encounter_1.jpg";
+  const connectImage = connectComm?.mediaUrl?.trim() || "/uploads/pelayanan/connect_1.jpg";
 
   return (
     <>
@@ -131,12 +136,27 @@ export default function PelayananPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card className="flex flex-col justify-between p-6">
-                <div className="space-y-3">
-                  <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center">
-                    <Compass className="size-5" />
+              {/* Explore Community */}
+              <Card className="flex flex-col justify-between p-6 overflow-hidden group hover:border-primary/40 transition-all shadow-warm-xs">
+                <div className="space-y-4">
+                  <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-muted shadow-xs">
+                    <Image
+                      src={exploreImage}
+                      alt="Explore Community (SMA)"
+                      fill
+                      unoptimized
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">Explore Community</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                      <Compass className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">Tahap 01 • Siswa</span>
+                      <h3 className="text-xl font-bold text-foreground">Explore Community</h3>
+                    </div>
+                  </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {exploreDesc}
                   </p>
@@ -151,12 +171,27 @@ export default function PelayananPage() {
                 </div>
               </Card>
 
-              <Card className="flex flex-col justify-between p-6 border-accent/40 bg-accent-50/10">
-                <div className="space-y-3">
-                  <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center">
-                    <GraduationCap className="size-5" />
+              {/* Encounter Community */}
+              <Card className="flex flex-col justify-between p-6 border-accent/40 bg-accent-50/10 overflow-hidden group hover:border-accent transition-all shadow-warm-xs">
+                <div className="space-y-4">
+                  <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-muted shadow-xs">
+                    <Image
+                      src={encounterImage}
+                      alt="Encounter Community (Mahasiswa)"
+                      fill
+                      unoptimized
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">Encounter Community</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-accent-50 text-accent flex items-center justify-center shrink-0">
+                      <GraduationCap className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-accent block">Tahap 02 • Mahasiswa</span>
+                      <h3 className="text-xl font-bold text-foreground">Encounter Community</h3>
+                    </div>
+                  </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {encounterDesc}
                   </p>
@@ -171,12 +206,27 @@ export default function PelayananPage() {
                 </div>
               </Card>
 
-              <Card className="flex flex-col justify-between p-6">
-                <div className="space-y-3">
-                  <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center">
-                    <Briefcase className="size-5" />
+              {/* Connect Community */}
+              <Card className="flex flex-col justify-between p-6 overflow-hidden group hover:border-primary/40 transition-all shadow-warm-xs">
+                <div className="space-y-4">
+                  <div className="relative aspect-[16/10] w-full rounded-2xl overflow-hidden bg-muted shadow-xs">
+                    <Image
+                      src={connectImage}
+                      alt="Connect Community (Alumni)"
+                      fill
+                      unoptimized
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground">Connect Community</h3>
+                  <div className="flex items-center gap-3">
+                    <div className="size-10 rounded-xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                      <Briefcase className="size-5" />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary block">Tahap 03 • Alumni</span>
+                      <h3 className="text-xl font-bold text-foreground">Connect Community</h3>
+                    </div>
+                  </div>
                   <p className="text-xs text-muted-foreground leading-relaxed">
                     {connectDesc}
                   </p>

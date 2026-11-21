@@ -4,6 +4,7 @@ import { defaultLegalOrg } from "@/lib/legalOrgConfig";
 import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
 import { initialFAQs } from "@/lib/faqData";
 import { DEFAULT_PAGE_STATUSES } from "@/lib/pageStatusConfig";
+import { defaultCommunities } from "@/lib/communityConfig";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -193,22 +194,7 @@ const DEFAULT_CONFIGS: Record<string, any> = {
         "Sending trained disciples to mission fields, campuses, marketplaces, and across Nusantara.",
     },
   },
-  pelayanan_communities: {
-    items: [
-      {
-        name: "Pelayanan Siswa (High School)",
-        desc: "Kelompok tumbuh bersama bagi siswa SMP & SMA dalam menghadapi pergaulan zaman.",
-      },
-      {
-        name: "Pelayanan Mahasiswa (University)",
-        desc: "Persekutuan kampus & asrama binaan mahasiswa di Banten dan Ternate.",
-      },
-      {
-        name: "Pelayanan Alumni & Profesional (Marketplace)",
-        desc: "Wadah para sarjana dan pekerja untuk menjadi saksi Kristus di dunia kerja.",
-      },
-    ],
-  },
+  pelayanan_communities: defaultCommunities,
 };
 
 const fallbackTestimonies = [

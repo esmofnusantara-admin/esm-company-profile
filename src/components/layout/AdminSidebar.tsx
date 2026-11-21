@@ -25,6 +25,9 @@ import {
   Network,
   Building2,
   Heart,
+  Layers,
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { logoutAdmin } from "@/actions/auth";
@@ -103,9 +106,24 @@ const navGroups: NavGroup[] = [
     label: "PELAYANAN (3C)",
     items: [
       {
-        title: "Explore, Encounter & Connect",
-        href: "/admin/konten/pelayanan",
+        title: "Kerangka 3C Pelayanan",
+        href: "/admin/konten/pelayanan?tab=3c",
+        icon: Layers,
+      },
+      {
+        title: "Explore (Siswa SMA)",
+        href: "/admin/konten/pelayanan?tab=explore",
         icon: Compass,
+      },
+      {
+        title: "Encounter (Mahasiswa/Kuliah)",
+        href: "/admin/konten/pelayanan?tab=encounter",
+        icon: GraduationCap,
+      },
+      {
+        title: "Connect (Alumni & Marketplace)",
+        href: "/admin/konten/pelayanan?tab=connect",
+        icon: Briefcase,
       },
     ],
   },

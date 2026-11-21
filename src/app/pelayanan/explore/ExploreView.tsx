@@ -25,9 +25,43 @@ import {
 import { useLanguage } from "@/context/LanguageContext";
 import { MaskedWhatsAppLink } from "@/components/common/MaskedWhatsAppLink";
 
-export function ExploreView() {
+import { CommunityDetail } from "@/lib/communityConfig";
+import { SwipeableCarousel, CarouselSlide } from "@/components/common/SwipeableCarousel";
+
+interface ExploreViewProps {
+  initialData?: CommunityDetail | null;
+}
+
+export function ExploreView({ initialData }: ExploreViewProps) {
   const { t, locale } = useLanguage();
   const e = t.explorePage;
+
+  // Dynamic image and captions
+  const heroImage = initialData?.mediaUrl?.trim() || "/uploads/pelayanan/explore_hero.jpg";
+  const heroKicker = initialData?.heroTitle || (locale === "en" ? "Explore Community Fellowship" : "Kehangatan Komunitas Explore");
+  const heroCaption = initialData?.heroCaption || (locale === "en"
+    ? "Studying Scripture is never dull when we discuss it with genuine friends and attentive mentors."
+    : "Belajar Alkitab bukan membosankan saat kita mendiskusikannya bersama teman-teman yang tulus dan kakak pembina yang setia mendengar.");
+
+  // If there are multiple gallery images, build slides for carousel
+  const carouselSlides: CarouselSlide[] = React.useMemo(() => {
+    const list: string[] = [];
+    if (heroImage) list.push(heroImage);
+    if (Array.isArray(initialData?.galleryImages)) {
+      for (const img of initialData.galleryImages) {
+        if (img?.trim() && !list.includes(img.trim())) {
+          list.push(img.trim());
+        }
+      }
+    }
+    return list.map((src, idx) => ({
+      src,
+      alt: `Dokumentasi Komunitas Explore Siswa ${idx + 1}`,
+      badge: idx === 0 ? heroKicker : "Dokumentasi Siswa SMA",
+      title: idx === 0 ? (initialData?.titleId || "Komunitas Explore Siswa") : "Kelompok Belajar Alkitab & Mentoring",
+      caption: idx === 0 ? heroCaption : "Masa remaja bertumbuh dalam iman dan sahabat sejati di Kristus.",
+    }));
+  }, [heroImage, initialData, heroKicker, heroCaption]);
 
   return (
     <>
@@ -75,30 +109,38 @@ export function ExploreView() {
 
         {/* ============================================================
             2. VISUAL PHOTO SHOWCASE (Like GraceLife Kids Image Feature)
-            Large authentic photograph of students in discipleship circle
+            Large authentic photograph / Carousel of students in discipleship circle
             ============================================================ */}
         <section className="relative -mt-10 sm:-mt-16 z-20 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
           <div className="rounded-3xl bg-white border border-stone-200/90 p-3 sm:p-4 shadow-warm-lg overflow-hidden">
-            <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-inner">
-              <Image
-                src="/uploads/pelayanan/explore_hero.jpg"
-                alt="Persekutuan dan Kelompok Pemuridan Siswa SMA Explore"
-                fill
-                priority
-                unoptimized
-                className="object-cover object-center"
+            {carouselSlides.length > 1 ? (
+              <SwipeableCarousel
+                slides={carouselSlides}
+                aspectRatio="aspect-[16/9]"
+                className="w-full rounded-2xl overflow-hidden shadow-inner"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-6 sm:p-8">
-                <div className="text-white space-y-1">
-                  <p className="text-xs font-bold uppercase tracking-wider text-amber-300">
-                    Kehangatan Komunitas Explore
-                  </p>
-                  <p className="font-serif italic text-sm sm:text-lg text-white font-medium">
-                    &ldquo;Belajar Alkitab bukan membosankan saat kita mendiskusikannya bersama teman-teman yang tulus dan kakak pembina yang setia mendengar.&rdquo;
-                  </p>
+            ) : (
+              <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden shadow-inner">
+                <Image
+                  src={heroImage}
+                  alt={initialData?.titleId || "Persekutuan dan Kelompok Pemuridan Siswa SMA Explore"}
+                  fill
+                  priority
+                  unoptimized
+                  className="object-cover object-center"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-6 sm:p-8">
+                  <div className="text-white space-y-1">
+                    <p className="text-xs font-bold uppercase tracking-wider text-amber-300">
+                      {heroKicker}
+                    </p>
+                    <p className="font-serif italic text-sm sm:text-lg text-white font-medium">
+                      &ldquo;{heroCaption}&rdquo;
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         </section>
 
