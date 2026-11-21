@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { AgendaView } from "@/components/agenda/AgendaView";
 import { PageStatusGate } from "@/components/common/PageStatusGate";
 
+export const dynamic = "force-dynamic";
+
 export default function AgendaPage() {
   return (
     <PageStatusGate

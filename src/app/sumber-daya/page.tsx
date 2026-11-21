@@ -1,6 +1,8 @@
 import { PageStatusGate } from "@/components/common/PageStatusGate";
 import { SumberDayaView } from "./SumberDayaView";
 
+export const dynamic = "force-dynamic";
+
 export default function SumberDayaPage() {
   return (
     <PageStatusGate

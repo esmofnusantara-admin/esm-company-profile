@@ -1,6 +1,8 @@
 import { PageStatusGate } from "@/components/common/PageStatusGate";
 import { ConnectView } from "./ConnectView";
 
+export const dynamic = "force-dynamic";
+
 export default function ConnectPage() {
   return (
     <PageStatusGate

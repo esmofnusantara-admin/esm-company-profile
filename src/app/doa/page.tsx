@@ -1,6 +1,8 @@
 import { PageStatusGate } from "@/components/common/PageStatusGate";
 import { DoaView } from "./DoaView";
 
+export const dynamic = "force-dynamic";
+
 export default function DoaPage() {
   return (
     <PageStatusGate
