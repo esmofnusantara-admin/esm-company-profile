@@ -7,9 +7,12 @@ import { isDbKnownOffline, markDbOffline, markDbOnline } from "@/lib/dbStatus";
 
 export interface EventInput {
   title: string;
+  titleEn?: string;
   description: string;
+  descriptionEn?: string;
   community?: "EXPLORE" | "ENCOUNTER" | "CONNECT" | "ALL";
   location?: string;
+  locationEn?: string;
   startDate: Date | string;
   endDate?: Date | string;
   coverImage?: string;
@@ -121,7 +124,65 @@ export async function createEvent(input: EventInput) {
   }
 }
 
-// 2. Hapus Event
+// 2. Perbarui Event (Edit)
+export async function updateEvent(id: string, input: Partial<EventInput>) {
+  try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
+    if (!input.title || !input.startDate) {
+      return { success: false, error: "Judul dan tanggal acara wajib diisi." };
+    }
+
+    if (isDbKnownOffline()) {
+      const list = getMemoryEvents();
+      const idx = list.findIndex((e) => e.id === id);
+      if (idx !== -1) {
+        list[idx] = {
+          ...list[idx],
+          ...input,
+          startDate: new Date(input.startDate),
+          endDate: input.endDate ? new Date(input.endDate) : list[idx].endDate,
+        };
+      }
+      return { success: true, id };
+    }
+
+    const data: any = {};
+    if (input.title !== undefined) data.title = input.title;
+    if (input.titleEn !== undefined) data.titleEn = input.titleEn || null;
+    if (input.description !== undefined) data.description = input.description || "";
+    if (input.descriptionEn !== undefined) data.descriptionEn = input.descriptionEn || null;
+    if (input.community !== undefined) data.community = input.community || "ALL";
+    if (input.location !== undefined) data.location = input.location || null;
+    if (input.locationEn !== undefined) data.locationEn = input.locationEn || null;
+    if (input.startDate !== undefined) data.startDate = new Date(input.startDate);
+    if (input.endDate !== undefined) data.endDate = input.endDate ? new Date(input.endDate) : null;
+    if (input.coverImage !== undefined) data.coverImage = input.coverImage || null;
+    if (input.status !== undefined) data.status = input.status;
+
+    const event = await prisma.event.update({
+      where: { id },
+      data,
+    });
+
+    markDbOnline();
+    revalidatePath("/agenda");
+    revalidatePath("/mobilisasi");
+    revalidatePath("/admin/event");
+    revalidatePath("/");
+
+    return { success: true, id: event.id };
+  } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    markDbOffline();
+    console.error("Gagal mengupdate event:", error);
+    return { success: false, error: "Gagal memperbarui agenda acara di database." };
+  }
+}
+
+// 3. Hapus Event
 export async function deleteEvent(id: string) {
   try {
     await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);

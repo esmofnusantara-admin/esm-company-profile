@@ -8,6 +8,9 @@ import {
   Calendar,
   Plus,
   Trash2,
+  Edit2,
+  Save,
+  X,
   MapPin,
   Video,
   CheckCircle2,
@@ -18,7 +21,7 @@ import {
   Check,
   Building2,
 } from "lucide-react";
-import { createEvent, deleteEvent } from "@/actions/event";
+import { createEvent, updateEvent, deleteEvent } from "@/actions/event";
 import {
   getEventRegistrations,
   updateEventRegistrationStatus,
@@ -41,6 +44,7 @@ export default function AdminEventPage() {
   const [activeTab, setActiveTab] = React.useState<"events" | "rsvp">("events");
 
   // Event CMS state
+  const [editingEventId, setEditingEventId] = React.useState<string | null>(null);
   const [title, setTitle] = React.useState("");
   const [community, setCommunity] = React.useState<"ALL" | "EXPLORE" | "ENCOUNTER" | "CONNECT">("ALL");
   const [location, setLocation] = React.useState("");
@@ -51,6 +55,43 @@ export default function AdminEventPage() {
   const [events, setEvents] = React.useState<EventItem[]>([]);
   const [fetching, setFetching] = React.useState(true);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
+
+  const formatForDateInput = (dateStr: string) => {
+    if (!dateStr) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+    try {
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    } catch {
+      return "";
+    }
+  };
+
+  const handleEdit = (ev: EventItem) => {
+    setEditingEventId(ev.id);
+    setTitle(ev.title || "");
+    setCommunity(ev.community || "ALL");
+    setLocation(ev.location || "");
+    setStartDate(formatForDateInput(ev.startDate));
+    setDescription(ev.description || "");
+    // Scroll smoothly to form
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEventId(null);
+    setTitle("");
+    setCommunity("ALL");
+    setLocation("");
+    setStartDate("");
+    setDescription("");
+  };
 
   // RSVP Attendees state
   const [registrations, setRegistrations] = React.useState<any[]>([]);
@@ -128,32 +169,57 @@ export default function AdminEventPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const res = await createEvent({
-      title,
-      community,
-      location,
-      startDate,
-      description,
-      status: "PUBLISHED",
-    });
-    setLoading(false);
-    if (res.success) {
-      setTitle("");
-      setLocation("");
-      setStartDate("");
-      setDescription("");
-      fetchEvents();
-      toast({
-        title: "Acara Diterbitkan",
-        description: "Agenda acara baru berhasil ditambahkan.",
-        type: "success",
+
+    if (editingEventId) {
+      const res = await updateEvent(editingEventId, {
+        title,
+        community,
+        location,
+        startDate,
+        description,
+        status: "PUBLISHED",
       });
+      setLoading(false);
+      if (res.success) {
+        handleCancelEdit();
+        fetchEvents();
+        toast({
+          title: "Agenda Diperbarui",
+          description: "Perubahan agenda acara berhasil disimpan.",
+          type: "success",
+        });
+      } else {
+        toast({
+          title: "Gagal Memperbarui",
+          description: res.error || "Gagal memperbarui acara.",
+          type: "error",
+        });
+      }
     } else {
-      toast({
-        title: "Gagal Menyimpan",
-        description: res.error || "Gagal menambahkan acara.",
-        type: "error",
+      const res = await createEvent({
+        title,
+        community,
+        location,
+        startDate,
+        description,
+        status: "PUBLISHED",
       });
+      setLoading(false);
+      if (res.success) {
+        handleCancelEdit();
+        fetchEvents();
+        toast({
+          title: "Acara Diterbitkan",
+          description: "Agenda acara baru berhasil ditambahkan.",
+          type: "success",
+        });
+      } else {
+        toast({
+          title: "Gagal Menyimpan",
+          description: res.error || "Gagal menambahkan acara.",
+          type: "error",
+        });
+      }
     }
   };
 
@@ -250,10 +316,46 @@ export default function AdminEventPage() {
       {/* Tab 1: Events CMS */}
       {activeTab === "events" && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Form Tambah Acara */}
+          {/* Form Tambah / Edit Acara */}
           <div className="lg:col-span-5">
-            <Card className="p-6 space-y-4 shadow-warm-sm">
-              <h3 className="font-bold text-sm text-foreground">Tambah Agenda Baru</h3>
+            <Card className={`p-6 space-y-4 shadow-warm-sm transition-all ${
+              editingEventId ? "border-amber-400/80 bg-amber-50/10 ring-2 ring-amber-400/20" : ""
+            }`}>
+              <div className="flex items-center justify-between border-b border-border pb-3">
+                <div>
+                  <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+                    {editingEventId ? (
+                      <>
+                        <Edit2 className="size-4 text-amber-600" />
+                        <span>Edit Agenda Acara</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="size-4 text-primary" />
+                        <span>Tambah Agenda Baru</span>
+                      </>
+                    )}
+                  </h3>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    {editingEventId
+                      ? "Ubah rincian agenda acara di bawah lalu simpan perubahan."
+                      : "Publikasikan agenda persekutuan atau kegiatan pemuridan baru."}
+                  </p>
+                </div>
+                {editingEventId && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleCancelEdit}
+                    className="text-xs text-muted-foreground hover:text-foreground h-7 px-2.5 rounded-lg border border-border"
+                  >
+                    <X className="size-3 mr-1" />
+                    <span>Batal</span>
+                  </Button>
+                )}
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
                 <div>
                   <label className="font-bold text-foreground block mb-1">Nama Acara *</label>
@@ -315,20 +417,41 @@ export default function AdminEventPage() {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full justify-center rounded-xl font-bold py-2.5 shadow-warm-sm"
-                >
-                  {loading ? (
-                    <span>Menyimpan ke Database...</span>
-                  ) : (
-                    <>
-                      <Plus className="size-3.5 mr-1" />
-                      <span>Publikasikan ke Website</span>
-                    </>
+                <div className="flex items-center gap-2 pt-1">
+                  <Button
+                    type="submit"
+                    disabled={loading}
+                    className={`flex-1 justify-center rounded-xl font-bold py-2.5 shadow-warm-sm transition-all ${
+                      editingEventId
+                        ? "bg-amber-600 hover:bg-amber-700 text-white"
+                        : "bg-primary hover:bg-primary/90 text-white"
+                    }`}
+                  >
+                    {loading ? (
+                      <span>Menyimpan ke Database...</span>
+                    ) : editingEventId ? (
+                      <>
+                        <Save className="size-3.5 mr-1" />
+                        <span>Simpan Perubahan Agenda</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="size-3.5 mr-1" />
+                        <span>Publikasikan ke Website</span>
+                      </>
+                    )}
+                  </Button>
+                  {editingEventId && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleCancelEdit}
+                      className="rounded-xl text-xs font-semibold py-2.5 px-4"
+                    >
+                      Batal
+                    </Button>
                   )}
-                </Button>
+                </div>
               </form>
             </Card>
           </div>
@@ -353,7 +476,11 @@ export default function AdminEventPage() {
                   {events.map((ev) => (
                     <div
                       key={ev.id}
-                      className="flex items-center justify-between p-3.5 rounded-xl border border-border bg-canvas hover:border-primary/40 transition-colors"
+                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all ${
+                        editingEventId === ev.id
+                          ? "border-amber-500/80 bg-amber-500/5 ring-2 ring-amber-500/20 shadow-xs"
+                          : "border-border bg-canvas hover:border-primary/40"
+                      }`}
                     >
                       <div className="space-y-1 max-w-md">
                         <div className="flex items-center gap-2">
@@ -363,6 +490,11 @@ export default function AdminEventPage() {
                           <span className="text-[11px] font-semibold text-muted-foreground">
                             {formatDate(ev.startDate)}
                           </span>
+                          {editingEventId === ev.id && (
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-200 border border-amber-500/30">
+                              Sedang Diedit
+                            </span>
+                          )}
                         </div>
                         <h4 className="font-bold text-xs text-foreground">{ev.title}</h4>
                         <p className="text-[11px] text-muted-foreground flex items-center gap-1">
@@ -371,15 +503,31 @@ export default function AdminEventPage() {
                         </p>
                       </div>
 
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        disabled={deletingId === ev.id}
-                        onClick={() => handleDelete(ev.id)}
-                        className="size-8 p-0 text-muted-foreground hover:text-rose-600 rounded-lg"
-                      >
-                        <Trash2 className="size-3.5" />
-                      </Button>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleEdit(ev)}
+                          title="Edit Agenda Acara"
+                          className={`size-8 p-0 rounded-lg transition-colors cursor-pointer ${
+                            editingEventId === ev.id
+                              ? "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                              : "text-muted-foreground hover:text-amber-600 hover:bg-amber-50"
+                          }`}
+                        >
+                          <Edit2 className="size-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={deletingId === ev.id}
+                          onClick={() => handleDelete(ev.id)}
+                          title="Hapus Agenda"
+                          className="size-8 p-0 text-muted-foreground hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                        >
+                          <Trash2 className="size-3.5" />
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
