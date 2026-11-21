@@ -38,6 +38,7 @@ services:
       NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3000}
       NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-esm-production-secret-key-32-chars-long}
       PORT: 3000
+      NODE_OPTIONS: "--dns-result-order=ipv4first"
     ports:
       # Hanya diexpose ke localhost VPS (akses publik wajib melalui Nginx port 80/443)
       - "127.0.0.1:${APP_PORT:-3000}:3000"

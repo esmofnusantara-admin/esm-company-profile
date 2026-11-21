@@ -1073,7 +1073,7 @@ export default function AdminTentangKamiCMS() {
                 <div className="flex items-center gap-3">
                   <div className="size-14 rounded-full bg-muted border border-border relative overflow-hidden shrink-0">
                     {member.photo ? (
-                      <Image src={member.photo} alt={member.name} fill className="object-cover" />
+                      <Image src={member.photo} alt={member.name} fill unoptimized className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center font-bold text-sm text-primary">
                         {member.name.charAt(0)}

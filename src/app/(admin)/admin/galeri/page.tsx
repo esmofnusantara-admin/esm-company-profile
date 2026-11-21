@@ -189,7 +189,7 @@ export default function AdminGaleriCMS() {
                     <video src={item.url} controls className="w-full h-full object-cover" />
                   )
                 ) : (
-                  <Image src={item.url} alt={item.title} fill className="object-cover" />
+                  <Image src={item.url} alt={item.title} fill unoptimized className="object-cover" />
                 )}
                 <span className="absolute top-2 left-2 px-2 py-0.5 rounded-md text-[10px] font-bold bg-black/60 text-white backdrop-blur-sm">
                   {item.type}

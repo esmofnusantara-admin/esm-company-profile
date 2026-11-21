@@ -148,7 +148,7 @@ export default function AdminTestimoniCMS() {
                 <div className="flex items-center gap-3">
                   <div className="size-12 rounded-full bg-muted border border-border relative overflow-hidden shrink-0">
                     {item.photo ? (
-                      <Image src={item.photo} alt={item.name} fill className="object-cover" />
+                      <Image src={item.photo} alt={item.name} fill unoptimized className="object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center font-bold text-xs text-primary">
                         {item.name.charAt(0)}

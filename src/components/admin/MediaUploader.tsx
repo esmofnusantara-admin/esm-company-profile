@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   UploadCloud,
   Link as LinkIcon,
@@ -36,6 +36,10 @@ export function MediaUploader({
   const [mode, setMode] = useState<"upload" | "url">("upload");
   const [imageError, setImageError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [value]);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -184,6 +188,7 @@ export function MediaUploader({
                     alt="Preview"
                     fill
                     sizes="80px"
+                    unoptimized
                     className="object-cover"
                     onError={() => setImageError(true)}
                   />
@@ -206,9 +211,19 @@ export function MediaUploader({
               </div>
 
               {imageError && (
-                <p className="text-[11px] text-amber-700 font-medium">
-                  ⚠️ Gambar saat ini tidak ditemukan di server. Silakan klik tombol <b>Ganti Foto</b> di bawah untuk mengunggah foto baru.
-                </p>
+                <div className="flex items-center gap-2">
+                  <p className="text-[11px] text-amber-700 font-medium">
+                    ⚠️ Gambar tidak dapat dimuat langsung. Silakan unggah foto baru jika berkas lama telah terhapus.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setImageError(false)}
+                    className="text-[10px] text-primary hover:underline font-bold inline-flex items-center gap-1 cursor-pointer shrink-0"
+                  >
+                    <RefreshCw className="size-3" />
+                    <span>Coba Muat Ulang</span>
+                  </button>
+                </div>
               )}
 
               {/* Action Buttons Row */}

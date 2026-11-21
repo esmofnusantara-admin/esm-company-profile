@@ -61,7 +61,89 @@ export async function createArticle(input: ArticleInput) {
   }
 }
 
-// 2. Hapus Artikel
+// 2. Perbarui Artikel (Bilingual ID & EN)
+export async function updateArticle(id: string, input: Partial<ArticleInput>) {
+  try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
+    const existing = await prisma.article.findUnique({ where: { id } });
+    if (!existing) {
+      return { success: false, error: "Artikel tidak ditemukan." };
+    }
+
+    const data: any = {};
+    if (input.title !== undefined) data.title = input.title;
+    if (input.titleEn !== undefined) data.titleEn = input.titleEn || null;
+    if (input.content !== undefined) data.content = input.content;
+    if (input.contentEn !== undefined) data.contentEn = input.contentEn || null;
+    if (input.category !== undefined) data.category = input.category;
+    if (input.coverImage !== undefined) data.coverImage = input.coverImage || null;
+    if (input.excerpt !== undefined) data.excerpt = input.excerpt;
+    if (input.excerptEn !== undefined) data.excerptEn = input.excerptEn || null;
+    if (input.status !== undefined) {
+      data.status = input.status;
+      if (input.status === "PUBLISHED" && !existing.publishedAt) {
+        data.publishedAt = new Date();
+      }
+    }
+
+    const article = await prisma.article.update({
+      where: { id },
+      data,
+    });
+
+    revalidatePath("/artikel");
+    revalidatePath(`/artikel/${article.slug}`);
+    revalidatePath("/admin/artikel");
+    revalidatePath("/admin");
+    revalidatePath("/");
+
+    return { success: true, id: article.id, slug: article.slug };
+  } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    console.error("Gagal memperbarui artikel:", error);
+    return { success: false, error: "Terjadi kesalahan saat memperbarui artikel." };
+  }
+}
+
+// 3. Toggle Status Artikel (PUBLISHED <-> DRAFT)
+export async function toggleArticleStatus(id: string) {
+  try {
+    await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
+
+    const existing = await prisma.article.findUnique({ where: { id } });
+    if (!existing) {
+      return { success: false, error: "Artikel tidak ditemukan." };
+    }
+
+    const newStatus = existing.status === "PUBLISHED" ? "DRAFT" : "PUBLISHED";
+    const article = await prisma.article.update({
+      where: { id },
+      data: {
+        status: newStatus,
+        publishedAt: newStatus === "PUBLISHED" && !existing.publishedAt ? new Date() : existing.publishedAt,
+      },
+    });
+
+    revalidatePath("/artikel");
+    revalidatePath(`/artikel/${article.slug}`);
+    revalidatePath("/admin/artikel");
+    revalidatePath("/admin");
+    revalidatePath("/");
+
+    return { success: true, status: article.status };
+  } catch (error) {
+    if (error instanceof Error && (error.message === "UNAUTHORIZED" || error.message === "FORBIDDEN")) {
+      return { success: false, error: "Sesi tidak valid atau hak akses tidak mencukupi." };
+    }
+    console.error("Gagal mengubah status artikel:", error);
+    return { success: false, error: "Gagal mengubah status artikel." };
+  }
+}
+
+// 4. Hapus Artikel
 export async function deleteArticle(id: string) {
   try {
     await requireAdminSession(["SUPER_ADMIN", "CONTENT_ADMIN"]);
